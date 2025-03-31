@@ -5,13 +5,11 @@ import typing
 import truck
 
 
-class Fourbyte(Truck.Dataset):
-    pass
-
-
-class FourbyteDatatype(Truck.Datatype):
-    dataset = Fourbyte
+class FourbyteDatatype(Truck.Table):
+    write_range = 'append_only'
     range_format = (int, int)
+
+    # custom
     endpoint: str
 
     @classmethod

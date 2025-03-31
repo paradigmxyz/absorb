@@ -1,6 +1,6 @@
-# truck: the easiest way to collect and manage datasets
+# truck 🚛
 
-collect and manage all the world's datasets using a simple universal interface
+simple interface for collecting, managing, and loading datasets
 
 ## Features
 - coverage
@@ -87,6 +87,7 @@ truck.upload('custom_dataset')
 - [chain_ids](https://github.com/ethereum-lists/chains) chain id's
 - [cryo](https://github.com/paradigmxyz/cryo) EVM datasets
 - [dune](https://dune.com) tables and queries
+- [growthepie](https://www.growthepie.xyz/) L2 metrics
 - [kalshi](https://kalshi.com) daily market summaries
 - [mempool dumpster](https://mempool-dumpster.flashbots.net) mempool history
 - [sourcify](https://sourcify.dev) verified contracts
@@ -106,27 +107,30 @@ the `TRUCK_ROOT` filesystem directory is organized as:
 {TRUCK_ROOT}/
     datasets/
         <dataset>/
-            data/
+            tables/
                 <datatype>/
                     {filename}.parquet
             repos/
                 {repo_name}/
             dataset_metadata.json
-    truck_metadata.json
+    truck_config.json
 ```
 
-schema of `truck_metadata.json`:
+schema of `truck_config.json`:
 
-```json
-{}
+```python
+{
+    'tracked_tables': list[TrackedTable]
+}
 ```
 
-schema of `dataset_metadata.json`:
+schema of `dataset_config.json`:
 
-```json
+```python
 {
     "name": str,
     "definition": str,
+    "parameters": dict[str, Any],
     "repos": [str]
 }
 ```

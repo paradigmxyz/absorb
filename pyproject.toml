@@ -30,9 +30,9 @@ classifiers = [
 dependencies = [
     "polars >= 1.0",
     "polars_evm >= 0.2.3",
-    "mesc",
-    "tooltime",
-    "cryo_manager",
+    # "mesc",
+    # "tooltime",
+    # "cryo_manager",
 ]
 
 [project.urls]

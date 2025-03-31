@@ -6,8 +6,7 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class MempoolDumpster():
-
+class MempoolDumpster:
     data_
 
     renamed = {
@@ -68,8 +67,7 @@ class MempoolDumpster():
         flat: bool | None = None,
         extra_kwargs: dict[str, typing.Any] | None = None,
     ) -> pl.LazyFrame:
-        lf = super().scan(
-        )
+        lf = super().scan()
 
         rename: bool = extra_kwargs.get('rename', True)
         reorder: bool = extra_kwargs.get('reorder', True)
@@ -90,7 +88,9 @@ class MempoolDumpster():
             lf = lf.select(reordered)
         if columns is not None:
             renamed_reverse = {v: k for k, v in renamed.items()}
-            columns = [renamed_reverse.get(column, column) for column in columns]
+            columns = [
+                renamed_reverse.get(column, column) for column in columns
+            ]
             lf = lf.select(columns)
 
         # deduplicate redundant transactions
@@ -112,8 +112,6 @@ class MempoolDumpster():
             lf = lf.rename(use_rename)
 
         return lf
-
-
 
 
 def load_block_stats(

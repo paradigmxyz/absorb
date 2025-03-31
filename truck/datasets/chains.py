@@ -5,14 +5,11 @@ from typing import Mapping, MutableMapping
 
 import requests
 
-
 from datum import Dataset
 
 
-class Chains(Dataset):
-    repos = [
-        'https://github.com/ethereum-lists/chains'
-    ]
+class Chains(truck.Table):
+    write_range = 'overwrite'
 
     @classmethod
     def get_schema() -> dict[str, pl.DataFrame]:
@@ -25,7 +22,7 @@ class Chains(Dataset):
         }
 
     @classmethod
-    def get_dataset(cls) -> pl.DataFrame:
+    def collect(cls, context: truck.Context) -> pl.DataFrame:
         network_names = get_network_names()
         chain_ids = network_names.keys()
         chain_id_hex = [
