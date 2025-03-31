@@ -8,10 +8,6 @@ if typing.TYPE_CHECKING:
 from . import paths
 
 
-class PhylumContext(typing.TypedDict):
-    root_dir: str
-
-
 class DataRange(typing.TypedDict):
     """specify data range using one of:
     1. time bounds
