@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import typing
 import truck
 
@@ -7,10 +8,10 @@ if typing.TYPE_CHECKING:
     import types
 
 
-def get_source_module(data_source: str) -> types.ModuleType:
+def get_source_module(source: str) -> types.ModuleType:
     import importlib
 
-    return importlib.import_module('truck.datasets.' + _camel_to_snake(dataset))
+    return importlib.import_module('truck.datasets.' + _camel_to_snake(source))
 
 
 def get_table_class(source: str, table_name: str) -> type[truck.Table]:
@@ -28,6 +29,8 @@ def get_sources() -> list[str]:
 
 
 def get_source_tables(source: str) -> list[str]:
+    import types
+
     module = get_source_module(source)
     if hasattr(module, 'get_tables'):
         return module.get_tables()
@@ -35,7 +38,7 @@ def get_source_tables(source: str) -> list[str]:
         return [
             value
             for key, value in vars(module).items()
-            if issubclass(value, truck.Table)
+            if isinstance(value, type) and issubclass(value, truck.Table)
         ]
 
 

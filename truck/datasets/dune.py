@@ -5,7 +5,7 @@ import polars as pl
 import truck
 
 
-class Query(truck.Template):
+class Query(truck.Table):
     """collect the output of a query"""
 
     write_range = 'overwrite'
@@ -30,7 +30,7 @@ class Query(truck.Template):
         return spice.collect(query, **spice_kwargs)
 
 
-class AppendOnlyQuery(truck.Template):
+class AppendOnlyQuery(truck.Table):
     """collect the output of a query, time-partitioned"""
 
     write_range = 'append_only'

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import typing
+import truck
 
 if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class MempoolDumpster:
-    data_
-
+class MempoolDumpster(truck.Table):
     renamed = {
         'hash': 'transaction_hash',
         'gas': 'gas_used',

@@ -1,5 +1,7 @@
+from __future__ import annotations
 
 _cache = {'root_dir_warning_shown': False}
+
 
 def get_root_dir() -> str:
     import os
@@ -14,6 +16,7 @@ def get_root_dir() -> str:
             )
             _cache['root_dir_warning_shown'] = True
         return os.path.expanduser('~/mempool_dumpster')
+
 
 def get_filename(
     year: int | str | None = None,
@@ -47,6 +50,7 @@ def get_filename(
             year=year, month=month, day=day
         )
 
+
 def get_path(
     year: int | str | None = None,
     month: int | str | None = None,
@@ -73,6 +77,7 @@ def get_path(
     )
     return os.path.join(dirpath, filename)
 
+
 def get_paths(
     start_time: tooltime.Timestamp,
     end_time: tooltime.Timestamp,
@@ -94,6 +99,7 @@ def get_paths(
         )
         for timestamp in timestamps['start']
     ]
+
 
 def get_dir(
     *,

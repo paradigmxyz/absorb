@@ -5,7 +5,7 @@ import typing
 import truck
 
 
-class FourbyteDatatype(Truck.Table):
+class FourbyteDatatype(truck.Table):
     write_range = 'append_only'
     range_format = (int, int)
 

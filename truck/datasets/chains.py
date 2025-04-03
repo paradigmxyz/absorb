@@ -5,7 +5,7 @@ from typing import Mapping, MutableMapping
 
 import requests
 
-from datum import Dataset
+import truck
 
 
 class Chains(truck.Table):

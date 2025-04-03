@@ -14,7 +14,7 @@ class DataRange(typing.TypedDict):
     2. non-temporal bounds
     3. list of chunks
     """
-    # type: typing.
+
     start_time: datetime.datetime | None
     end_time: datetime.datetime | None
     start_bound: typing.Any | None
@@ -48,7 +48,7 @@ class DatasetDownload:
         if cls.cadence == 'daily':
             dates = tooltime.get_intervals(
                 start='2021-06-28',
-                end=,
+                end=None,
                 interval='1d',
             )['start']
             df = cls.collect_date(date)
@@ -122,4 +122,3 @@ def _download_file(url: str, output_path: str) -> None:
             if chunk:
                 file.write(chunk)
     shutil.move(tmp_path, output_path)
-

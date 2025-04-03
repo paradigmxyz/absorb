@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 
 def get_min_local_timestamp(dataset: DatasetReference) -> datetime.datetime:
     return _resolve_dataset_class(dataset).get_min_local_timestamp()
