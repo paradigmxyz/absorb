@@ -79,7 +79,7 @@ def download(
 
     # summmarize
     if root_dir is None:
-        root_dir = paths.get_root_dir()
+        root_dir = paths.get_truck_root()
     print('downloading', len(timestamps), 'files to:', root_dir)
 
     # download files

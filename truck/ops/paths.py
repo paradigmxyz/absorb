@@ -8,19 +8,17 @@ if typing.TYPE_CHECKING:
 _cache = {'root_dir_warning_shown': False}
 
 
-def get_root_dir() -> str:
+def get_truck_root() -> str:
     import os
 
-    root_dir = os.environ.get('MEMPOOL_DUMPSTER_ROOT')
-    if root_dir is not None:
-        return root_dir
-    else:
+    path = os.environ.get('TRUCK_ROOT')
+    if path is None or path == '':
         if not _cache['root_dir_warning_shown']:
-            print(
-                'using default value for MEMPOOL_DUMPSTER_ROOT: ~/mempool_dumpster'
-            )
+            print('using default value for TRUCK_ROOT: ~/truck')
             _cache['root_dir_warning_shown'] = True
-        return os.path.expanduser('~/mempool_dumpster')
+        path = '~/truck'
+    path = os.path.expanduser(path)
+    return path
 
 
 def get_filename(
@@ -120,7 +118,7 @@ def get_dir(
 
     # get root dir
     if root_dir is None:
-        root_dir = get_root_dir()
+        root_dir = get_truck_root()
     dirpath = root_dir
 
     # add year-month subdir

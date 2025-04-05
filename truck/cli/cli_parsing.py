@@ -19,9 +19,11 @@ def parse_args() -> argparse.Namespace:
     subparsers = parser.add_subparsers(dest='command')
 
     parsers = {}
-    for name, description, f_command in cli_commands.get_subcommands():
+    for name, description, f, arg_args in cli_commands.get_subcommands():
         subparser = subparsers.add_parser(name, help=description)
-        subparser.set_defaults(f_command=f_command)
+        subparser.set_defaults(f_command=f)
+        for sub_args, sub_kwargs in arg_args:
+            subparser.add_argument(*sub_args, **sub_kwargs)
         subparser.add_argument(
             '--debug',
             '--pdb',

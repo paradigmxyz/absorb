@@ -101,4 +101,5 @@ TableReference = typing.Any
 
 
 class TruckConfig(typing.TypedDict):
+    version: str
     tracked_tables: list[TrackedTable]
