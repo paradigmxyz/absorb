@@ -42,16 +42,19 @@ def get_config() -> truck.TruckConfig:
 
 def write_config(config: truck.TruckConfig) -> None:
     import json
+    import os
 
     default_config = get_default_config()
     default_config.update(config)
     config = default_config
 
-    if validate_config(config):
-        with open(get_config_path(), 'w') as f:
-            json.dump(config, f)
-    else:
+    if not validate_config(config):
         raise Exception('invalid config format')
+
+    path = get_config_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w') as f:
+        json.dump(config, f)
 
 
 def validate_config(
