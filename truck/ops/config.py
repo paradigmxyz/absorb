@@ -76,7 +76,7 @@ def get_tracked_tables() -> list[truck.TrackedTable]:
     return get_config()['tracked_tables']
 
 
-def create_tracked_tables(tables: list[truck.TrackedTable]) -> None:
+def start_tracking_tables(tables: list[truck.TrackedTable]) -> None:
     import json
 
     config = get_config()
@@ -88,4 +88,19 @@ def create_tracked_tables(tables: list[truck.TrackedTable]) -> None:
         if as_str not in tracked_tables:
             config['tracked_tables'].append(table)
             tracked_tables.add(as_str)
+    write_config(config)
+
+
+def stop_tracking_tables(tables: list[truck.TrackedTable]) -> None:
+    import json
+
+    tables_str = [json.dumps(table, sort_keys=True) for table in tables]
+
+    config = get_config()
+    config['tracked_tables'] = [
+        table
+        for table in config['tracked_tables']
+        if json.dumps(table, sort_keys=True) not in tables_str
+    ]
+
     write_config(config)
