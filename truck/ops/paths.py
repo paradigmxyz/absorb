@@ -14,7 +14,11 @@ def get_truck_root() -> str:
     path = os.environ.get('TRUCK_ROOT')
     if path is None or path == '':
         if not _cache['root_dir_warning_shown']:
-            print('using default value for TRUCK_ROOT: ~/truck')
+            import rich
+
+            rich.print(
+                '[#777777]using default value for TRUCK_ROOT: ~/truck[/#777777]\n'
+            )
             _cache['root_dir_warning_shown'] = True
         path = '~/truck'
     path = os.path.expanduser(path)

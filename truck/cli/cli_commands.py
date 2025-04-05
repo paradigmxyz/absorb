@@ -59,6 +59,13 @@ def get_subcommands() -> (
 
 def ls_command(args: Namespace) -> dict[str, Any]:
     import truck
+    import toolstr
+
+    bullet_styles = {
+        'key_style': 'white bold',
+        'bullet_style': 'green',
+        'colon_style': 'green',
+    }
 
     tracked_datasets = truck.get_tracked_tables()
 
@@ -66,25 +73,43 @@ def ls_command(args: Namespace) -> dict[str, Any]:
     source_tables = {
         source: truck.get_source_tables(source) for source in sources
     }
-    print('Available datasets')
+    _print_title('Available datasets')
     for source in source_tables.keys():
         datasets = [cls.class_name(snake=True) for cls in source_tables[source]]
-        print('-', source + ':', ', '.join(datasets))
+        toolstr.print_bullet(
+            key=source,
+            value='[green],[/green] '.join(datasets),
+            **bullet_styles,
+        )
     print()
-    print('Tracked datasets')
+    _print_title('Tracked datasets')
     if len(tracked_datasets) == 0:
         print('[none]')
     else:
         for dataset in tracked_datasets:
-            print(dataset)
+            toolstr.print_bullet(
+                '[white bold]'
+                + dataset['source_name']
+                + '.'
+                + dataset['table_name']
+                + '[/white bold]',
+                **bullet_styles,
+            )
     return {}
+
+
+def _print_title(title: str) -> None:
+    import rich
+
+    rich.print('[bold green]' + title + '[/bold green]')
 
 
 def track_command(args: Namespace) -> dict[str, Any]:
     parameters: dict[str, typing.Any] = {}
-    for parameter in args.parameters:
-        key, value = parameter.split('=')
-        parameters[key] = value
+    if args.parameters is not None:
+        for parameter in args.parameters:
+            key, value = parameter.split('=')
+            parameters[key] = value
 
     track_datasets: list[truck.TrackedTable] = []
     track_dataset: truck.TrackedTable
@@ -117,10 +142,24 @@ def track_command(args: Namespace) -> dict[str, Any]:
             track_dataset['table_name']
         )
 
+    sources = set(td['source_name'] for td in track_datasets)
+    source_datasets = {
+        source: [
+            table.class_name() for table in truck.get_source_tables(source)
+        ]
+        for source in sources
+    }
+    for track_dataset in track_datasets:
+        if (
+            track_dataset['table_name']
+            not in source_datasets[track_dataset['source_name']]
+        ):
+            raise Exception('invalid dataset:')
+
     if len(track_datasets) == 0:
         print('[no datasets to track]')
     else:
-        print('Now tracking these datasets')
+        print('Now tracking:')
         for track_dataset in track_datasets:
             print(
                 '- '
