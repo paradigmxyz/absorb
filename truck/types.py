@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+import truck
 
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T')
@@ -27,6 +28,13 @@ class Table:
     @classmethod
     async def async_collect(cls, context: Context) -> pl.DataFrame:
         raise NotImplementedError()
+
+    @classmethod
+    def name(cls, snake: bool = True) -> str:
+        if snake:
+            return truck.ops.names._camel_to_snake(cls.__name__)
+        else:
+            return cls.__name__
 
     # paths
 
