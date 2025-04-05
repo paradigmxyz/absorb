@@ -30,14 +30,13 @@ def _print_dataset_bullet(dataset: truck.TrackedTable) -> None:
 
 
 def _print_source_datasets_bullet(
-    source: str, datasets: list[truck.TrackedTable]
+    source: str, datasets: list[type[truck.Table]]
 ) -> None:
     import toolstr
 
-    datasets = [cls.class_name(snake=True) for cls in datasets]
+    names = [cls.class_name(snake=True) for cls in datasets]
     toolstr.print_bullet(
         key=source,
-        value='[green],[/green] '.join(datasets),
+        value='[green],[/green] '.join(names),
         **bullet_styles,
     )
-

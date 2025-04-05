@@ -106,13 +106,13 @@ the `TRUCK_ROOT` filesystem directory is organized as:
 ```
 {TRUCK_ROOT}/
     datasets/
-        <dataset>/
+        <source>/
             tables/
                 <datatype>/
                     {filename}.parquet
+                table_metadata.json
             repos/
                 {repo_name}/
-            dataset_metadata.json
     truck_config.json
 ```
 

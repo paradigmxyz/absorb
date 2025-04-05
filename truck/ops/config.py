@@ -3,15 +3,10 @@ from __future__ import annotations
 import typing
 
 import truck
+from . import paths
 
 if typing.TYPE_CHECKING:
     import typing_extensions
-
-
-def get_config_path() -> str:
-    import os
-
-    return os.path.join(truck.get_truck_root(), 'truck_config.json')
 
 
 def get_default_config() -> truck.TruckConfig:
@@ -25,7 +20,7 @@ def get_config() -> truck.TruckConfig:
     import json
 
     try:
-        with open(get_config_path(), 'r') as f:
+        with open(paths.get_config_path(), 'r') as f:
             config = json.load(f)
     except FileNotFoundError:
         return get_default_config()
@@ -51,7 +46,7 @@ def write_config(config: truck.TruckConfig) -> None:
     if not validate_config(config):
         raise Exception('invalid config format')
 
-    path = get_config_path()
+    path = paths.get_config_path()
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
         json.dump(config, f)

@@ -61,55 +61,55 @@ if typing.TYPE_CHECKING:
 #         raise Exception()
 
 
-def download(
-    start_time: tooltime.Timestamp,
-    end_time: tooltime.Timestamp,
-    root_dir: str | None = None,
-) -> None:
-    import os
-    import tooltime
+# def download(
+#     start_time: tooltime.Timestamp,
+#     end_time: tooltime.Timestamp,
+#     root_dir: str | None = None,
+# ) -> None:
+#     import os
+#     import tooltime
 
-    # determine timestamps
-    timestamps = tooltime.get_intervals(
-        start=start_time, end=end_time, interval='1d'
-    )['start']
+#     # determine timestamps
+#     timestamps = tooltime.get_intervals(
+#         start=start_time, end=end_time, interval='1d'
+#     )['start']
 
-    # summmarize
-    if root_dir is None:
-        root_dir = paths.get_truck_root()
-    print('downloading', len(timestamps), 'files to:', root_dir)
+#     # summmarize
+#     if root_dir is None:
+#         root_dir = paths.get_truck_root()
+#     print('downloading', len(timestamps), 'files to:', root_dir)
 
-    # download files
-    for timestamp in timestamps:
-        url = get_url(timestamp=timestamp)
-        output_path = paths.get_path(timestamp=timestamp, root_dir=root_dir)
-        if os.path.exists(output_path):
-            print('already downloaded', timestamp)
-        else:
-            print('downloading', timestamp)
-            _download_file(url=url, output_path=output_path)
-
-
-def get_url(timestamp: tooltime.Timestamp) -> str:
-    return paths.get_path(
-        timestamp=timestamp,
-        root_dir='https://mempool-dumpster.flashbots.net/ethereum/mainnet',
-        flat=False,
-    )
+#     # download files
+#     for timestamp in timestamps:
+#         url = get_url(timestamp=timestamp)
+#         output_path = paths.get_path(timestamp=timestamp, root_dir=root_dir)
+#         if os.path.exists(output_path):
+#             print('already downloaded', timestamp)
+#         else:
+#             print('downloading', timestamp)
+#             _download_file(url=url, output_path=output_path)
 
 
-def _download_file(url: str, output_path: str) -> None:
-    """generic downloader function"""
-    import os
-    import requests
-    import shutil
+# def get_url(timestamp: tooltime.Timestamp) -> str:
+#     return paths.get_path(
+#         timestamp=timestamp,
+#         root_dir='https://mempool-dumpster.flashbots.net/ethereum/mainnet',
+#         flat=False,
+#     )
 
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    response = requests.get(url, stream=True)
-    response.raise_for_status()
-    tmp_path = output_path + '_tmp'
-    with open(tmp_path, 'wb') as file:
-        for chunk in response.iter_content(chunk_size=8192):
-            if chunk:
-                file.write(chunk)
-    shutil.move(tmp_path, output_path)
+
+# def _download_file(url: str, output_path: str) -> None:
+#     """generic downloader function"""
+#     import os
+#     import requests
+#     import shutil
+
+#     os.makedirs(os.path.dirname(output_path), exist_ok=True)
+#     response = requests.get(url, stream=True)
+#     response.raise_for_status()
+#     tmp_path = output_path + '_tmp'
+#     with open(tmp_path, 'wb') as file:
+#         for chunk in response.iter_content(chunk_size=8192):
+#             if chunk:
+#                 file.write(chunk)
+#     shutil.move(tmp_path, output_path)

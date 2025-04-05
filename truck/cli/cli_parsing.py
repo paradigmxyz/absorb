@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 
-from .. import types
+import truck
 from . import cli_commands
 from . import cli_helpers
 
@@ -49,3 +49,44 @@ def parse_args() -> argparse.Namespace:
         sys.exit(0)
 
     return args
+
+
+def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
+    # parse parameters
+    parameters: dict[str, typing.Any] = {}
+    if args.parameters is not None:
+        for parameter in args.parameters:
+            key, value = parameter.split('=')
+            parameters[key] = value
+
+    # parse datasets
+    track_datasets: list[truck.TrackedTable] = []
+    track_dataset: truck.TrackedTable
+    for dataset in args.dataset:
+        if '.' in dataset:
+            source, table = dataset.split('.')
+            cls = (
+                'truck.datasets'
+                + source
+                + '.'
+                + truck.ops.names._snake_to_camel(table)
+            )
+            track_dataset = {
+                'source_name': source,
+                'table_name': table,
+                'table_class': cls,
+                'parameters': parameters,
+            }
+            track_datasets.append(track_dataset)
+        else:
+            for source_dataset in truck.get_source_tables(dataset):
+                cls = 'truck.datasets' + dataset + '.' + source_dataset.__name__
+                track_dataset = {
+                    'source_name': dataset,
+                    'table_name': source_dataset.__name__,
+                    'table_class': cls,
+                    'parameters': parameters,
+                }
+                track_datasets.append(track_dataset)
+
+    return track_datasets
