@@ -41,12 +41,16 @@ class FourbyteDatatype(truck.Table):
         return await async_scrape_4byte(url=cls.endpoint, data_range=data_range)
 
 
-class FunctionSignatures(FourbyteDatatype):
+class Functions(FourbyteDatatype):
     endpoint = 'https://www.4byte.directory/api/v1/signatures/'
 
 
-class EventSignatures(FourbyteDatatype):
+class Events(FourbyteDatatype):
     endpoint = 'https://www.4byte.directory/api/v1/event-signatures/'
+
+
+def get_tables() -> list[type[truck.Table]]:
+    return [Functions, Events]
 
 
 async def async_scrape_4byte(
