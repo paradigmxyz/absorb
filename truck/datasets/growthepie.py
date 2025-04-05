@@ -19,7 +19,10 @@ class Fundamentals(truck.Table):
 
     @classmethod
     def collect(cls, context: truck.Context) -> pl.DataFrame:
-        response = requests.get(root + endpoints['fundamentals'])
+        import requests
+
+        url = 'https://api.growthepie.xyz/v1/fundamentals_full.json'
+        response = requests.get(url)
         data = response.json()
         return (
             pl.DataFrame(data)

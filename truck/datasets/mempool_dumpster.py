@@ -5,6 +5,7 @@ import truck
 
 if typing.TYPE_CHECKING:
     import polars as pl
+    import tooltime
 
 
 class MempoolDumpster(truck.Table):
@@ -56,61 +57,61 @@ class MempoolDumpster(truck.Table):
         'rawTx',
     ]
 
-    @classmethod
-    def scan(
-        dataset: DatasetReference,
-        *,
-        start_time: tooltime.Timestamp | None = None,
-        end_time: tooltime.Timestamp | None = None,
-        root_dir: str | None = None,
-        flat: bool | None = None,
-        extra_kwargs: dict[str, typing.Any] | None = None,
-    ) -> pl.LazyFrame:
-        lf = super().scan()
+    # @classmethod
+    # def scan(
+    #     dataset: truck.TableReference,
+    #     *,
+    #     start_time: tooltime.Timestamp | None = None,
+    #     end_time: tooltime.Timestamp | None = None,
+    #     root_dir: str | None = None,
+    #     flat: bool | None = None,
+    #     extra_kwargs: dict[str, typing.Any] | None = None,
+    # ) -> pl.LazyFrame:
+    #     lf = super().scan()
 
-        rename: bool = extra_kwargs.get('rename', True)
-        reorder: bool = extra_kwargs.get('reorder', True)
-        deduplicate: bool = extra_kwargs.get('deduplicate', True)
-        columns: typing.Sequence[str] | None = extra_kwargs.get('columns', None)
+    #     rename: bool = extra_kwargs.get('rename', True)
+    #     reorder: bool = extra_kwargs.get('reorder', True)
+    #     deduplicate: bool = extra_kwargs.get('deduplicate', True)
+    #     columns: typing.Sequence[str] | None = extra_kwargs.get('columns', None)
 
-        lf = lf.with_columns(
-            value=pl.col.value.cast(pl.Float64),
-            nonce=pl.col.nonce.cast(pl.Int64),
-            gas=pl.col.gas.cast(pl.Float64),
-            gasPrice=pl.col.gasPrice.cast(pl.Float64),
-            gasTipCap=pl.col.gasTipCap.cast(pl.Float64),
-            gasFeeCap=pl.col.gasFeeCap.cast(pl.Float64),
-        )
+    #     lf = lf.with_columns(
+    #         value=pl.col.value.cast(pl.Float64),
+    #         nonce=pl.col.nonce.cast(pl.Int64),
+    #         gas=pl.col.gas.cast(pl.Float64),
+    #         gasPrice=pl.col.gasPrice.cast(pl.Float64),
+    #         gasTipCap=pl.col.gasTipCap.cast(pl.Float64),
+    #         gasFeeCap=pl.col.gasFeeCap.cast(pl.Float64),
+    #     )
 
-        # select and reorder columns
-        if reorder:
-            lf = lf.select(reordered)
-        if columns is not None:
-            renamed_reverse = {v: k for k, v in renamed.items()}
-            columns = [
-                renamed_reverse.get(column, column) for column in columns
-            ]
-            lf = lf.select(columns)
+    #     # select and reorder columns
+    #     if reorder:
+    #         lf = lf.select(reordered)
+    #     if columns is not None:
+    #         renamed_reverse = {v: k for k, v in renamed.items()}
+    #         columns = [
+    #             renamed_reverse.get(column, column) for column in columns
+    #         ]
+    #         lf = lf.select(columns)
 
-        # deduplicate redundant transactions
-        if deduplicate:
-            if columns is None:
-                columns = lf.collect_schema().names()
-            column_kwargs = {}
-            for column in columns:
-                if column != 'hash':
-                    column_kwargs[column] = pl.col(column).min()
-            lf = lf.group_by('hash').agg(**column_kwargs)
+    #     # deduplicate redundant transactions
+    #     if deduplicate:
+    #         if columns is None:
+    #             columns = lf.collect_schema().names()
+    #         column_kwargs = {}
+    #         for column in columns:
+    #             if column != 'hash':
+    #                 column_kwargs[column] = pl.col(column).min()
+    #         lf = lf.group_by('hash').agg(**column_kwargs)
 
-        # rename columns
-        if rename:
-            if columns is not None:
-                use_rename = {k: v for k, v in renamed.items() if k in columns}
-            else:
-                use_rename = renamed
-            lf = lf.rename(use_rename)
+    #     # rename columns
+    #     if rename:
+    #         if columns is not None:
+    #             use_rename = {k: v for k, v in renamed.items() if k in columns}
+    #         else:
+    #             use_rename = renamed
+    #         lf = lf.rename(use_rename)
 
-        return lf
+    #     return lf
 
 
 def load_block_stats(

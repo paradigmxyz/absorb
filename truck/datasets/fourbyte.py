@@ -4,16 +4,19 @@ import typing
 
 import truck
 
+if typing.TYPE_CHECKING:
+    import polars as pl
+
 
 class FourbyteDatatype(truck.Table):
     write_range = 'append_only'
-    range_format = (int, int)
+    range_format = tuple[int, int]
 
     # custom
     endpoint: str
 
     @classmethod
-    def get_schema(cls):
+    def get_schema(cls, context: truck.Context) -> dict[str, type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -25,11 +28,16 @@ class FourbyteDatatype(truck.Table):
         }
 
     @classmethod
-    def get_available_range(cls) -> typing.Any:
-        return get_available_range(cls.endpoint)
+    def get_available_range(cls, conext: truck.Context) -> typing.Any:
+        import requests
+
+        results = requests.get(cls.endpoint).json()
+        max_id = max(result['id'] for result in results)
+        return (0, max_id)
 
     @classmethod
-    async def async_collect(cls, data_range, context) -> pl.DataFrame:
+    async def async_collect(cls, context: truck.Context) -> pl.DataFrame:
+        data_range = context['data_range']
         return await async_scrape_4byte(url=cls.endpoint, data_range=data_range)
 
 
@@ -41,16 +49,11 @@ class EventSignatures(FourbyteDatatype):
     endpoint = 'https://www.4byte.directory/api/v1/event-signatures/'
 
 
-def get_available_range(url: str) -> (int, int):
-    import requests
-
-    results = requests.get(cls.endpoint).json()
-    max_id = max(result['id'] for result in results)
-    return (0, max_id)
-
-
 async def async_scrape_4byte(
-    url: str, data_range: tuple[int, int], wait_time: float = 0.1
+    url: str,
+    data_range: tuple[int, int],
+    wait_time: float = 0.1,
+    min_id: int | None = None,
 ) -> pl.DataFrame:
     import aiohttp
     import polars as pl

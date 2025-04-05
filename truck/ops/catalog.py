@@ -15,7 +15,7 @@ def get_source_module(source: str) -> types.ModuleType:
 
 
 def get_table_class(source: str, table_name: str) -> type[truck.Table]:
-    return getattr(get_source_module(module), _snake_to_camel(table_name))
+    return getattr(get_source_module(source), _snake_to_camel(table_name))  # type: ignore
 
 
 def get_sources() -> list[str]:
@@ -28,18 +28,22 @@ def get_sources() -> list[str]:
     ]
 
 
-def get_source_tables(source: str) -> list[str]:
+def get_source_tables(source: str) -> list[type[truck.Table]]:
     import types
 
     module = get_source_module(source)
     if hasattr(module, 'get_tables'):
-        return module.get_tables()
+        return module.get_tables()  # type: ignore
     else:
         return [
             value
             for key, value in vars(module).items()
             if isinstance(value, type) and issubclass(value, truck.Table)
         ]
+
+
+def resolve_table_class(reference: truck.TableReference) -> type[truck.Table]:
+    raise NotImplementedError()
 
 
 def _camel_to_snake(name: str) -> str:

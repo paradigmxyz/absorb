@@ -1,6 +1,12 @@
 from __future__ import annotations
 
+import typing
+
 import truck
+
+if typing.TYPE_CHECKING:
+    import datetime
+    import polars as pl
 
 
 url_template = 'https://kalshi-public-docs.s3.amazonaws.com/reporting/market_data_{year}-{month:02}-{day:02}.json'
@@ -11,7 +17,12 @@ class DailySummaries(truck.Table):
     overwrite = 'append_only'
     cadence = 'daily'
 
-    def collect_date(cls, date: datetime.datetime) -> pl.DataFrame:
+    @classmethod
+    def collect(cls, context: truck.Context) -> pl.DataFrame:
+        import requests
+        import polars as pl
+
+        date = context['data_range']
         url = get_date_url(date)
         response = requests.get(url, stream=True)
         response.raise_for_status()
@@ -21,11 +32,14 @@ class DailySummaries(truck.Table):
 class Metadata:
     cadence = None
 
-    def get_dataset(cls):
+    def collect(cls, context: truck.Context) -> pl.DataFrame:
+        import requests
+        import time
+
         base_url = 'https://api.elections.kalshi.com/v1/search/series?order_by=trending&page_size=100'
 
         cursor = None
-        cursor_results = []
+        cursor_results: list[typing.Any] = []
         while True:
             if cursor is not None:
                 url = base_url + '&cursor=' + cursor
@@ -44,12 +58,14 @@ class Metadata:
                 print('status code', response.status_code)
                 break
 
-        print('collected', len(cursor_results), 'pages')
+        return pl.DataFrame(
+            item for result in cursor_results for item in result['current_page']
+        ).unique('series_ticker')
 
 
-def get_date_url(date):
+def get_date_url(date: datetime.datetime) -> str:
     return url_template.format(year=date.year, month=date.month, day=date.day)
 
 
-def get_date_path(date):
+def get_date_path(date: datetime.datetime) -> str:
     return path_template.format(year=date.year, month=date.month, day=date.day)

@@ -1,18 +1,24 @@
 from __future__ import annotations
 
 import os
-from typing import Mapping, MutableMapping
+import typing
 
 import requests
 
 import truck
+
+if typing.TYPE_CHECKING:
+    from typing import Mapping, MutableMapping
+    import polars as pl
 
 
 class Chains(truck.Table):
     write_range = 'overwrite'
 
     @classmethod
-    def get_schema() -> dict[str, pl.DataFrame]:
+    def get_schema(
+        self, context: truck.Context
+    ) -> dict[str, type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -26,14 +32,14 @@ class Chains(truck.Table):
         network_names = get_network_names()
         chain_ids = network_names.keys()
         chain_id_hex = [
-            hex(chain_id)[2:].rjust(64, '0') for chain_id in chain_ids
+            hex(int(chain_id))[2:].rjust(64, '0') for chain_id in chain_ids
         ]
         data = {
             'name': network_names.values(),
             'chain_id': chain_ids,
             'chain_id_hex': chain_id_hex,
         }
-        return pl.DataFrame(data, schema=cls.get_schema())
+        return pl.DataFrame(data, schema=cls.get_schema(context=context))
 
 
 # specialcase the standard name for certain chains

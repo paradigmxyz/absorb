@@ -1,17 +1,36 @@
 from __future__ import annotations
 
+import typing
 
-def get_min_local_timestamp(dataset: DatasetReference) -> datetime.datetime:
-    return _resolve_dataset_class(dataset).get_min_local_timestamp()
+import truck
 
-
-def get_max_local_timestamp(dataset: DatasetReference) -> datetime.datetime:
-    return _resolve_dataset_class(dataset).get_max_local_timestamp()
-
-
-def get_min_available_timestamp(dataset: DatasetReference) -> datetime.datetime:
-    return _resolve_dataset_class(dataset).get_min_available_timestamp()
+if typing.TYPE_CHECKING:
+    import datetime
 
 
-def get_max_available_timestamp(dataset: DatasetReference) -> datetime.datetime:
-    return _resolve_dataset_class(dataset).get_max_available_timestamp()
+# def get_min_local_timestamp(
+#     dataset: truck.TableReference, context: truck.Context | None = None
+# ) -> datetime.datetime:
+#     return truck.resolve_table_class(dataset).get_min_local_timestamp(context)
+
+
+# def get_max_local_timestamp(
+#     dataset: truck.TableReference, context: truck.Context | None = None
+# ) -> datetime.datetime:
+#     return truck.resolve_table_class(dataset).get_max_local_timestamp(context)
+
+
+# def get_min_available_timestamp(
+#     dataset: truck.TableReference, context: truck.Context | None = None
+# ) -> datetime.datetime:
+#     return truck.resolve_table_class(dataset).get_min_available_timestamp(
+#         context
+#     )
+
+
+# def get_max_available_timestamp(
+#     dataset: truck.TableReference, context: truck.Context | None = None
+# ) -> datetime.datetime:
+#     return truck.resolve_table_class(dataset).get_max_available_timestamp(
+#         context
+#     )

@@ -15,19 +15,23 @@ class Query(truck.Table):
     }
 
     @classmethod
-    def get_schema(cls, context: truck.Context) -> dict[str, pl.DataFrame]:
-        query = context.get_parameter('query')
-        spice_kwargs = context.get_parameter('spice_kwargs')
+    def get_schema(cls, context: truck.Context) -> dict[str, type[pl.DataType]]:
+        import spice
+
+        query = context['parameters']['query']
+        spice_kwargs = context['parameters']['spice_kwargs']
         spice_kwargs['limit'] = 0
-        return dict(spice.collect(query, **spice_kwargs).schema)
+        return dict(spice.query(query, **spice_kwargs).schema)
 
     @classmethod
     def collect(cls, context: truck.Context) -> pl.DataFrame:
         import spice
 
-        query = context.get_parameter('query')
-        spice_kwargs = context.get_parameter('spice_kwargs')
-        return spice.collect(query, **spice_kwargs)
+        query = context['parameters']['query']
+        spice_kwargs = context['parameters']['spice_kwargs']
+        return spice.query(
+            query, poll=True, include_execution=False, **spice_kwargs
+        )
 
 
 class AppendOnlyQuery(truck.Table):
@@ -41,24 +45,22 @@ class AppendOnlyQuery(truck.Table):
     }
 
     @classmethod
-    def get_schema(cls, context: truck.Context) -> dict[str, pl.DataFrame]:
-        query = context.get_parameter('query')
-        spice_kwargs = context.get_parameter('spice_kwargs')
+    def get_schema(cls, context: truck.Context) -> dict[str, type[pl.DataType]]:
+        import spice
+
+        query = context['parameters']['query']
+        spice_kwargs = context['parameters']['spice_kwargs']
         spice_kwargs['limit'] = 0
-        return dict(spice.collect(query, **spice_kwargs).schema)
+        return dict(spice.query(query, **spice_kwargs).schema)
 
     @classmethod
     def collect(cls, context: truck.Context) -> pl.DataFrame:
         import spice
 
-        query = context.get_parameter('query')
-        spice_kwargs = context.get('spice_kwargs')
-        range_parameters = context.get('range_parameters')
-
-        # set range parameters
+        query = context['parameters']['query']
+        spice_kwargs = context['parameters']['spice_kwargs']
         spice_kwargs.setdefault('parameters', {})
-        data_range = context.get_range()
-        for parameter in range_parameters:
-            spice_kwargs[parameter] = data_range[parameter]
-
-        return spice.collect(query, **spice_kwargs)
+        spice_kwargs['parameters'].update(context['data_range'])
+        return spice.query(
+            query, poll=True, include_execution=False, **spice_kwargs
+        )

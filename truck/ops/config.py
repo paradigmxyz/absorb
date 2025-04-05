@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import truck
+
 
 def get_truck_root() -> str:
     import os
@@ -21,7 +23,8 @@ def get_config() -> truck.TruckConfig:
     import json
 
     with open(get_config_path(), 'r') as f:
-        return json.load(f)
+        config: truck.TruckConfig = json.load(f)
+        return config
 
 
 def get_tracked_tables() -> list[truck.TrackedTable]:

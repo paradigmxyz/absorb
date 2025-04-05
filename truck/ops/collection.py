@@ -2,72 +2,66 @@ from __future__ import annotations
 
 import typing
 
-if typing.TYPE_CHECKING:
-    import tooltime
-
+import truck
 from . import paths
 
-
-class DataRange(typing.TypedDict):
-    """specify data range using one of:
-    1. time bounds
-    2. non-temporal bounds
-    3. list of chunks
-    """
-
-    start_time: datetime.datetime | None
-    end_time: datetime.datetime | None
-    start_bound: typing.Any | None
-    end_bound: typing.Any | None
-    chunks: list[typing.Any] | None
+if typing.TYPE_CHECKING:
+    import datetime
+    import tooltime
 
 
-class DatasetDownload:
-    cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
-    write_range: typing.Literal['append_only', 'overwrite']
+# class DataRange(typing.TypedDict):
+#     """specify data range using one of:
+#     1. time bounds
+#     2. non-temporal bounds
+#     3. list of chunks
+#     """
 
-    @classmethod
-    def get_path(cls, date: datetime.datetime, context: PhylumContext) -> str:
-        path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}-{month:02}-{day:02}.json'
-        return path_template.format(
-            year=date.year, month=date.month, day=date.day
-        )
+#     start_time: datetime.datetime | None
+#     end_time: datetime.datetime | None
+#     start_bound: typing.Any | None
+#     end_bound: typing.Any | None
+#     chunks: list[typing.Any] | None
 
-    @classmethod
-    def update_dataset(
-        cls,
-        context: PhylumContext | None = None,
-        data_range: DataRange | None = None,
-        overwrite: bool = False,
-    ) -> None:
-        if data_range is None:
-            collected = cls.get_range_collected()
-            available = cls.get_range_available()
-            missing = None
 
-        if cls.cadence == 'daily':
-            dates = tooltime.get_intervals(
-                start='2021-06-28',
-                end=None,
-                interval='1d',
-            )['start']
-            df = cls.collect_date(date)
-            path = cls.get_path(date=date)
-            df.write_parquet(df)
-        else:
-            raise Exception()
+# def get_path(table: truck.TableReference, date: datetime.datetime, context: truck.Context) -> str:
+#     path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}-{month:02}-{day:02}.json'
+#     return path_template.format(
+#         year=date.year, month=date.month, day=date.day
+#     )
 
-    @classmethod
-    def get_range_available(cls) -> DataRange:
-        pass
 
-    @classmethod
-    def get_range_collected() -> DataRange:
-        pass
+def collect(
+    table: truck.TableReference,
+    context: truck.Context | None = None,
+    overwrite: bool = False,
+) -> None:
+    import tooltime
 
-    @classmethod
-    def get_local_path() -> str:
-        pass
+    cls = truck.resolve_table_class(table)
+    if context is None:
+        context = cls.get_default_context()
+
+    data_range = context['data_range']
+    if data_range is None:
+        collected = cls.get_collected_range(context)
+        available = cls.get_available_range(context)
+        missing = None
+
+    if cls.cadence == 'daily':
+        dates = tooltime.get_intervals(
+            start='2021-06-28',
+            end=tooltime.now(),
+            interval='1d',
+        )['start']
+        for date in dates:
+            date_context = context.copy()
+            date_context['data_range'] = date
+            df = cls.collect(date_context)
+            path = cls.get_path(date_context)
+            df.write_parquet(path)
+    else:
+        raise Exception()
 
 
 def download(
