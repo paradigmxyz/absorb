@@ -68,7 +68,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
     }
     print('Available datasets')
     for source in source_tables.keys():
-        datasets = [cls.name(snake=True) for cls in source_tables[source]]
+        datasets = [cls.class_name(snake=True) for cls in source_tables[source]]
         print('-', source + ':', ', '.join(datasets))
     print()
     print('Tracked datasets')

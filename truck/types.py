@@ -13,82 +13,69 @@ if typing.TYPE_CHECKING:
 class Table:
     write_range: typing.Literal['append_only', 'overwrite']
     range_format: type
-    parameter_types: dict[str, typing.Any] = {}
     index_by: typing.Literal['time', 'block', 'id']
     cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
+    parameter_types: dict[str, typing.Any] = {}
 
-    @classmethod
-    def get_schema(cls, context: Context) -> dict[str, type[pl.DataType]]:
+    def __init__(self, parameters: dict[str, typing.Any] | None = None):
+        if parameters is None:
+            self.parameters = {}
+        else:
+            self.parameters = parameters
+
+    def get_schema(self) -> dict[str, type[pl.DataType]]:
+        raise NotImplementedError()
+
+    def collect(self, data_range: typing.Any) -> pl.DataFrame:
+        raise NotImplementedError()
+
+    async def async_collect(self, data_range: typing.Any) -> pl.DataFrame:
         raise NotImplementedError()
 
     @classmethod
-    def collect(cls, context: Context) -> pl.DataFrame:
-        raise NotImplementedError()
-
-    @classmethod
-    async def async_collect(cls, context: Context) -> pl.DataFrame:
-        raise NotImplementedError()
-
-    @classmethod
-    def name(cls, snake: bool = True) -> str:
+    def class_name(cls, snake: bool = True) -> str:
         if snake:
             return truck.ops.names._camel_to_snake(cls.__name__)
         else:
             return cls.__name__
 
+    def name(self, snake: bool = True) -> str:
+        if snake:
+            return truck.ops.names._camel_to_snake(type(self).__name__)
+        else:
+            return type(self).__name__
+
     # paths
 
-    @classmethod
-    def get_path(cls, context: Context) -> str:
+    def get_path(self) -> str:
         raise NotImplementedError()
 
-    @classmethod
-    def get_paths(cls, context: Context) -> list[str]:
+    def get_paths(self) -> list[str]:
         raise NotImplementedError()
 
     # coverage
 
-    @classmethod
-    def get_available_range(cls, context: Context) -> typing.Any:
+    def get_available_range(self) -> typing.Any:
         raise NotImplementedError()
 
-    @classmethod
-    def get_collected_range(cls, context: Context) -> typing.Any:
+    def get_collected_range(self) -> typing.Any:
         raise NotImplementedError()
 
-    @classmethod
-    def get_min_collected_timestamp(cls, context: Context) -> datetime.datetime:
+    def get_min_collected_timestamp(self) -> datetime.datetime:
         raise NotImplementedError()
 
-    @classmethod
-    def get_max_collected_timestamp(cls, context: Context) -> datetime.datetime:
+    def get_max_collected_timestamp(self) -> datetime.datetime:
         raise NotImplementedError()
 
-    @classmethod
-    def get_min_available_timestamp(cls, context: Context) -> datetime.datetime:
+    def get_min_available_timestamp(self) -> datetime.datetime:
         raise NotImplementedError()
 
-    @classmethod
-    def get_max_available_timestamp(cls, context: Context) -> datetime.datetime:
+    def get_max_available_timestamp(self) -> datetime.datetime:
         raise NotImplementedError()
 
     # defaults
 
-    @classmethod
-    def get_default_context(cls) -> Context:
-        raise NotImplementedError()
-        if len(cls.parameter_types) == 0:
-            data_range = cls.get_default_data_range()
-            return {
-                'parameters': {},
-                'data_range': data_range,
-                'overwrite': False,
-            }
-        else:
-            raise NotImplementedError()
-
-    @classmethod
-    def get_default_data_range(cls) -> typing.Any:
+    def get_default_data_range(self) -> typing.Any:
         raise NotImplementedError()
 
 

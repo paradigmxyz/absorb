@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import typing
 
 import requests
@@ -15,10 +14,7 @@ if typing.TYPE_CHECKING:
 class Chains(truck.Table):
     write_range = 'overwrite'
 
-    @classmethod
-    def get_schema(
-        self, context: truck.Context
-    ) -> dict[str, type[pl.DataType]]:
+    def get_schema(self) -> dict[str, type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -27,8 +23,7 @@ class Chains(truck.Table):
             'chain_id_hex': pl.String,
         }
 
-    @classmethod
-    def collect(cls, context: truck.Context) -> pl.DataFrame:
+    def collect(self, data_range: typing.Any) -> pl.DataFrame:
         network_names = get_network_names()
         chain_ids = network_names.keys()
         chain_id_hex = [
@@ -39,7 +34,7 @@ class Chains(truck.Table):
             'chain_id': chain_ids,
             'chain_id_hex': chain_id_hex,
         }
-        return pl.DataFrame(data, schema=cls.get_schema(context=context))
+        return pl.DataFrame(data, schema=self.get_schema())
 
 
 # specialcase the standard name for certain chains

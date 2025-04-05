@@ -31,37 +31,34 @@ if typing.TYPE_CHECKING:
 #     )
 
 
-def collect(
-    table: truck.TableReference,
-    context: truck.Context | None = None,
-    overwrite: bool = False,
-) -> None:
-    import tooltime
+# def collect(
+#     table: truck.TableReference,
+#     data_range: typing.Any,
+#     overwrite: bool = False,
+# ) -> None:
+#     import tooltime
 
-    cls = truck.resolve_table_class(table)
-    if context is None:
-        context = cls.get_default_context()
+#     cls = truck.resolve_table_class(table)
 
-    data_range = context['data_range']
-    if data_range is None:
-        collected = cls.get_collected_range(context)
-        available = cls.get_available_range(context)
-        missing = None
+#     if data_range is None:
+#         collected = cls.get_collected_range()
+#         available = cls.get_available_range()
+#         missing = None
 
-    if cls.cadence == 'daily':
-        dates = tooltime.get_intervals(
-            start='2021-06-28',
-            end=tooltime.now(),
-            interval='1d',
-        )['start']
-        for date in dates:
-            date_context = context.copy()
-            date_context['data_range'] = date
-            df = cls.collect(date_context)
-            path = cls.get_path(date_context)
-            df.write_parquet(path)
-    else:
-        raise Exception()
+#     if cls.cadence == 'daily':
+#         dates = tooltime.get_intervals(
+#             start='2021-06-28',
+#             end=tooltime.now(),
+#             interval='1d',
+#         )['start']
+#         for date in dates:
+#             date_context = context.copy()
+#             date_context['data_range'] = date
+#             df = cls.collect(data_range=data_range)
+#             path = cls.get_path(date_context)
+#             df.write_parquet(path)
+#     else:
+#         raise Exception()
 
 
 def download(

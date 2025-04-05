@@ -15,8 +15,7 @@ class FourbyteDatatype(truck.Table):
     # custom
     endpoint: str
 
-    @classmethod
-    def get_schema(cls, context: truck.Context) -> dict[str, type[pl.DataType]]:
+    def get_schema(self) -> dict[str, type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -27,18 +26,17 @@ class FourbyteDatatype(truck.Table):
             'bytes_signature': pl.Binary,
         }
 
-    @classmethod
-    def get_available_range(cls, conext: truck.Context) -> typing.Any:
+    def get_available_range(self) -> typing.Any:
         import requests
 
-        results = requests.get(cls.endpoint).json()
+        results = requests.get(self.endpoint).json()
         max_id = max(result['id'] for result in results)
         return (0, max_id)
 
-    @classmethod
-    async def async_collect(cls, context: truck.Context) -> pl.DataFrame:
-        data_range = context['data_range']
-        return await async_scrape_4byte(url=cls.endpoint, data_range=data_range)
+    async def async_collect(self, data_range: typing.Any) -> pl.DataFrame:
+        return await async_scrape_4byte(
+            url=self.endpoint, data_range=data_range
+        )
 
 
 class Functions(FourbyteDatatype):

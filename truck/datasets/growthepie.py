@@ -13,12 +13,10 @@ if typing.TYPE_CHECKING:
 class Fundamentals(truck.Table):
     write_range = 'overwrite'
 
-    @classmethod
-    def get_schema(cls, context: truck.Context) -> dict[str, pl.Datatype]:
-        return dict(cls.collect(context).schema)
+    def get_schema(self) -> dict[str, pl.Datatype]:
+        return dict(self.collect(None).schema)
 
-    @classmethod
-    def collect(cls, context: truck.Context) -> pl.DataFrame:
+    def collect(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
 
         url = 'https://api.growthepie.xyz/v1/fundamentals_full.json'

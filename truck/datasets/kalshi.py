@@ -17,12 +17,11 @@ class DailySummaries(truck.Table):
     overwrite = 'append_only'
     cadence = 'daily'
 
-    @classmethod
-    def collect(cls, context: truck.Context) -> pl.DataFrame:
+    def collect(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
         import polars as pl
 
-        date = context['data_range']
+        date: datetime.datetime = data_range
         url = get_date_url(date)
         response = requests.get(url, stream=True)
         response.raise_for_status()
@@ -32,7 +31,7 @@ class DailySummaries(truck.Table):
 class Metadata:
     cadence = None
 
-    def collect(cls, context: truck.Context) -> pl.DataFrame:
+    def collect(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
         import time
 
