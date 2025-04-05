@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import typing
+
 from .. import types
 from . import cli_commands
 from . import cli_helpers
+
+if typing.TYPE_CHECKING:
+    import argparse
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,6 +41,8 @@ def parse_args() -> argparse.Namespace:
 
     # display help if no command specified
     if args.command is None:
+        import sys
+
         parser.print_help()
         sys.exit(0)
 

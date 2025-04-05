@@ -30,7 +30,7 @@ def get_subcommands() -> (
     ]
 
 
-def ls_command(args: Namespace) -> None:
+def ls_command(args: Namespace) -> dict[str, Any]:
     import truck
 
     sources = truck.get_sources()
@@ -44,7 +44,9 @@ def ls_command(args: Namespace) -> None:
     print()
     print('Tracked Datasets')
     print('[none]')
+    return {}
 
 
-def collect_command(args: Namespace) -> None:
+def collect_command(args: Namespace) -> dict[str, Any]:
     print()
+    return {}
