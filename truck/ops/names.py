@@ -24,10 +24,6 @@ def _snake_to_camel(name: str) -> str:
             result.append(char.upper())
             capitalize_next = False
         else:
-            # Keep first letter lowercase for camelCase convention
-            if i == 0:
-                result.append(char.lower())
-            else:
-                result.append(char)
+            result.append(char)
 
-    return ''.join(result)
+    return result[0].upper() + ''.join(result[1:])

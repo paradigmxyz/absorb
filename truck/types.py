@@ -56,7 +56,7 @@ class Table:
     # coverage
 
     def get_available_range(self) -> typing.Any:
-        raise NotImplementedError()
+        return None
 
     def get_collected_range(self) -> typing.Any:
         raise NotImplementedError()

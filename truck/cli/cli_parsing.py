@@ -66,7 +66,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
         if '.' in dataset:
             source, table = dataset.split('.')
             cls = (
-                'truck.datasets'
+                'truck.datasets.'
                 + source
                 + '.'
                 + truck.ops.names._snake_to_camel(table)
@@ -80,7 +80,9 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
             track_datasets.append(track_dataset)
         else:
             for source_dataset in truck.get_source_tables(dataset):
-                cls = 'truck.datasets' + dataset + '.' + source_dataset.__name__
+                cls = (
+                    'truck.datasets.' + dataset + '.' + source_dataset.__name__
+                )
                 track_dataset = {
                     'source_name': dataset,
                     'table_name': source_dataset.__name__,

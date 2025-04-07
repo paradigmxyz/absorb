@@ -26,7 +26,15 @@ def get_subcommands() -> (
             'ls',
             'list tracked datasets',
             ls_command,
-            [],
+            [
+                (
+                    ['--verbose', '-v'],
+                    {
+                        'action': 'store_true',
+                        'help': 'show verbose details',
+                    },
+                ),
+            ],
         ),
         (
             'collect',
@@ -35,9 +43,9 @@ def get_subcommands() -> (
             [],
         ),
         (
-            'track',
+            'add',
             'start tracking datasets',
-            track_command,
+            add_command,
             [
                 (
                     ['dataset'],
@@ -57,9 +65,9 @@ def get_subcommands() -> (
             ],
         ),
         (
-            'stop',
-            'stop tracking datasets',
-            stop_command,
+            'remove',
+            'remove tracking datasets',
+            remove_command,
             [
                 (
                     ['dataset'],
@@ -112,7 +120,7 @@ def path_command(args: Namespace) -> dict[str, Any]:
     return {}
 
 
-def stop_command(args: Namespace) -> dict[str, Any]:
+def remove_command(args: Namespace) -> dict[str, Any]:
     tracked_datasets = cli_parsing._parse_datasets(args)
     truck.stop_tracking_tables(tracked_datasets)
     cli_outputs._print_title('Stopped tracking')
@@ -123,26 +131,61 @@ def stop_command(args: Namespace) -> dict[str, Any]:
 
 def ls_command(args: Namespace) -> dict[str, Any]:
     import truck
+    import toolstr
 
     tracked_datasets = truck.get_tracked_tables()
 
+    # available datasets
     cli_outputs._print_title('Available datasets')
-    for source in truck.get_sources():
+    for source in sorted(truck.get_sources()):
         cli_outputs._print_source_datasets_bullet(
             source, truck.get_source_tables(source)
         )
     print()
-    cli_outputs._print_title('Tracked datasets')
-    if len(tracked_datasets) == 0:
-        print('[none]')
+
+    if args.verbose:
+        # tracked datasets
+        cli_outputs._print_title('Tracked datasets')
+        if len(tracked_datasets) == 0:
+            print('[none]')
+        else:
+            rows = []
+            for dataset in tracked_datasets:
+                instance = _instantiate(dataset)
+                available_range = instance.get_available_range()
+                available_range = cli_outputs._format_range(available_range)
+                row = [
+                    dataset['source_name'],
+                    dataset['table_name'],
+                    available_range,
+                ]
+                rows.append(row)
+            columns = ['source', 'table', 'available range']
+            toolstr.print_table(rows, labels=columns)
     else:
-        for dataset in tracked_datasets:
-            cli_outputs._print_dataset_bullet(dataset)
+        # tracked datasets
+        cli_outputs._print_title('Tracked datasets')
+        if len(tracked_datasets) == 0:
+            print('[none]')
+        else:
+            for dataset in tracked_datasets:
+                cli_outputs._print_dataset_bullet(dataset)
+
     return {}
 
 
-def track_command(args: Namespace) -> dict[str, Any]:
+def _instantiate(dataset: truck.TrackedTable) -> truck.Table:
+    import importlib
+
+    module_name, class_name = dataset['table_class'].rsplit('.', maxsplit=1)
+    module = importlib.import_module(module_name)
+    cls = getattr(module, class_name)
+    return cls(parameters=dataset['parameters'])  # type: ignore
+
+
+def add_command(args: Namespace) -> dict[str, Any]:
     import json
+    import rich
 
     # parse inputs
     track_datasets = cli_parsing._parse_datasets(args)
@@ -197,6 +240,10 @@ def track_command(args: Namespace) -> dict[str, Any]:
     else:
         for dataset in track_datasets:
             cli_outputs._print_dataset_bullet(dataset)
+        print()
+        rich.print(
+            'to proceed with data collection, use [white bold]truck collect[/white bold]'
+        )
     truck.start_tracking_tables(track_datasets)
 
     return {}
