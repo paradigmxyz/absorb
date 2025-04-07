@@ -22,6 +22,8 @@ class Table:
     filename_template = '{source}__{table}__{data_range}.parquet'
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
+        if set(self.parameters.keys()) != set(self.parameter_types.keys()):
+            raise Exception('parameters must match parameter_types spec')
         if parameters is None:
             self.parameters = {}
         else:
