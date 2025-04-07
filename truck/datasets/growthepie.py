@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 
 
 class Fundamentals(truck.Table):
+    source = 'growthepie'
     write_range = 'overwrite'
 
     def get_schema(self) -> dict[str, pl.Datatype]:

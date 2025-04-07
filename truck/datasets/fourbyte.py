@@ -9,6 +9,7 @@ if typing.TYPE_CHECKING:
 
 
 class FourbyteDatatype(truck.Table):
+    source = 'fourbyte'
     write_range = 'append_only'
     range_format = tuple[int, int]
 

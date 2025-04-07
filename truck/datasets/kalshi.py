@@ -14,6 +14,7 @@ path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}
 
 
 class DailySummaries(truck.Table):
+    source = 'kalshi'
     overwrite = 'append_only'
     cadence = 'daily'
 
@@ -35,7 +36,8 @@ class DailySummaries(truck.Table):
         return [first, last]
 
 
-class Metadata:
+class Metadata(truck.Table):
+    source = 'kalshi'
     cadence = None
 
     def collect(self, data_range: typing.Any) -> pl.DataFrame:

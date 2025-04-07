@@ -9,6 +9,7 @@ if typing.TYPE_CHECKING:
 
 
 class MempoolDumpster(truck.Table):
+    source = 'mempool_dumpster'
     renamed = {
         'hash': 'transaction_hash',
         'gas': 'gas_used',
