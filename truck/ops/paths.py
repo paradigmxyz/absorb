@@ -36,19 +36,26 @@ def get_source_dir(source: str, *, warn: bool = False) -> str:
 
 
 def get_table_dir(
-    dataset: truck.TrackedTable | str, *, warn: bool = False
+    dataset: truck.TrackedTable | str | None = None,
+    *,
+    source: str | None = None,
+    table: str | None = None,
+    warn: bool = False,
 ) -> str:
     import os
 
     if isinstance(dataset, str):
         source, table = dataset.split('.')
-        source_dir = get_source_dir(source, warn=warn)
-        return os.path.join(source_dir, 'tables', table)
     elif isinstance(dataset, dict):
-        source_dir = get_source_dir(dataset['source_name'], warn=warn)
-        return os.path.join(source_dir, 'tables', dataset['table_name'])
+        source = dataset['source_name']
+        table = dataset['table_name']
+    elif source is not None and table is not None:
+        pass
     else:
         raise Exception('invalid format')
+
+    source_dir = get_source_dir(source, warn=warn)
+    return os.path.join(source_dir, 'tables', table)
 
 
 def get_table_glob(

@@ -13,7 +13,9 @@ if typing.TYPE_CHECKING:
 class Table:
     source: str
     write_range: typing.Literal['append_only', 'overwrite']
-    range_format: type
+    range_format: typing.Literal[
+        'date', 'date_range', 'named_range', 'block_range', 'id_range', None
+    ]
     index_by: typing.Literal['time', 'block', 'id']
     cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
     parameter_types: dict[str, typing.Any] = {}
@@ -49,7 +51,35 @@ class Table:
 
     # paths
 
-    def get_path(self, data_range: typing.Any) -> str:
+    def get_dir_path(self) -> str:
+        return truck.ops.paths.get_table_dir(
+            source=self.source,
+            table=truck.ops.names._camel_to_snake(str(type(self))),
+        )
+
+    def get_file_path(self, data_range: typing.Any) -> str:
+        import os
+
+        return os.path.join(self.get_dir_path(), self.get_file_name(data_range))
+
+    def get_file_glob(self) -> str:
+        import os
+
+        filename = self.get_file_name(None, glob=True)
+        return os.path.join(self.get_dir_path(), filename)
+
+    def get_file_paths(self, data_ranges: typing.Any) -> list[str]:
+        import os
+
+        dir_path = self.get_dir_path()
+        return [
+            os.path.join(dir_path, self.get_file_name(data_range))
+            for data_range in data_ranges
+        ]
+
+    def get_file_name(
+        self, data_range: typing.Any, *, glob: bool = False
+    ) -> str:
         format_params = self.parameters.copy()
         if self.source is not None:
             format_params['source'] = self.source
@@ -57,17 +87,17 @@ class Table:
             str(type(self))
         )
         if '{data_range}' in self.filename_template:
-            format_params['data_range'] = self.format_data_range(data_range)
+            if glob:
+                format_params['data_range'] = '*'
+            else:
+                format_params['data_range'] = self.format_data_range(data_range)
         return self.filename_template.format(**format_params)
 
-    # def get_paths(self, *args, **kwargs) -> list[str]:
-    #     raise NotImplementedError()
-
-    def parse_path(self, path: str) -> dict[str, typing.Any]:
+    def parse_file_path(self, path: str) -> dict[str, typing.Any]:
         import os
 
         keys = os.path.splitext(self.filename_template)[0].split('__')
-        values = os.path.splitext(path)[0].split('__')
+        values = os.path.splitext(os.path.basename(path))[0].split('__')
         return {k[1:-1]: v for k, v in zip(keys, values)}
 
     def format_data_range(self, data_range: typing.Any) -> str:
@@ -95,7 +125,25 @@ class Table:
         return None
 
     def get_collected_range(self) -> typing.Any:
-        raise NotImplementedError()
+        import os
+        import glob
+
+        dir_path = self.get_dir_path()
+        if not os.path.isdir(dir_path):
+            return None
+
+        glob_str = self.get_file_glob()
+        if self.is_range_sortable():
+            files = sorted(glob.glob(glob_str))
+            start = self.parse_file_path(files[0])['data_range']
+            end = self.parse_file_path(files[-1])['data_range']
+            return [start, end]
+        else:
+            raise Exception()
+
+    @classmethod
+    def is_range_sortable(cls) -> bool:
+        return cls.range_format is not None
 
     def get_min_collected_timestamp(self) -> datetime.datetime:
         raise NotImplementedError()
