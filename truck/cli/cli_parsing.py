@@ -3,15 +3,99 @@ from __future__ import annotations
 import typing
 
 import truck
-from . import cli_commands
 from . import cli_helpers
 
 if typing.TYPE_CHECKING:
     import argparse
 
 
+def get_subcommands() -> (
+    list[tuple[str, str, list[tuple[list[str], dict[str, typing.Any]]]]]
+):
+    return [
+        (
+            'ls',
+            'list tracked datasets',
+            [
+                (
+                    ['--verbose', '-v'],
+                    {
+                        'action': 'store_true',
+                        'help': 'show verbose details',
+                    },
+                ),
+            ],
+        ),
+        (
+            'collect',
+            'collect datasets',
+            [],
+        ),
+        (
+            'add',
+            'start tracking datasets',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--path'],
+                    {'help': 'directory location to store the dataset'},
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+            ],
+        ),
+        (
+            'remove',
+            'remove tracking datasets',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+            ],
+        ),
+        (
+            'path',
+            'print truck root path or dataset path',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '?',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+                (
+                    ['--glob'],
+                    {'action': 'store_true'},
+                ),
+            ],
+        ),
+    ]
+
+
 def parse_args() -> argparse.Namespace:
     import argparse
+    import importlib
 
     parser = argparse.ArgumentParser(
         formatter_class=cli_helpers.HelpFormatter, allow_abbrev=False
@@ -19,7 +103,11 @@ def parse_args() -> argparse.Namespace:
     subparsers = parser.add_subparsers(dest='command')
 
     parsers = {}
-    for name, description, f, arg_args in cli_commands.get_subcommands():
+    for name, description, arg_args in get_subcommands():
+        f_module = importlib.import_module(
+            'truck.cli.cli_commands.command_' + name
+        )
+        f = getattr(f_module, name + '_command')
         subparser = subparsers.add_parser(name, help=description)
         subparser.set_defaults(f_command=f)
         for sub_args, sub_kwargs in arg_args:
@@ -60,35 +148,24 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
             parameters[key] = value
 
     # parse datasets
-    track_datasets: list[truck.TrackedTable] = []
-    track_dataset: truck.TrackedTable
+    sources = []
+    tables = []
     for dataset in args.dataset:
         if '.' in dataset:
             source, table = dataset.split('.')
-            cls = (
-                'truck.datasets.'
-                + source
-                + '.'
-                + truck.ops.names._snake_to_camel(table)
-            )
-            track_dataset = {
-                'source_name': source,
-                'table_name': table,
-                'table_class': cls,
-                'parameters': parameters,
-            }
-            track_datasets.append(track_dataset)
+            sources.append(source)
+            tables.append(table)
         else:
             for source_dataset in truck.get_source_tables(dataset):
-                cls = (
-                    'truck.datasets.' + dataset + '.' + source_dataset.__name__
-                )
-                track_dataset = {
-                    'source_name': dataset,
-                    'table_name': source_dataset.__name__,
-                    'table_class': cls,
-                    'parameters': parameters,
-                }
-                track_datasets.append(track_dataset)
+                sources.append(dataset)
+                tables.append(source_dataset.__name__)
 
-    return track_datasets
+    return [
+        {
+            'source_name': source,
+            'table_name': dataset,
+            'table_class': 'truck.datasets.' + source + '.' + dataset,
+            'parameters': parameters,
+        }
+        for source, table in zip(sources, tables)
+    ]

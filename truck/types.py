@@ -182,3 +182,12 @@ TableReference = typing.Any
 class TruckConfig(typing.TypedDict):
     version: str
     tracked_tables: list[TrackedTable]
+
+
+def instantiate(dataset: truck.TrackedTable) -> truck.Table:
+    import importlib
+
+    module_name, class_name = dataset['table_class'].rsplit('.', maxsplit=1)
+    module = importlib.import_module(module_name)
+    cls = getattr(module, class_name)
+    return cls(parameters=dataset['parameters'])  # type: ignore
