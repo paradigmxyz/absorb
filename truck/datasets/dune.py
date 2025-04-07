@@ -5,15 +5,7 @@ import polars as pl
 import truck
 
 
-class Query(truck.Table):
-    """collect the output of a query"""
-
-    write_range = 'overwrite'
-    parameter_types = {
-        'query': str,
-        'spice_kwargs': dict[str, typing.Any],
-    }
-
+class BaseQuery(truck.Table):
     def get_schema(self) -> dict[str, type[pl.DataType]]:
         import spice
 
@@ -21,6 +13,16 @@ class Query(truck.Table):
         spice_kwargs = self.parameters['spice_kwargs']
         spice_kwargs['limit'] = 0
         return dict(spice.query(query, **spice_kwargs).schema)
+
+
+class FullQuery(BaseQuery):
+    """collect the full output of a query"""
+
+    write_range = 'overwrite'
+    parameter_types = {
+        'query': str,
+        'spice_kwargs': dict[str, typing.Any],
+    }
 
     def collect(self, data_range: typing.Any) -> pl.DataFrame:
         import spice
@@ -42,14 +44,6 @@ class AppendOnlyQuery(truck.Table):
         'range_parameters': list[str],
     }
 
-    def get_schema(self) -> dict[str, type[pl.DataType]]:
-        import spice
-
-        query = self.parameters['query']
-        spice_kwargs = self.parameters['spice_kwargs']
-        spice_kwargs['limit'] = 0
-        return dict(spice.query(query, **spice_kwargs).schema)
-
     def collect(self, data_range: typing.Any) -> pl.DataFrame:
         import spice
 
@@ -60,3 +54,7 @@ class AppendOnlyQuery(truck.Table):
         return spice.query(
             query, poll=True, include_execution=False, **spice_kwargs
         )
+
+
+def get_tables() -> list[type[truck.Table]]:
+    return [FullQuery, AppendOnlyQuery]
