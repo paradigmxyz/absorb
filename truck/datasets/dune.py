@@ -40,6 +40,7 @@ class AppendOnlyQuery(truck.Table):
     """collect the output of a query, time-partitioned"""
 
     write_range = 'append_only'
+    range_format = 'named_range'
     parameter_types = {
         'query': str,
         'spice_kwargs': dict[str, typing.Any],

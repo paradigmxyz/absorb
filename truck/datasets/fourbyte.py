@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 class FourbyteDatatype(truck.Table):
     source = 'fourbyte'
     write_range = 'append_only'
-    range_format = tuple[int, int]
+    range_format = 'id_range'
 
     # custom
     endpoint: str

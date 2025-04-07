@@ -17,6 +17,7 @@ class DailySummaries(truck.Table):
     source = 'kalshi'
     overwrite = 'append_only'
     cadence = 'daily'
+    range_format = 'date'
 
     def collect(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
