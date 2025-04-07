@@ -27,6 +27,13 @@ class DailySummaries(truck.Table):
         response.raise_for_status()
         return pl.DataFrame(response.json())
 
+    def get_available_range(self) -> typing.Any:
+        import datetime
+
+        first = datetime.datetime(year=2021, month=6, day=28)
+        last = _find_last()
+        return [first, last]
+
 
 class Metadata:
     cadence = None
@@ -68,3 +75,30 @@ def get_date_url(date: datetime.datetime) -> str:
 
 def get_date_path(date: datetime.datetime) -> str:
     return path_template.format(year=date.year, month=date.month, day=date.day)
+
+
+def _find_last() -> datetime.datetime:
+    import datetime
+
+    current = datetime.datetime.now()
+    current = datetime.datetime(
+        year=current.year, month=current.month, day=current.day
+    )
+    while current > datetime.datetime(year=2021, month=6, day=28):
+        if does_file_exist(get_date_url(current)):
+            return current
+        current = current - datetime.timedelta(days=1)
+    raise Exception()
+
+
+def does_file_exist(url: str) -> bool:
+    import requests
+
+    try:
+        response = requests.head(url, allow_redirects=True)
+        # Check if status code is 200 (OK) and content-length exists
+        if response.status_code == 200 and 'content-length' in response.headers:
+            return True
+        return False
+    except requests.RequestException:
+        return False
