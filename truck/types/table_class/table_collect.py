@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 class TableCollect(table_coverage.TableCoverage):
     def collect(
         self, data_range: typing.Any | None = None, overwrite: bool = False
-    ) -> pl.DataFrame:
+    ) -> None:
         chunk_ranges, paths = self._get_chunk_ranges(data_range, overwrite)
 
         # collect chunks
@@ -22,7 +22,23 @@ class TableCollect(table_coverage.TableCoverage):
             df = self.collect_chunk(data_range=data_range)
             df.write_parquet(path)
 
-        return df
+    async def async_collect(
+        self, data_range: typing.Any | None = None, overwrite: bool = False
+    ) -> None:
+        import asyncio
+
+        chunk_ranges, paths = self._get_chunk_ranges(data_range, overwrite)
+        coroutines = [
+            self._collect_and_save(chunk_range, path)
+            for chunk_range, path in zip(chunk_ranges, paths)
+        ]
+        await asyncio.gather(*coroutines)
+
+    async def _collect_and_save(
+        self, data_range: typing.Any | None, path: str
+    ) -> None:
+        df = await self.async_collect_chunk(data_range=data_range)
+        df.write_parquet(path)
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         raise NotImplementedError()
