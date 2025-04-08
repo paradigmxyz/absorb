@@ -19,7 +19,7 @@ class DailySummaries(truck.Table):
     cadence = 'daily'
     range_format = 'date'
 
-    def collect(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
         import polars as pl
 
@@ -41,7 +41,7 @@ class Metadata(truck.Table):
     source = 'kalshi'
     cadence = None
 
-    def collect(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
         import time
 

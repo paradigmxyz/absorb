@@ -34,7 +34,7 @@ class FourbyteDatatype(truck.Table):
         max_id = max(result['id'] for result in results)
         return (0, max_id)
 
-    async def async_collect(self, data_range: typing.Any) -> pl.DataFrame:
+    async def async_collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return await async_scrape_4byte(
             url=self.endpoint, data_range=data_range
         )

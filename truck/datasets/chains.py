@@ -25,7 +25,7 @@ class Chains(truck.Table):
             'chain_id_hex': pl.String,
         }
 
-    def collect(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         network_names = get_network_names()
         chain_ids = network_names.keys()
         chain_id_hex = [
