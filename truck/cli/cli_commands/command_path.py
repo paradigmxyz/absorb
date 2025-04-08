@@ -15,7 +15,7 @@ def path_command(args: Namespace) -> dict[str, Any]:
         print(truck.get_truck_root(warn=False))
     elif args.glob:
         tracked_dataset = cli_parsing._parse_datasets(args)[0]
-        instance = truck.instantiate(tracked_dataset)
+        instance = truck.Table.instantiate(tracked_dataset)
         print(instance.get_glob(warn=False))
     elif '.' in args.dataset:
         source, table = args.dataset.split('.')

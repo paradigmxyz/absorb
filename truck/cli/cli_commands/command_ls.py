@@ -31,7 +31,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
         else:
             rows = []
             for dataset in tracked_datasets:
-                instance = truck.instantiate(dataset)
+                instance = truck.Table.instantiate(dataset)
                 available_range = instance.get_available_range()
                 available_range = cli_outputs._format_range(available_range)
                 collected_range = instance.get_collected_range()
