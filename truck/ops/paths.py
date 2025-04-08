@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing
+
 import truck
 
 
@@ -58,14 +60,6 @@ def get_table_dir(
     return os.path.join(source_dir, 'tables', table)
 
 
-def get_table_glob(
-    dataset: truck.TrackedTable | str, *, warn: bool = False
-) -> str:
-    import os
-
-    return os.path.join(get_table_dir(dataset, warn=warn), '*.parquet')
-
-
 def get_table_metadata_path(
     dataset: truck.TrackedTable | str, *, warn: bool = False
 ) -> str:
@@ -76,129 +70,159 @@ def get_table_metadata_path(
     )
 
 
-#
-# # old
-#
+def get_table_filepath(
+    data_range: typing.Any,
+    range_format: truck.RangeFormat,
+    filename_template: str,
+    table: str,
+    *,
+    source: str | None,
+    parameters: dict[str, typing.Any],
+    glob: bool = False,
+    warn: bool = True,
+) -> str:
+    import os
 
-# def get_filename(
-#     year: int | str | None = None,
-#     month: int | str | None = None,
-#     day: int | str | None = None,
-#     timestamp: tooltime.Timestamp | None = None,
-# ) -> str:
-#     import tooltime
-
-#     if timestamp is not None:
-#         dt = tooltime.timestamp_to_datetime(timestamp)
-#         return '{year:04}-{month:02}-{day:02}.parquet'.format(
-#             year=dt.year,
-#             month=dt.month,
-#             day=dt.day,
-#         )
-#     else:
-#         if year is None:
-#             year = '*'
-#         elif isinstance(year, int):
-#             year = '%04d' % year
-#         if month is None:
-#             month = '*'
-#         elif isinstance(month, int):
-#             month = '%02d' % month
-#         if day is None:
-#             day = '*'
-#         elif isinstance(day, int):
-#             day = '%02d' % day
-#         return '{year}-{month}-{day}.parquet'.format(
-#             year=year, month=month, day=day
-#         )
+    dir_path = get_table_dir(source=source, table=table, warn=warn)
+    filename = get_table_filename(
+        data_range=data_range,
+        range_format=range_format,
+        filename_template=filename_template,
+        table=table,
+        source=source,
+        parameters=parameters,
+        glob=glob,
+    )
+    return os.path.join(dir_path, filename)
 
 
-# def get_path(
-#     year: int | str | None = None,
-#     month: int | str | None = None,
-#     day: int | str | None = None,
-#     timestamp: tooltime.Timestamp | None = None,
-#     flat: bool | None = None,
-#     root_dir: str | None = None,
-# ) -> str:
-#     import os
-
-#     dirpath = get_dir(
-#         year=year,
-#         month=month,
-#         day=day,
-#         timestamp=timestamp,
-#         flat=flat,
-#         root_dir=root_dir,
-#     )
-#     filename = get_filename(
-#         year=year,
-#         month=month,
-#         day=day,
-#         timestamp=timestamp,
-#     )
-#     return os.path.join(dirpath, filename)
+def get_table_filename(
+    data_range: typing.Any,
+    range_format: truck.RangeFormat,
+    filename_template: str,
+    table: str,
+    *,
+    source: str | None,
+    parameters: dict[str, typing.Any],
+    glob: bool = False,
+) -> str:
+    format_params = parameters.copy()
+    if source is not None:
+        format_params['source'] = source
+    format_params['table'] = table
+    if '{data_range}' in filename_template:
+        if glob:
+            format_params['data_range'] = '*'
+        else:
+            format_params['data_range'] = _format_data_range(
+                data_range, range_format
+            )
+    return filename_template.format(**format_params)
 
 
-# def get_paths(
-#     start_time: tooltime.Timestamp,
-#     end_time: tooltime.Timestamp,
-#     root_dir: str | None = None,
-#     flat: bool | None = None,
-# ) -> list[str]:
-#     import tooltime
+def get_table_filepaths(
+    data_ranges: typing.Any,
+    range_format: truck.RangeFormat,
+    filename_template: str,
+    table: str,
+    *,
+    source: str | None,
+    parameters: dict[str, typing.Any],
+    warn: bool = True,
+) -> list[str]:
+    import os
 
-#     timestamps = tooltime.get_intervals(
-#         start=start_time,
-#         end=end_time,
-#         interval='1d',
-#     )
-#     return [
-#         get_path(
-#             timestamp=timestamp,
-#             flat=flat,
-#             root_dir=root_dir,
-#         )
-#         for timestamp in timestamps['start']
-#     ]
+    dir_path = get_table_dir(source=source, table=table, warn=warn)
+    paths = []
+    for data_range in data_ranges:
+        filename = get_table_filename(
+            data_range=data_range,
+            range_format=range_format,
+            filename_template=filename_template,
+            table=table,
+            source=source,
+            parameters=parameters,
+        )
+        path = os.path.join(dir_path, filename)
+        paths.append(path)
+    return paths
 
 
-# def get_dir(
-#     *,
-#     year: int | str | None = None,
-#     month: int | str | None = None,
-#     day: int | str | None = None,
-#     timestamp: tooltime.Timestamp | None = None,
-#     flat: bool | None = None,
-#     root_dir: str | None = None,
-# ) -> str:
-#     import os
-#     import tooltime
+def _format_data_range(
+    data_range: typing.Any, range_format: truck.RangeFormat
+) -> str:
+    if range_format == 'date':
+        return data_range.strftime('%Y-%m-%d')  # type: ignore
+    elif range_format == 'date_range':
+        return (
+            _format_value(data_range[0], 'date')
+            + '_to_'
+            + _format_value(data_range[1], 'date')
+        )
+    elif range_format == 'named_range':
+        if len(data_range) == 2:
+            values = list(data_range.values())
+            values = sorted(values)
+            values_str = [_format_value(value) for value in values]
+            return values_str[0] + '_to_' + values_str[1]
+        else:
+            raise NotImplementedError('range with >2 keys')
+    elif range_format == 'block_range':
+        return (
+            _format_value(data_range[0], 'int')
+            + '_to_'
+            + _format_value(data_range[1], 'int')
+        )
+    elif range_format == 'id_range':
+        return (
+            _format_value(data_range[0]) + '_to_' + _format_value(data_range[1])
+        )
+    elif range_format is None:
+        return str(range_format)
+    else:
+        raise Exception('invalid range_format: ' + str(range_format))
 
-#     # get root dir
-#     if root_dir is None:
-#         root_dir = get_truck_root()
-#     dirpath = root_dir
 
-#     # add year-month subdir
-#     if flat is None:
-#         dir_files = os.listdir(root_dir)
-#         if any(file.endswith('.parquet') for file in dir_files):
-#             flat = True
-#         elif len(dir_files) > 1:
-#             flat = False
-#         else:
-#             flat = True
-#     if not flat:
-#         if timestamp is not None:
-#             dt = tooltime.timestamp_to_datetime(timestamp)
-#             year = dt.year
-#             month = dt.month
-#         elif year is not None and month is not None:
-#             pass
-#         else:
-#             raise Exception('need more date information for non-flat path')
-#         year_month = str(year) + '-' + ('%02d' % dt.month)
-#         dirpath = os.path.join(dirpath, year_month)
+def _format_value(
+    value: typing.Any, format: str | None = None, width: int = 10
+) -> str:
+    if format is None:
+        import datetime
 
-#     return dirpath
+        if isinstance(value, datetime.datetime):
+            format = 'date'
+        elif isinstance(value, int):
+            format = 'int'
+        else:
+            raise Exception('invalid format')
+
+    if format == 'date':
+        return value.strftime('%Y-%m-%d')  # type: ignore
+    elif format == 'int':
+        return ('%0' + str(width) + 'd') % value  # type: ignore
+    else:
+        raise Exception('invalid format')
+
+
+def parse_file_path(
+    path: str,
+    filename_template: str,
+    *,
+    range_format: truck.RangeFormat | None = None,
+) -> dict[str, typing.Any]:
+    import os
+
+    keys = os.path.splitext(filename_template)[0].split('__')
+    values = os.path.splitext(os.path.basename(path))[0].split('__')
+    items = {k[1:-1]: v for k, v in zip(keys, values)}
+    if range_format is not None and 'data_range' in items:
+        items['data_range'] = parse_data_range(
+            items['data_range'], range_format
+        )
+    return items
+
+
+def parse_data_range(
+    as_str: str, range_format: truck.RangeFormat
+) -> typing.Any:
+    raise NotImplementedError()
