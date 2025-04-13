@@ -43,12 +43,19 @@ def get_subcommands() -> (
                     },
                 ),
                 (
-                    ['--path'],
-                    {'help': 'directory location to store the dataset'},
-                ),
-                (
                     ['--parameters'],
                     {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+                (
+                    ['--all'],
+                    {
+                        'help': 'add all available datasets',
+                        'action': 'store_true',
+                    },
+                ),
+                (
+                    ['--path'],
+                    {'help': 'directory location to store the dataset'},
                 ),
             ],
         ),
@@ -66,6 +73,13 @@ def get_subcommands() -> (
                 (
                     ['--parameters'],
                     {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+                (
+                    ['--all'],
+                    {
+                        'help': 'add all available datasets',
+                        'action': 'store_true',
+                    },
                 ),
             ],
         ),
@@ -160,12 +174,14 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
                 sources.append(dataset)
                 tables.append(source_dataset.__name__)
 
-    return [
-        {
+    parsed = []
+    for source, table in zip(sources, tables):
+        camel_table = truck.ops.names._snake_to_camel(table)
+        tracked_table: truck.TrackedTable = {
             'source_name': source,
-            'table_name': dataset,
-            'table_class': 'truck.datasets.' + source + '.' + dataset,
+            'table_name': table,
+            'table_class': 'truck.datasets.' + source + '.' + camel_table,
             'parameters': parameters,
         }
-        for source, table in zip(sources, tables)
-    ]
+        parsed.append(tracked_table)
+    return parsed

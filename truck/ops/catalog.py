@@ -51,3 +51,22 @@ def get_source_tables(source: str) -> list[type[truck.Table]]:
 
 def resolve_table_class(reference: truck.TableReference) -> type[truck.Table]:
     raise NotImplementedError()
+
+
+def get_available_tables() -> list[truck.TrackedTable]:
+    tables = []
+    for source in get_sources():
+        for table in get_source_tables(source):
+            if len(table.parameter_types) == 0:
+                snake_table = truck.ops.names._camel_to_snake(table.__name__)
+                tracked_table: truck.TrackedTable = {
+                    'source_name': source,
+                    'table_name': snake_table,
+                    'table_class': 'truck.datasets.'
+                    + source
+                    + '.'
+                    + table.__name__,
+                    'parameters': {},
+                }
+                tables.append(tracked_table)
+    return tables

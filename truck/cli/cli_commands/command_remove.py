@@ -12,7 +12,10 @@ if typing.TYPE_CHECKING:
 
 
 def remove_command(args: Namespace) -> dict[str, Any]:
-    tracked_datasets = cli_parsing._parse_datasets(args)
+    if args.all:
+        tracked_datasets = truck.get_tracked_tables()
+    else:
+        tracked_datasets = cli_parsing._parse_datasets(args)
     truck.stop_tracking_tables(tracked_datasets)
     cli_outputs._print_title('Stopped tracking')
     for dataset in tracked_datasets:

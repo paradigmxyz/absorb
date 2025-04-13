@@ -16,7 +16,10 @@ def add_command(args: Namespace) -> dict[str, Any]:
     import rich
 
     # parse inputs
-    track_datasets = cli_parsing._parse_datasets(args)
+    if args.all:
+        track_datasets = truck.ops.catalog.get_available_tables()
+    else:
+        track_datasets = cli_parsing._parse_datasets(args)
 
     # use snake case throughout
     for track_dataset in track_datasets:
