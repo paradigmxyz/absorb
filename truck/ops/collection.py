@@ -10,6 +10,19 @@ if typing.TYPE_CHECKING:
     import tooltime
 
 
+def does_file_exist(url: str) -> bool:
+    import requests
+
+    try:
+        response = requests.head(url, allow_redirects=True)
+        # Check if status code is 200 (OK) and content-length exists
+        if response.status_code == 200 and 'content-length' in response.headers:
+            return True
+        return False
+    except requests.RequestException:
+        return False
+
+
 # class DataRange(typing.TypedDict):
 #     """specify data range using one of:
 #     1. time bounds

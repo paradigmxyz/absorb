@@ -88,20 +88,7 @@ def _find_last() -> datetime.datetime:
         year=current.year, month=current.month, day=current.day
     )
     while current > datetime.datetime(year=2021, month=6, day=28):
-        if does_file_exist(get_date_url(current)):
+        if truck.ops.collection.does_file_exist(get_date_url(current)):
             return current
         current = current - datetime.timedelta(days=1)
     raise Exception()
-
-
-def does_file_exist(url: str) -> bool:
-    import requests
-
-    try:
-        response = requests.head(url, allow_redirects=True)
-        # Check if status code is 200 (OK) and content-length exists
-        if response.status_code == 200 and 'content-length' in response.headers:
-            return True
-        return False
-    except requests.RequestException:
-        return False

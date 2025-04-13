@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 class Chains(truck.Table):
     source = 'chains'
     write_range = 'overwrite'
-    range_format = None
+    range_format = 'count'
 
     def get_schema(self) -> dict[str, type[pl.DataType]]:
         import polars as pl
@@ -38,6 +38,9 @@ class Chains(truck.Table):
         }
         return pl.DataFrame(data, schema=self.get_schema())
 
+    def get_available_range(self) -> typing.Any:
+        return len(get_network_data())
+
 
 # specialcase the standard name for certain chains
 special_cases: Mapping[str, str] = {
@@ -55,10 +58,7 @@ special_cases: Mapping[str, str] = {
 
 def get_network_names() -> Mapping[str, str]:
     # fetch raw network data
-    url = 'https://chainid.network/chains.json'
-    result = requests.get(url)
-    data = result.json()
-
+    data = get_network_data()
     network_names: MutableMapping[str, str] = {}
     for datum in data:
         # standardize name
@@ -73,6 +73,12 @@ def get_network_names() -> Mapping[str, str]:
         network_names[str(datum['chainId'])] = filtered
 
     return network_names
+
+
+def get_network_data() -> list[Mapping[str, typing.Any]]:
+    url = 'https://chainid.network/chains.json'
+    response = requests.get(url)
+    return response.json()  # type: ignore
 
 
 def standardize_name(name: str) -> str:

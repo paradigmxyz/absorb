@@ -30,8 +30,8 @@ class FourbyteDatatype(truck.Table):
     def get_available_range(self) -> typing.Any:
         import requests
 
-        results = requests.get(self.endpoint).json()
-        max_id = max(result['id'] for result in results)
+        data = requests.get(self.endpoint).json()
+        max_id = max(result['id'] for result in data['results'])
         return (0, max_id)
 
     async def async_collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:

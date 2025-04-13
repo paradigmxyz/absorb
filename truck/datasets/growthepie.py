@@ -35,6 +35,7 @@ class Fundamentals(truck.Table):
     def get_available_range(self) -> typing.Any:
         import datetime
         import requests
+        import polars as pl
 
         first = datetime.datetime(year=2021, month=6, day=1)
 

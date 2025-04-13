@@ -7,6 +7,8 @@ if typing.TYPE_CHECKING:
     import polars as pl
     import tooltime
 
+url_template = 'https://mempool-dumpster.flashbots.net/ethereum/mainnet/{year}-{month:02}/{year}-{month:02}-{day:02}.parquet'
+
 
 class MempoolDumpster(truck.Table):
     range_format = 'date'
@@ -59,6 +61,24 @@ class MempoolDumpster(truck.Table):
         'data4Bytes',
         'rawTx',
     ]
+
+    def get_available_range(self) -> typing.Any:
+        import datetime
+
+        current = datetime.datetime.now()
+        current = datetime.datetime(
+            year=current.year, month=current.month, day=current.day
+        )
+        current = current + datetime.timedelta(days=1)
+        initial = datetime.datetime(year=2023, month=8, day=8)
+        while current > initial:
+            url = url_template.format(
+                year=current.year, month=current.month, day=current.day
+            )
+            if truck.ops.does_file_exist(url):
+                break
+            current -= datetime.timedelta(days=1)
+        return [initial, current]
 
     # @classmethod
     # def scan(
