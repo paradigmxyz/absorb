@@ -4,7 +4,13 @@ import typing
 
 
 RangeFormat = typing.Literal[
-    'date', 'date_range', 'named_range', 'block_range', 'id_range', 'count', None
+    'date',
+    'date_range',
+    'named_range',
+    'block_range',
+    'id_range',
+    'count',
+    None,
 ]
 
 

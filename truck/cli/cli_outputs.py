@@ -46,8 +46,9 @@ def _print_source_datasets_bullet(
 
 def _format_range(data_range: typing.Any) -> str:
     if isinstance(data_range, list):
-        return (
-            '\[' + ', '.join(dt.strftime('%Y-%m-%d') for dt in data_range) + ']'
-        )
+        date_strs = [
+            '-' if dt is None else dt.strftime('%Y-%m-%d') for dt in data_range
+        ]
+        return '\[' + ', '.join(date_strs) + ']'
     else:
         return str(data_range)

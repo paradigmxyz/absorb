@@ -71,6 +71,14 @@ class Metadata(truck.Table):
             item for result in cursor_results for item in result['current_page']
         ).unique('series_ticker')
 
+    def get_available_range(self) -> typing.Any:
+        import datetime
+
+        now = datetime.datetime.now(datetime.timezone.utc).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        return [None, now]
+
 
 def get_date_url(date: datetime.datetime) -> str:
     return url_template.format(year=date.year, month=date.month, day=date.day)
