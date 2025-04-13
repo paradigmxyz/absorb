@@ -13,7 +13,7 @@ url_template = 'https://kalshi-public-docs.s3.amazonaws.com/reporting/market_dat
 path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}-{month:02}-{day:02}.json'
 
 
-class DailySummaries(truck.Table):
+class DailyStats(truck.Table):
     source = 'kalshi'
     overwrite = 'append_only'
     cadence = 'daily'

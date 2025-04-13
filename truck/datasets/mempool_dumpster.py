@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 url_template = 'https://mempool-dumpster.flashbots.net/ethereum/mainnet/{year}-{month:02}/{year}-{month:02}-{day:02}.parquet'
 
 
-class MempoolDumpster(truck.Table):
+class Transactions(truck.Table):
     range_format = 'date'
 
     source = 'mempool_dumpster'
