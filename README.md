@@ -88,7 +88,8 @@ truck.upload('custom_dataset')
 - [cryo](https://github.com/paradigmxyz/cryo) EVM datasets
 - [dune](https://dune.com) tables and queries
 - [growthepie](https://www.growthepie.xyz/) L2 metrics
-- [kalshi](https://kalshi.com) daily market summaries
+- [kalshi](https://kalshi.com) prediction market metrics
+- [l2beat](https://l2beat.com) L2 metrics
 - [mempool dumpster](https://mempool-dumpster.flashbots.net) mempool history
 - [sourcify](https://sourcify.dev) verified contracts
 - [tix](https://github.com/paradigmxyz/tix) price feeds
