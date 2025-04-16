@@ -16,7 +16,7 @@ class Chains(truck.Table):
     write_range = 'overwrite'
     range_format = 'count'
 
-    def get_schema(self) -> dict[str, type[pl.DataType]]:
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
 
         return {

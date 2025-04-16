@@ -16,7 +16,7 @@ class FourbyteDatatype(truck.Table):
     # custom
     endpoint: str
 
-    def get_schema(self) -> dict[str, type[pl.DataType]]:
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
 
         return {

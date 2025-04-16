@@ -25,7 +25,7 @@ class TableBase:
                 raise Exception('parameters must match parameter_types spec')
             self.parameters = parameters
 
-    def get_schema(self) -> dict[str, type[pl.DataType]]:
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()
 
     @classmethod

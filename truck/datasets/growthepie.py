@@ -15,7 +15,7 @@ class Fundamentals(truck.Table):
     write_range = 'overwrite'
     range_format = 'date_range'
 
-    def get_schema(self) -> dict[str, pl.Datatype]:
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return dict(self.collect_chunk(None).schema)
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
