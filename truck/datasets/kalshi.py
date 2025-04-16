@@ -15,7 +15,7 @@ path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}
 
 class DailyStats(truck.Table):
     source = 'kalshi'
-    overwrite = 'append_only'
+    write_range = 'append_only'
     cadence = 'daily'
     range_format = 'date'
 

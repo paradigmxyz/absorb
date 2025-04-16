@@ -12,6 +12,7 @@ url_template = 'https://mempool-dumpster.flashbots.net/ethereum/mainnet/{year}-{
 
 class Transactions(truck.Table):
     range_format = 'date'
+    write_range = 'append_only'
 
     source = 'mempool_dumpster'
     renamed = {
