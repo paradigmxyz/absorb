@@ -29,7 +29,19 @@ def get_subcommands() -> (
         (
             'collect',
             'collect datasets',
-            [],
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+            ],
         ),
         (
             'add',
@@ -185,3 +197,26 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
         }
         parsed.append(tracked_table)
     return parsed
+
+
+def _parse_ranges(
+    raw_ranges: list[str] | None, range_format: truck.RangeFormat
+) -> list[typing.Any]:
+    """
+    examples:
+    --range 2025-01-01:2025-03-01
+    --range 2025-01-01:
+    --range :2025-01-01
+    """
+    if range_format == 'date' or range_format == 'date_range':
+        raise NotImplementedError('manual ranges for ' + str(range_format))
+    else:
+        raise NotImplementedError('manual ranges for ' + str(range_format))
+
+    # 'date',
+    # 'date_range',
+    # 'named_range',
+    # 'block_range',
+    # 'id_range',
+    # 'count',
+    # None,

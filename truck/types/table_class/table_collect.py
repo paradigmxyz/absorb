@@ -12,44 +12,70 @@ if typing.TYPE_CHECKING:
 
 
 class TableCollect(table_coverage.TableCoverage):
-    def collect(
-        self, data_range: typing.Any | None = None, overwrite: bool = False
-    ) -> None:
-        chunk_ranges, paths = self._get_chunk_ranges(data_range, overwrite)
-
-        # collect chunks
-        for chunk_range, path in zip(chunk_ranges, paths):
-            df = self.collect_chunk(data_range=data_range)
-            df.write_parquet(path)
-
-    async def async_collect(
-        self, data_range: typing.Any | None = None, overwrite: bool = False
-    ) -> None:
-        import asyncio
-
-        chunk_ranges, paths = self._get_chunk_ranges(data_range, overwrite)
-        coroutines = [
-            self._collect_and_save(chunk_range, path)
-            for chunk_range, path in zip(chunk_ranges, paths)
-        ]
-        await asyncio.gather(*coroutines)
-
-    async def _collect_and_save(
-        self, data_range: typing.Any | None, path: str
-    ) -> None:
-        df = await self.async_collect_chunk(data_range=data_range)
-        df.write_parquet(path)
-
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         raise NotImplementedError()
 
     async def async_collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         raise NotImplementedError()
 
+    def collect(
+        self,
+        data_range: typing.Any | None = None,
+        *,
+        overwrite: bool = False,
+        verbose: int = 1,
+    ) -> None:
+        chunk_ranges, paths = self._get_chunk_ranges(data_range, overwrite)
+
+        if verbose >= 1:
+            self.summarize_collection(
+                chunk_ranges=chunk_ranges, paths=paths, overwrite=overwrite
+            )
+
+        # collect chunks
+        for chunk_range, path in zip(chunk_ranges, paths):
+            df = self.collect_chunk(data_range=data_range)
+            truck.ops.collection.write_file(df=df, path=path)
+
+    # async def async_collect(
+    #     self, data_range: typing.Any | None = None, overwrite: bool = False
+    # ) -> None:
+    #     import asyncio
+
+    #     chunk_ranges, paths = self._get_chunk_ranges(data_range, overwrite)
+    #     coroutines = [
+    #         self._async_collect_and_save(chunk_range, path)
+    #         for chunk_range, path in zip(chunk_ranges, paths)
+    #     ]
+    #     await asyncio.gather(*coroutines)
+
+    # async def _async_collect_and_save(
+    #     self, data_range: typing.Any | None, path: str
+    # ) -> None:
+    #     df = await self.async_collect_chunk(data_range=data_range)
+    #     truck.ops.collection.write_file(df=df, path=path)
+
+    def summarize_collection(
+        self, chunk_ranges: list[typing.Any], paths: list[str], overwrite: bool
+    ) -> None:
+        print('collecting', self.name())
+        print('- n_chunks:', len(chunk_ranges))
+        if self.write_range == 'overwrite':
+            print('- chunk: [entire dataset]')
+        elif len(chunk_ranges) == 1:
+            print('- chunk:', chunk_ranges[0])
+        elif len(chunk_ranges) > 1:
+            print('- min_chunk:', chunk_ranges[0])
+            print('- max_chunk:', chunk_ranges[-1])
+        print('- overwrite:', overwrite)
+
     def _get_chunk_ranges(
         self, data_range: typing.Any | None = None, overwrite: bool = False
     ) -> tuple[list[typing.Any], list[str]]:
         import os
+
+        if self.write_range == 'overwrite':
+            return ([None], [self.get_file_path(None)])
 
         # get data range
         if data_range is None:

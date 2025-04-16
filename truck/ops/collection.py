@@ -8,6 +8,7 @@ from . import paths
 if typing.TYPE_CHECKING:
     import datetime
     import tooltime
+    import polars as pl
 
 
 def does_file_exist(url: str) -> bool:
@@ -21,6 +22,23 @@ def does_file_exist(url: str) -> bool:
         return False
     except requests.RequestException:
         return False
+
+
+def download_file(*, url: str, path: str) -> None:
+    raise NotImplementedError()
+
+
+def write_file(*, df: pl.DataFrame, path: str) -> None:
+    import shutil
+
+    tmp_path = path + '_tmp'
+    if path.endswith('.parquet'):
+        df.write_parquet(tmp_path)
+    elif path.endswith('.csv'):
+        df.write_csv(tmp_path)
+    else:
+        raise Exception('invalid file extension')
+    shutil.move(tmp_path, path)
 
 
 # class DataRange(typing.TypedDict):

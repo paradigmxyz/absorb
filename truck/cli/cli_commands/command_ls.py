@@ -17,7 +17,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
 
     # available datasets
     cli_outputs._print_title('Available datasets')
-    for source in sorted(truck.get_sources(), reverse=True):
+    for source in sorted(truck.get_sources()):
         cli_outputs._print_source_datasets_bullet(
             source, truck.get_source_tables(source)
         )
