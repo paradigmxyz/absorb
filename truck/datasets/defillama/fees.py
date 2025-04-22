@@ -18,7 +18,7 @@ class Fees(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        data = common.get_url_data(common.endpoints['fees'])
+        data = common._fetch('fees')
         return extract_total_revenue(data)
 
 
@@ -36,8 +36,7 @@ class FeesPerChain(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for chain in self.parameters['chains']:
-            url = common.endpoints['fees_per_chain'].format(chain=chain)
-            data = common.get_url_data(url)
+            data = common._fetch('fees_per_chain', {'chain': chain})
             df = extract_revenue_per_protocol(data)
             df = df.select('timestamp', pl.lit(chain), 'protocol', 'revenue')
             dfs.append(df)
@@ -58,10 +57,7 @@ class FeesPerProtocol(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for protocol in self.parameters['protocols']:
-            url = common.endpoints['fees_per_protocol'].format(
-                protocol=protocol
-            )
-            data = common.get_url_data(url)
+            data = common._fetch('fees_per_protocol', {'protocol': protocol})
             df = extract_revenue_per_protocol_per_chain(data)
             dfs.append(df)
         return pl.concat(dfs)

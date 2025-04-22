@@ -29,8 +29,7 @@ class HistoricalYields(truck.Table):
 def get_current_yields() -> pl.DataFrame:
     import polars as pl
 
-    url = common.endpoints['current_yields']
-    data = common.get_url_data(url)
+    data = common._fetch('current_yields')
 
     columns = {
         'pool': 'pool',
@@ -72,8 +71,7 @@ def get_current_yields() -> pl.DataFrame:
 def get_pool_yield_history(pool: str) -> pl.DataFrame:
     import polars as pl
 
-    url = common.endpoints['yields_per_pool'].format(pool=pool)
-    data = common.get_url_data(url)
+    data = common._fetch('yields_per_pool', {'pool': pool})
     columns: dict[str, str | pl.Expr] = {
         'timestamp': pl.col.timestamp.str.to_datetime(),
         'tvl_usd': 'tvlUsd',
