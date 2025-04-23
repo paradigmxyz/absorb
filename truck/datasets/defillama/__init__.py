@@ -1,4 +1,3 @@
-from .coins import *
 from .common import *
 from .fees import *
 from .stablecoins import *

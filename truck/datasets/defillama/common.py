@@ -10,21 +10,44 @@ from __future__ import annotations
 import typing
 
 
+default_root = 'https://api.llama.fi'
+stablecoin_root = 'https://stablecoins.llama.fi'
+yield_root = 'https://yields.llama.fi'
+
+
 endpoints = {
+    # tvl
+    'current_tvls': default_root + '/protocols',
+    'historical_tvl_of_protocol': default_root + '/protocol/{protocol}',
+    'historical_tvl': default_root + '/v2/historicalChainTvl',
+    'historical_tvl_of_chain': default_root + '/v2/historicalChainTvl/{chain}',
+    'current_tvl_of_protocol': default_root + '/tvl/{protocol}',
+    'current_tvl_per_chain': default_root + '/v2/chains',
     # stablecoins
-    'current_stablecoins': 'https://stablecoins.llama.fi/stablecoins',
-    'historical_total_stablecoins': 'https://stablecoins.llama.fi/stablecoincharts/all',
-    'historical_stablecoins_of_chain': 'https://stablecoins.llama.fi/stablecoincharts/{chain}',
-    'historical_stablecoins_of_token': 'https://stablecoins.llama.fi/stablecoin/{token}',
-    'current_stablecoins_per_chain': 'https://stablecoins.llama.fi/stablecoinchains',
-    'historical_stablecoin_prices': 'https://stablecoins.llama.fi/stablecoinprices',
+    'current_stablecoins': stablecoin_root + '/stablecoins',
+    'historical_total_stablecoins': stablecoin_root + '/stablecoincharts/all',
+    'historical_stablecoins_of_chain': stablecoin_root
+    + '/stablecoincharts/{chain}',
+    'historical_stablecoins_of_token': stablecoin_root + '/stablecoin/{token}',
+    'current_stablecoins_per_chain': stablecoin_root + '/stablecoinchains',
+    'historical_stablecoin_prices': stablecoin_root + '/stablecoinprices',
     # yields
-    'current_yields': 'https://yields.llama.fi/pools',
-    'yields_per_pool': 'https://yields.llama.fi/chart/{pool}',
+    'current_yields': yield_root + '/pools',
+    'historical_yields_per_pool': yield_root + '/chart/{pool}',
+    # volumes
+    'historical_dex_volume': default_root + '/overview/dexs',
+    'historical_dex_volume_of_chain': default_root + '/overview/dexs/{chain}',
+    'historical_dex_volume_of_protocol': default_root
+    + '/summary/dexs/{protocol}',
+    'historical_options_volume': default_root + '/overview/options',
+    'historical_options_volume_of_chain': default_root
+    + '/overview/options/{chain}',
+    'historical_options_volume_of_protocol': default_root
+    + '/summary/options/{protocol}',
     # fees and revenue
-    'fees': 'https://api.llama.fi/overview/fees',
-    'fees_per_chain': 'https://api.llama.fi/overview/fees/{chain}',
-    'fees_per_protocol': 'https://api.llama.fi/summary/fees/{protocol}',
+    'historical_fees': default_root + '/overview/fees',
+    'historical_fees_per_chain': default_root + '/overview/fees/{chain}',
+    'historical_fees_per_protocol': default_root + '/summary/fees/{protocol}',
 }
 
 
@@ -35,6 +58,7 @@ def _fetch(
 
     url = _get_url(endpoint, parameters)
     response = requests.get(url)
+    response.raise_for_status()
     return response.json()
 
 

@@ -21,7 +21,7 @@ class HistoricalYields(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for pool in self.parameters['pools']:
-            df = get_pool_yield_history(pool)
+            df = get_historical_yields_of_pool(pool)
             dfs.append(df)
         return pl.concat(dfs)
 
@@ -68,12 +68,13 @@ def get_current_yields() -> pl.DataFrame:
     )
 
 
-def get_pool_yield_history(pool: str) -> pl.DataFrame:
+def get_historical_yields_of_pool(pool: str) -> pl.DataFrame:
     import polars as pl
 
-    data = common._fetch('yields_per_pool', {'pool': pool})
+    data = common._fetch('historical_yields_per_pool', {'pool': pool})
     columns: dict[str, str | pl.Expr] = {
         'timestamp': pl.col.timestamp.str.to_datetime(),
+        'pool': pl.lit(pool),
         'tvl_usd': 'tvlUsd',
         'apy_base': 'apyBase',
         'apy_base_7d': 'apyBase7d',

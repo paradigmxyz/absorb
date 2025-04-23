@@ -18,8 +18,7 @@ class Fees(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        data = common._fetch('fees')
-        return extract_total_revenue(data)
+        return get_historical_fees()
 
 
 class FeesPerChain(truck.Table):
@@ -36,8 +35,7 @@ class FeesPerChain(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for chain in self.parameters['chains']:
-            data = common._fetch('fees_per_chain', {'chain': chain})
-            df = extract_revenue_per_protocol(data)
+            df = get_fees_per_protocol_of_chain(chain)
             df = df.select('timestamp', pl.lit(chain), 'protocol', 'revenue')
             dfs.append(df)
         return pl.concat(dfs)
@@ -57,14 +55,15 @@ class FeesPerProtocol(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for protocol in self.parameters['protocols']:
-            data = common._fetch('fees_per_protocol', {'protocol': protocol})
-            df = extract_revenue_per_protocol_per_chain(data)
+            df = get_fees_per_chain_of_protocol(protocol)
             dfs.append(df)
         return pl.concat(dfs)
 
 
-def extract_total_revenue(data: dict[str, typing.Any]) -> pl.DataFrame:
+def get_historical_fees() -> pl.DataFrame:
     import polars as pl
+
+    data = common._fetch('historical_fees')
 
     return (
         pl.DataFrame(
@@ -78,17 +77,19 @@ def extract_total_revenue(data: dict[str, typing.Any]) -> pl.DataFrame:
     )
 
 
-def extract_revenue_per_protocol(data: dict[str, typing.Any]) -> pl.DataFrame:
+def get_fees_per_protocol_of_chain(chain: str) -> pl.DataFrame:
     import polars as pl
+
+    data = common._fetch('historical_fees_per_chain', {'chain': chain})
 
     return (
         pl.DataFrame(
             [
-                [time, protocol, value]
+                [time, chain, protocol, value]
                 for time, item in data['totalDataChartBreakdown']
                 for protocol, value in item.items()
             ],
-            schema=['timestamp', 'protocol', 'revenue_usd'],
+            schema=['timestamp', 'chain', 'protocol', 'revenue_usd'],
             orient='row',
         )
         .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
@@ -96,10 +97,10 @@ def extract_revenue_per_protocol(data: dict[str, typing.Any]) -> pl.DataFrame:
     )
 
 
-def extract_revenue_per_protocol_per_chain(
-    data: dict[str, typing.Any],
-) -> pl.DataFrame:
+def get_fees_per_chain_of_protocol(protocol: str) -> pl.DataFrame:
     import polars as pl
+
+    data = common._fetch('historical_fees_per_protocol', {'protocol': protocol})
 
     return (
         pl.DataFrame(
@@ -107,7 +108,7 @@ def extract_revenue_per_protocol_per_chain(
                 [time, chain, protocol, value]
                 for time, item in data['totalDataChartBreakdown']
                 for chain, subitem in item.items()
-                for protocol, value in subitem.items()
+                for _, value in subitem.items()
             ],
             schema=['timestamp', 'chain', 'protocol', 'revenue_usd'],
             orient='row',

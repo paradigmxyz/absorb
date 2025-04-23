@@ -89,19 +89,19 @@ def get_historical_stablecoins_of_chain(chain: str) -> pl.DataFrame:
     rows = [
         [
             datum['date'],
+            chain,
             sum(datum['totalCirculatingUSD'].values()),
             sum(datum.get('totalMintedUSD', {'': 0}).values()),
             sum(datum.get('totalBridgedToUSD', {'': 0}).values()),
-            chain,
         ]
         for datum in data
     ]
     schema = [
         'timestamp',
+        'chain',
         'circulating_usd',
         'minted_usd',
         'bridged_usd',
-        'chain',
     ]
 
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
