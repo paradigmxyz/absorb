@@ -2,13 +2,71 @@ from __future__ import annotations
 
 import typing
 
+import truck
 from . import common
 
 if typing.TYPE_CHECKING:
     import polars as pl
 
 
-def get_project_metadata() -> pl.DataFrame:
+class TvlOfChains(truck.Table):
+    parameter_types = {'chains': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'chain': pl.String,
+            'tvl_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_tvl_of_chain(chain)
+            for chain in self.parameters['chains']
+        ]
+        return pl.concat(dfs)
+
+
+class TvlOfProtocols(truck.Table):
+    parameter_types = {'protocols': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'chain': pl.String,
+            'protocol': pl.String,
+            'tvl_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_tvl_per_chain_of_protocol(protocol)
+            for protocol in self.parameters['protocols']
+        ]
+        return pl.concat(dfs)
+
+
+class TvlPerTokenOfProtocols(truck.Table):
+    parameter_types = {'protocols': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'protocol': pl.String,
+            'symbol': pl.String,
+            'supply': pl.Float64,
+            'tvl_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_tvl_per_token_of_protocol(protocol)
+            for protocol in self.parameters['protocols']
+        ]
+        return pl.concat(dfs)
+
+
+def get_current_project_tvls() -> pl.DataFrame:
     import polars as pl
 
     data = common._fetch('current_tvls')
@@ -40,7 +98,7 @@ def get_historical_tvl() -> pl.DataFrame:
     )
 
 
-def get_tvl_of_chain(chain: str) -> pl.DataFrame:
+def get_historical_tvl_of_chain(chain: str) -> pl.DataFrame:
     import polars as pl
 
     data = common._fetch('historical_tvl_of_chain', {'chain': chain})
@@ -65,7 +123,7 @@ def get_historical_tvl_per_chain_of_protocol(
         for chain in data['chainTvls']
         for datum in data['chainTvls'][chain]['tvl']
     ]
-    schema = ['timestamp', 'chain', 'protocol', 'supply_usd']
+    schema = ['timestamp', 'chain', 'protocol', 'tvl_usd']
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
         (pl.col.timestamp * 1000).cast(pl.Datetime('ms'))
     )

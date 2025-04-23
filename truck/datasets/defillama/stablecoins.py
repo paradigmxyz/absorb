@@ -10,12 +10,12 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class TotalStablecoins(truck.Table):
+class Stablecoins(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_total_stablecoins()
 
 
-class StablecoinsPerChain(truck.Table):
+class StablecoinsOfChains(truck.Table):
     parameter_types = {'chains': list}
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
@@ -28,20 +28,7 @@ class StablecoinsPerChain(truck.Table):
         return pl.concat(dfs)
 
 
-class StablecoinsPerToken(truck.Table):
-    parameter_types = {'tokens': list}
-
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        import polars as pl
-
-        dfs = []
-        for token in self.parameters['tokens']:
-            df = get_historical_stablecoins_of_token(token)
-            dfs.append(df)
-        return pl.concat(dfs)
-
-
-class StablecoinsPerTokenPerChain(truck.Table):
+class StablecoinsOfTokens(truck.Table):
     parameter_types = {'tokens': list}
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:

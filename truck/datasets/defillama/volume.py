@@ -5,7 +5,84 @@ import typing
 if typing.TYPE_CHECKING:
     import polars as pl
 
+import truck
 from . import common
+
+
+class DexVolumeOfProtocols(truck.Table):
+    parameter_types = {'protocols': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'chain': pl.String,
+            'protocol': pl.String,
+            'volume_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_dex_volume_per_chain_of_protocol(protocol)
+            for protocol in self.parameters['protocols']
+        ]
+        return pl.concat(dfs)
+
+
+class DexVolumeOfChains(truck.Table):
+    parameter_types = {'chains': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'chain': pl.String,
+            'protocol': pl.String,
+            'volume_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_dex_volume_per_protocol_of_chain(chain)
+            for chain in self.parameters['chains']
+        ]
+        return pl.concat(dfs)
+
+
+class OptionsVolumeOfProtocols(truck.Table):
+    parameter_types = {'protocols': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'chain': pl.String,
+            'protocol': pl.String,
+            'volume_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_options_volume_per_chain_of_protocol(protocol)
+            for protocol in self.parameters['protocols']
+        ]
+        return pl.concat(dfs)
+
+
+class OptionsVolumeOfChains(truck.Table):
+    parameter_types = {'chains': list[str]}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'chain': pl.String,
+            'protocol': pl.String,
+            'volume_usd': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        dfs = [
+            get_historical_options_volume_per_protocol_of_chain(chain)
+            for chain in self.parameters['chains']
+        ]
+        return pl.concat(dfs)
 
 
 #

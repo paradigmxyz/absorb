@@ -21,7 +21,7 @@ class Fees(truck.Table):
         return get_historical_fees()
 
 
-class FeesPerChain(truck.Table):
+class FeesOfChains(truck.Table):
     parameter_types = {'protocols': list[str]}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -35,13 +35,13 @@ class FeesPerChain(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for chain in self.parameters['chains']:
-            df = get_fees_per_protocol_of_chain(chain)
+            df = get_historical_fees_per_protocol_of_chain(chain)
             df = df.select('timestamp', pl.lit(chain), 'protocol', 'revenue')
             dfs.append(df)
         return pl.concat(dfs)
 
 
-class FeesPerProtocol(truck.Table):
+class FeesOfProtocols(truck.Table):
     parameter_types = {'protocols': list[str]}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -55,7 +55,7 @@ class FeesPerProtocol(truck.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []
         for protocol in self.parameters['protocols']:
-            df = get_fees_per_chain_of_protocol(protocol)
+            df = get_historical_fees_per_chain_of_protocol(protocol)
             dfs.append(df)
         return pl.concat(dfs)
 
@@ -77,7 +77,7 @@ def get_historical_fees() -> pl.DataFrame:
     )
 
 
-def get_fees_per_protocol_of_chain(chain: str) -> pl.DataFrame:
+def get_historical_fees_per_protocol_of_chain(chain: str) -> pl.DataFrame:
     import polars as pl
 
     data = common._fetch('historical_fees_per_chain', {'chain': chain})
@@ -97,7 +97,7 @@ def get_fees_per_protocol_of_chain(chain: str) -> pl.DataFrame:
     )
 
 
-def get_fees_per_chain_of_protocol(protocol: str) -> pl.DataFrame:
+def get_historical_fees_per_chain_of_protocol(protocol: str) -> pl.DataFrame:
     import polars as pl
 
     data = common._fetch('historical_fees_per_protocol', {'protocol': protocol})

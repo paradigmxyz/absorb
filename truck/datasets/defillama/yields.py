@@ -10,12 +10,7 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class CurrentYields(truck.Table):
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        return get_current_yields()
-
-
-class HistoricalYields(truck.Table):
+class YieldsOfPools(truck.Table):
     parameter_types = {'pools': list[str]}
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
