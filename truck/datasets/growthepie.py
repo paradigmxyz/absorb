@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 class Fundamentals(truck.Table):
     source = 'growthepie'
-    write_range = 'overwrite'
+    write_range = 'overwrite_all'
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -20,6 +20,7 @@ class Fundamentals(truck.Table):
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
+        import polars as pl
 
         url = 'https://api.growthepie.xyz/v1/fundamentals_full.json'
         response = requests.get(url)

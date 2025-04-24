@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 
 class Chains(truck.Table):
     source = 'chains'
-    write_range = 'overwrite'
+    write_range = 'overwrite_all'
     range_format = 'count'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -26,8 +26,10 @@ class Chains(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        import polars as pl
+
         network_names = get_network_names()
-        chain_ids = network_names.keys()
+        chain_ids = [int(chain_id) for chain_id in network_names.keys()]
         chain_id_hex = [
             hex(int(chain_id))[2:].rjust(64, '0') for chain_id in chain_ids
         ]

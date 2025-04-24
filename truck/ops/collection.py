@@ -29,7 +29,10 @@ def download_file(*, url: str, path: str) -> None:
 
 
 def write_file(*, df: pl.DataFrame, path: str) -> None:
+    import os
     import shutil
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
 
     tmp_path = path + '_tmp'
     if path.endswith('.parquet'):

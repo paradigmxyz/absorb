@@ -31,11 +31,16 @@ class TableCollect(table_coverage.TableCoverage):
             self.summarize_collection(
                 chunk_ranges=chunk_ranges, paths=paths, overwrite=overwrite
             )
+            print()
 
         # collect chunks
         for chunk_range, path in zip(chunk_ranges, paths):
             df = self.collect_chunk(data_range=data_range)
             truck.ops.collection.write_file(df=df, path=path)
+            if verbose >= 1:
+                import os
+
+                print('wrote', os.path.basename(path))
 
     # async def async_collect(
     #     self, data_range: typing.Any | None = None, overwrite: bool = False
@@ -58,9 +63,9 @@ class TableCollect(table_coverage.TableCoverage):
     def summarize_collection(
         self, chunk_ranges: list[typing.Any], paths: list[str], overwrite: bool
     ) -> None:
-        print('collecting', self.name())
+        print('collecting dataset:', self.source + '.' + self.name())
         print('- n_chunks:', len(chunk_ranges))
-        if self.write_range == 'overwrite':
+        if self.write_range == 'overwrite_all':
             print('- chunk: [entire dataset]')
         elif len(chunk_ranges) == 1:
             print('- chunk:', chunk_ranges[0])
@@ -68,13 +73,14 @@ class TableCollect(table_coverage.TableCoverage):
             print('- min_chunk:', chunk_ranges[0])
             print('- max_chunk:', chunk_ranges[-1])
         print('- overwrite:', overwrite)
+        print('- output dir:', self.get_dir_path())
 
     def _get_chunk_ranges(
         self, data_range: typing.Any | None = None, overwrite: bool = False
     ) -> tuple[list[typing.Any], list[str]]:
         import os
 
-        if self.write_range == 'overwrite':
+        if self.write_range == 'overwrite_all':
             return ([None], [self.get_file_path(None)])
 
         # get data range

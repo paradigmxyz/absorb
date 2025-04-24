@@ -11,7 +11,9 @@ if typing.TYPE_CHECKING:
 
 class TableBase:
     source: str
-    write_range: typing.Literal['append_only', 'overwrite']
+    write_range: typing.Literal[
+        'append_only', 'overwrite_all', 'overwrite_chunks'
+    ]
     range_format: truck.types.annotations.RangeFormat
     index_by: typing.Literal['time', 'block', 'id']
     cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None

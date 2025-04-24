@@ -178,7 +178,7 @@ def _format_data_range(
             _format_value(data_range[0]) + '_to_' + _format_value(data_range[1])
         )
     elif range_format is None:
-        return str(range_format)
+        return str(data_range)
     else:
         raise Exception('invalid range_format: ' + str(range_format))
 

@@ -42,7 +42,7 @@ class StablecoinsOfTokens(truck.Table):
 
 
 class StablecoinPrices(truck.Table):
-    write_range = 'overwrite'
+    write_range = 'overwrite_all'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_stablecoin_prices()

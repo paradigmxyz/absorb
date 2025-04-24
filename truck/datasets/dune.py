@@ -20,7 +20,7 @@ class BaseQuery(truck.Table):
 class FullQuery(BaseQuery):
     """collect the full output of a query"""
 
-    write_range = 'overwrite'
+    write_range = 'overwrite_all'
     parameter_types = {
         'query': str,
         'spice_kwargs': dict[str, typing.Any],
