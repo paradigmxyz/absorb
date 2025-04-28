@@ -59,6 +59,7 @@ class Metrics(truck.Table):
 
 def get_projects() -> pl.DataFrame:
     import requests
+    import polars as pl
 
     response = requests.get(endpoints['summary'])
     data = response.json()
@@ -67,11 +68,14 @@ def get_projects() -> pl.DataFrame:
 
 def get_project_activity(project: str) -> pl.DataFrame:
     import requests
+    import polars as pl
 
     response = requests.get(
         endpoints['project_activity'].format(project=project)
     )
     data = response.json()
+    if not data['success']:
+        raise Exception(data['error'])
     return (
         pl.DataFrame(
             data['data']['chart']['data'],
@@ -85,9 +89,12 @@ def get_project_activity(project: str) -> pl.DataFrame:
 
 def get_project_tvs(project: str) -> pl.DataFrame:
     import requests
+    import polars as pl
 
     response = requests.get(endpoints['project_tvs'].format(project=project))
     data = response.json()
+    if not data['success']:
+        raise Exception(data['error'])
     return pl.DataFrame(
         data['data']['chart']['data'],
         schema=data['data']['chart']['types'],
@@ -97,25 +104,29 @@ def get_project_tvs(project: str) -> pl.DataFrame:
         native_tvs=pl.col.native.cast(pl.Float64),
         canonical_tvs=pl.col.canonical.cast(pl.Float64),
         external_tvs=pl.col.external.cast(pl.Float64),
-        total_tvs=pl.col.native + pl.col.canonical + pl.col.external,
+        total_tvs=(pl.col.native + pl.col.canonical + pl.col.external).cast(
+            pl.Float64
+        ),
     )
 
 
 def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
+    import polars as pl
+
     if projects is None:
         projects = get_projects()
 
     dfs = []
     for project in projects.to_dicts():
-        activity = get_project_activity(project['slug'])
-        tvs = get_project_tvs(project['slug'])
+        print('getting', project['slug'])
+        try:
+            activity = get_project_activity(project['slug'])
+            tvs = get_project_tvs(project['slug'])
+        except Exception as e:
+            print('skipping ' + project['slug'] + ' because ' + str(e.args[0]))
+            continue
         df = (
-            activity.join(
-                tvs,
-                on='timestamp',
-                how='full',
-                coalesce=True,
-            )
+            activity.join(tvs, on='timestamp', how='full', coalesce=True)
             .fill_null(0)
             .with_columns(
                 name=pl.lit(project['name']),
