@@ -41,6 +41,26 @@ def get_subcommands() -> (
                     ['--parameters'],
                     {'nargs': '*', 'help': 'dataset parameters'},
                 ),
+                (
+                    ['--dry'],
+                    {
+                        'action': 'store_true',
+                        'help': 'perform dry run (avoids collecting data)',
+                    },
+                ),
+                (
+                    ['--overwrite'],
+                    {
+                        'action': 'store_true',
+                        'help': 'overwrite existing files',
+                    },
+                ),
+                (
+                    ['--range'],
+                    {
+                        'help': 'range of data to collect',
+                    },
+                ),
             ],
         ),
         (
@@ -201,13 +221,15 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
 
 def _parse_ranges(
     raw_ranges: list[str] | None, range_format: truck.RangeFormat
-) -> list[typing.Any]:
+) -> list[typing.Any] | None:
     """
     examples:
     --range 2025-01-01:2025-03-01
     --range 2025-01-01:
     --range :2025-01-01
     """
+    if raw_ranges is None:
+        return None
     if range_format == 'date' or range_format == 'date_range':
         raise NotImplementedError('manual ranges for ' + str(range_format))
     else:

@@ -27,7 +27,11 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             )
         else:
             data_ranges = None
-        instance.collect(data_range=data_ranges)
+        instance.collect(
+            data_range=data_ranges,
+            dry=args.dry,
+            overwrite=args.overwrite,
+        )
         first = False
 
     return {}

@@ -32,12 +32,15 @@ class TableCollect(table_coverage.TableCoverage):
         *,
         overwrite: bool = False,
         verbose: int = 1,
+        dry: bool = False,
     ) -> None:
         chunk_ranges, paths = self._get_chunks_to_collect(data_range, overwrite)
         if verbose >= 1:
             self.summarize_collection_plan(
                 chunk_ranges=chunk_ranges, paths=paths, overwrite=overwrite
             )
+        if dry:
+            return None
         for chunk_range, path in zip(chunk_ranges, paths):
             df = self.collect_chunk(data_range=data_range)
             truck.ops.collection.write_file(df=df, path=path)
@@ -49,6 +52,7 @@ class TableCollect(table_coverage.TableCoverage):
         data_range: typing.Any | None = None,
         overwrite: bool = False,
         verbose: int = 1,
+        dry: bool = False,
     ) -> None:
         import asyncio
 
@@ -57,6 +61,8 @@ class TableCollect(table_coverage.TableCoverage):
             self.summarize_collection_plan(
                 chunk_ranges=chunk_ranges, paths=paths, overwrite=overwrite
             )
+        if dry:
+            return None
         coroutines = [
             self._async_process_chunk(chunk_range, path, verbose)
             for chunk_range, path in zip(chunk_ranges, paths)
