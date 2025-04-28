@@ -73,8 +73,12 @@ class TablePaths(table_base.TableBase):
         )
 
     def parse_file_path(self, path: str) -> dict[str, typing.Any]:
+        if self.write_range == 'overwrite_all':
+            range_format = None
+        else:
+            range_format = self.range_format
         return truck.ops.paths.parse_file_path(
             path=path,
             filename_template=self.filename_template,
-            range_format=self.range_format,
+            range_format=range_format,
         )

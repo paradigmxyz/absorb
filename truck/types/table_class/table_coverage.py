@@ -22,7 +22,15 @@ class TableCoverage(table_paths.TablePaths):
             return None
 
         glob_str = self.get_glob()
-        if self.is_range_sortable():
+        if self.write_range == 'overwrite_all':
+            files = sorted(glob.glob(glob_str))
+            if len(files) == 0:
+                return None
+            elif len(files) == 1:
+                return self.parse_file_path(files[0])['data_range']
+            else:
+                raise Exception('too many files')
+        elif self.is_range_sortable():
             files = sorted(glob.glob(glob_str))
             start = self.parse_file_path(files[0])['data_range']
             end = self.parse_file_path(files[-1])['data_range']
