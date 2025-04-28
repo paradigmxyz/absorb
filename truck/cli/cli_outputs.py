@@ -5,13 +5,6 @@ import typing
 import truck
 
 
-bullet_styles = {
-    'key_style': 'white bold',
-    'bullet_style': 'green',
-    'colon_style': 'green',
-}
-
-
 def _print_title(title: str) -> None:
     import rich
 
@@ -27,7 +20,7 @@ def _print_dataset_bullet(dataset: truck.TrackedTable) -> None:
 
     toolstr.print_bullet(
         '[white bold]' + _dataset_to_str(dataset) + '[/white bold]',
-        **bullet_styles,
+        **truck.ops.formatting.bullet_styles,
     )
 
 
@@ -40,7 +33,7 @@ def _print_source_datasets_bullet(
     toolstr.print_bullet(
         key=source,
         value='[green],[/green] '.join(names),
-        **bullet_styles,
+        **truck.ops.formatting.bullet_styles,
     )
 
 

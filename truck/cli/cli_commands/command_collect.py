@@ -16,7 +16,10 @@ def collect_command(args: Namespace) -> dict[str, Any]:
     else:
         datasets = truck.ops.config.get_tracked_tables()
 
+    first = True
     for dataset in datasets:
+        if not first:
+            print()
         instance = truck.Table.instantiate(dataset)
         if instance.write_range == 'append_only':
             data_ranges = cli_parsing._parse_ranges(
@@ -25,5 +28,6 @@ def collect_command(args: Namespace) -> dict[str, Any]:
         else:
             data_ranges = None
         instance.collect(data_range=data_ranges)
+        first = False
 
     return {}
