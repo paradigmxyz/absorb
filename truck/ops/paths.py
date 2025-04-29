@@ -225,4 +225,9 @@ def parse_file_path(
 def parse_data_range(
     as_str: str, range_format: truck.RangeFormat
 ) -> typing.Any:
-    raise NotImplementedError()
+    if range_format == 'date':
+        import datetime
+
+        return datetime.datetime.strptime(as_str, '%Y-%m-%d')
+    else:
+        raise NotImplementedError()
