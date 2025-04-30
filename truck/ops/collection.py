@@ -28,6 +28,23 @@ def download_file(*, url: str, path: str) -> None:
     raise NotImplementedError()
 
 
+def download_parquet_to_dataframe(url: str) -> pl.DataFrame:
+    import io
+    import requests
+    import polars as pl
+
+    try:
+        response = requests.get(url)
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to download: HTTP status code {response.status_code}"
+            )
+        parquet_buffer = io.BytesIO(response.content)
+        return pl.read_parquet(parquet_buffer)
+    except Exception as e:
+        raise Exception(f"Error processing parquet file: {str(e)}")
+
+
 def write_file(*, df: pl.DataFrame, path: str) -> None:
     import os
     import shutil
@@ -147,3 +164,4 @@ def write_file(*, df: pl.DataFrame, path: str) -> None:
 #             if chunk:
 #                 file.write(chunk)
 #     shutil.move(tmp_path, output_path)
+

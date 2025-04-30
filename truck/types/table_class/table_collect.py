@@ -45,10 +45,10 @@ class TableCollect(table_coverage.TableCoverage):
         if dry:
             return None
         for chunk_range, path in zip(chunk_ranges, paths):
-            df = self.collect_chunk(data_range=data_range)
-            truck.ops.collection.write_file(df=df, path=path)
             if verbose >= 1:
-                self.summarize_collected_chunk(df, data_range, path)
+                self.summarize_chunk(chunk_range, path)
+            df = self.collect_chunk(data_range=chunk_range)
+            truck.ops.collection.write_file(df=df, path=path)
 
     async def async_collect(
         self,
@@ -78,10 +78,10 @@ class TableCollect(table_coverage.TableCoverage):
     async def _async_process_chunk(
         self, data_range: typing.Any | None, path: str, verbose: int
     ) -> None:
+        if verbose >= 1:
+            self.summarize_chunk(data_range, path)
         df = await self.async_collect_chunk(data_range=data_range)
         truck.ops.collection.write_file(df=df, path=path)
-        if verbose >= 1:
-            self.summarize_collected_chunk(df, data_range, path)
 
     def summarize_collection_plan(
         self,
@@ -90,6 +90,7 @@ class TableCollect(table_coverage.TableCoverage):
         overwrite: bool,
         verbose: int,
     ) -> None:
+        import datetime
         import rich
 
         rich.print(
@@ -109,8 +110,10 @@ class TableCollect(table_coverage.TableCoverage):
             truck.ops.print_bullet('max_chunk', chunk_ranges[-1])
         truck.ops.print_bullet('overwrite', str(overwrite))
         truck.ops.print_bullet('output dir', self.get_dir_path())
+        truck.ops.print_bullet('collection start time', datetime.datetime.now())
         if len(chunk_ranges) == 0:
             print('[already collected]')
+        print()
 
         if verbose > 1:
             truck.ops.print_bullet(key='chunks', value='')
@@ -165,12 +168,7 @@ class TableCollect(table_coverage.TableCoverage):
 
         return chunk_ranges, paths
 
-    def summarize_collected_chunk(
-        self,
-        df: pl.DataFrame,
-        data_range: typing.Any,
-        path: str,
-    ) -> None:
+    def summarize_chunk(self, data_range: typing.Any, path: str) -> None:
         import os
 
-        print('wrote', os.path.basename(path))
+        print('collecting', os.path.basename(path))
