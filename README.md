@@ -94,6 +94,7 @@ truck.upload('custom_dataset')
 - [mempool dumpster](https://mempool-dumpster.flashbots.net) Ethereum mempool history
 - [sourcify](https://sourcify.dev) verified contracts
 - [tix](https://github.com/paradigmxyz/tix) price feeds
+- [vera](https://verifieralliance.org) verified contract archives
 - [xatu](https://github.com/ethpandaops/xatu-data) Ethereum mempool datasets
 
 
