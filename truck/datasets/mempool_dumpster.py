@@ -81,6 +81,14 @@ class Transactions(truck.Table):
             current -= datetime.timedelta(days=1)
         return [initial, current]
 
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        url = url_template.format(
+            year=data_range.year,
+            month=data_range.month,
+            day=data_range.day,
+        )
+        return truck.ops.download_parquet_to_dataframe(url)
+
     # @classmethod
     # def scan(
     #     dataset: truck.TableReference,
