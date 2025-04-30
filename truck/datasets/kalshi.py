@@ -19,20 +19,29 @@ class DailyStats(truck.Table):
     cadence = 'daily'
     range_format = 'date'
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         import requests
         import polars as pl
 
         date: datetime.datetime = data_range
         url = get_date_url(date)
         response = requests.get(url, stream=True)
+        if response.status_code == 404:
+            return None
         response.raise_for_status()
-        return pl.DataFrame(response.json())
+
+        df = pl.DataFrame(response.json())
+        if 'old_ticker_name' not in df.columns:
+            df = df.insert_column(
+                2, pl.lit(None, dtype=pl.String).alias('old_ticker_name')
+            )
+
+        return df
 
     def get_available_range(self) -> typing.Any:
         import datetime
 
-        first = datetime.datetime(year=2021, month=6, day=28)
+        first = datetime.datetime(year=2021, month=6, day=30)
         last = _find_last()
         return [first, last]
 
