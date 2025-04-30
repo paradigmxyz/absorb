@@ -37,7 +37,10 @@ class TableCollect(table_coverage.TableCoverage):
         chunk_ranges, paths = self._get_chunks_to_collect(data_range, overwrite)
         if verbose >= 1:
             self.summarize_collection_plan(
-                chunk_ranges=chunk_ranges, paths=paths, overwrite=overwrite
+                chunk_ranges=chunk_ranges,
+                paths=paths,
+                overwrite=overwrite,
+                verbose=verbose,
             )
         if dry:
             return None
@@ -59,7 +62,10 @@ class TableCollect(table_coverage.TableCoverage):
         chunk_ranges, paths = self._get_chunks_to_collect(data_range, overwrite)
         if verbose >= 1:
             self.summarize_collection_plan(
-                chunk_ranges=chunk_ranges, paths=paths, overwrite=overwrite
+                chunk_ranges=chunk_ranges,
+                paths=paths,
+                overwrite=overwrite,
+                verbose=verbose,
             )
         if dry:
             return None
@@ -78,7 +84,11 @@ class TableCollect(table_coverage.TableCoverage):
             self.summarize_collected_chunk(df, data_range, path)
 
     def summarize_collection_plan(
-        self, chunk_ranges: list[typing.Any], paths: list[str], overwrite: bool
+        self,
+        chunk_ranges: list[typing.Any],
+        paths: list[str],
+        overwrite: bool,
+        verbose: int,
     ) -> None:
         import rich
 
@@ -101,6 +111,16 @@ class TableCollect(table_coverage.TableCoverage):
         truck.ops.print_bullet('output dir', self.get_dir_path())
         if len(chunk_ranges) == 0:
             print('[already collected]')
+
+        if verbose > 1:
+            truck.ops.print_bullet(key='chunks', value='')
+            for c, chunk_range in enumerate(chunk_ranges):
+                truck.ops.print_bullet(
+                    key=None,
+                    value=truck.ops.format_range(chunk_range),
+                    number=c + 1,
+                    indent=4,
+                )
 
     def _get_chunks_to_collect(
         self, data_range: typing.Any | None = None, overwrite: bool = False

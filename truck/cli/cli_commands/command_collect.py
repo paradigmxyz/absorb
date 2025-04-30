@@ -31,6 +31,7 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             data_range=data_ranges,
             dry=args.dry,
             overwrite=args.overwrite,
+            verbose=args.verbose,
         )
         first = False
 

@@ -22,6 +22,7 @@ class FullQuery(BaseQuery):
 
     write_range = 'overwrite_all'
     parameter_types = {
+        'name': str,
         'query': str,
         'spice_kwargs': dict[str, typing.Any],
     }
@@ -42,6 +43,7 @@ class AppendOnlyQuery(truck.Table):
     write_range = 'append_only'
     range_format = 'named_range'
     parameter_types = {
+        'name': str,
         'query': str,
         'spice_kwargs': dict[str, typing.Any],
         'range_parameters': list[str],

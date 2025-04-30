@@ -61,6 +61,16 @@ def get_subcommands() -> (
                         'help': 'range of data to collect',
                     },
                 ),
+                (
+                    ['-v', '--verbose'],
+                    {
+                        'help': 'display extra information',
+                        'nargs': '?',
+                        'const': 1,
+                        'default': 1,
+                        'type': int,
+                    },
+                ),
             ],
         ),
         (

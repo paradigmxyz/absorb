@@ -33,10 +33,10 @@ def ls_command(args: Namespace) -> dict[str, Any]:
             for dataset in tracked_datasets:
                 instance = truck.Table.instantiate(dataset)
                 available_range = instance.get_available_range()
-                available_range = cli_outputs._format_range(available_range)
+                available_range = truck.ops.format_range(available_range)
                 collected_range = instance.get_collected_range()
                 if collected_range is not None:
-                    collected_range = cli_outputs._format_range(collected_range)
+                    collected_range = truck.ops.format_range(collected_range)
                 else:
                     collected_range = '-'
                 row = [
