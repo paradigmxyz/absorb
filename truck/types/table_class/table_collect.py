@@ -16,10 +16,12 @@ class TableCollect(table_coverage.TableCoverage):
     # # each table should implement collect_chunk or async_collect_chunk
     #
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         raise NotImplementedError()
 
-    async def async_collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    async def async_collect_chunk(
+        self, data_range: typing.Any
+    ) -> pl.DataFrame | None:
         raise NotImplementedError()
 
     #
@@ -48,7 +50,13 @@ class TableCollect(table_coverage.TableCoverage):
             if verbose >= 1:
                 self.summarize_chunk(chunk_range, path)
             df = self.collect_chunk(data_range=chunk_range)
-            truck.ops.collection.write_file(df=df, path=path)
+            if df is None:
+                if verbose >= 1:
+                    import os
+
+                    print('could not collect data for', os.path.basename(path))
+            else:
+                truck.ops.collection.write_file(df=df, path=path)
 
     async def async_collect(
         self,
@@ -81,7 +89,13 @@ class TableCollect(table_coverage.TableCoverage):
         if verbose >= 1:
             self.summarize_chunk(data_range, path)
         df = await self.async_collect_chunk(data_range=data_range)
-        truck.ops.collection.write_file(df=df, path=path)
+        if df is not None:
+            truck.ops.collection.write_file(df=df, path=path)
+        else:
+            if verbose >= 1:
+                import os
+
+                print('could not collect data for', os.path.basename(path))
 
     def summarize_collection_plan(
         self,
@@ -102,7 +116,7 @@ class TableCollect(table_coverage.TableCoverage):
         )
         truck.ops.print_bullet('n_chunks', str(len(chunk_ranges)))
         if self.write_range == 'overwrite_all':
-            truck.ops.print_bullet('chunk', '\[entire dataset]')
+            truck.ops.print_bullet('chunk', '\[entire dataset]')  # noqa
         elif len(chunk_ranges) == 1:
             truck.ops.print_bullet('single chunk', chunk_ranges[0])
         elif len(chunk_ranges) > 1:
@@ -110,7 +124,9 @@ class TableCollect(table_coverage.TableCoverage):
             truck.ops.print_bullet('max_chunk', chunk_ranges[-1])
         truck.ops.print_bullet('overwrite', str(overwrite))
         truck.ops.print_bullet('output dir', self.get_dir_path())
-        truck.ops.print_bullet('collection start time', datetime.datetime.now())
+        truck.ops.print_bullet(
+            'collection start time', str(datetime.datetime.now())
+        )
         if len(chunk_ranges) == 0:
             print('[already collected]')
         print()
@@ -138,17 +154,24 @@ class TableCollect(table_coverage.TableCoverage):
             # get data range
             if data_range is None:
                 if overwrite:
-                    data_range = self.get_available_range()
+                    data_range = [self.get_available_range()]
                 else:
-                    data_range = truck.ops.ranges.get_range_diff(
-                        subtract_this=self.get_collected_range(),
-                        from_this=self.get_available_range(),
-                        range_format=self.range_format,
-                    )
+                    collected_range = self.get_collected_range()
+                    available_range = self.get_available_range()
+                    if collected_range is None:
+                        data_ranges = [available_range]
+                    else:
+                        data_ranges = truck.ops.ranges.get_range_diff(
+                            subtract_this=collected_range,
+                            from_this=available_range,
+                            range_format=self.range_format,
+                        )
+            else:
+                data_ranges = [data_range]
 
             # partition range into chunks
             chunk_ranges = truck.ops.ranges.partition_into_chunks(
-                data_range, range_format=self.range_format
+                data_ranges, range_format=self.range_format
             )
             paths = [
                 self.get_file_path(data_range=chunk_range)

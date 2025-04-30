@@ -37,12 +37,12 @@ def download_parquet_to_dataframe(url: str) -> pl.DataFrame:
         response = requests.get(url)
         if response.status_code != 200:
             raise Exception(
-                f"Failed to download: HTTP status code {response.status_code}"
+                f'Failed to download: HTTP status code {response.status_code}'
             )
         parquet_buffer = io.BytesIO(response.content)
         return pl.read_parquet(parquet_buffer)
     except Exception as e:
-        raise Exception(f"Error processing parquet file: {str(e)}")
+        raise Exception(f'Error processing parquet file: {str(e)}')
 
 
 def write_file(*, df: pl.DataFrame, path: str) -> None:
@@ -164,4 +164,3 @@ def write_file(*, df: pl.DataFrame, path: str) -> None:
 #             if chunk:
 #                 file.write(chunk)
 #     shutil.move(tmp_path, output_path)
-

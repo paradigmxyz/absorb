@@ -42,7 +42,7 @@ class Metrics(truck.Table):
             'stack': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         return get_all_data()
 
     def get_available_range(self) -> typing.Any:

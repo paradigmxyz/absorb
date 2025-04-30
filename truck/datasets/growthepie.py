@@ -16,9 +16,13 @@ class Fundamentals(truck.Table):
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
-        return dict(self.collect_chunk(None).schema)
+        df = self.collect_chunk(None)
+        if df is not None:
+            return dict(df.schema)
+        else:
+            raise Exception('data not found')
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         import requests
         import polars as pl
 

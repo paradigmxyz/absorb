@@ -49,7 +49,7 @@ class AppendOnlyQuery(truck.Table):
         'range_parameters': list[str],
     }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         import spice
 
         query = self.parameters['query']
