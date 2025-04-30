@@ -49,12 +49,14 @@ class DailyStats(truck.Table):
 class Metadata(truck.Table):
     source = 'kalshi'
     cadence = None
+    write_range = 'overwrite_all'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import requests
         import time
+        import polars as pl
 
-        base_url = 'https://api.elections.kalshi.com/v1/search/series?order_by=trending&page_size=100'
+        base_url = 'https://api.elections.kalshi.com/v1/search/series?order_by=newest&page_size=100'
 
         cursor = None
         cursor_results: list[typing.Any] = []
@@ -64,13 +66,15 @@ class Metadata(truck.Table):
             else:
                 url = base_url
             time.sleep(0.25)
-            print('getting page', len(cursor_results))
+            print('getting kalshi metadata page', len(cursor_results) + 1)
             response = requests.get(url)
             data = response.json()
             if response.status_code == 200:
                 cursor_results.append(data)
                 cursor = data.get('next_cursor')
                 if cursor is None:
+                    break
+                if len(cursor_results) * 100 > 2 * data['total_results_count']:
                     break
             else:
                 print('status code', response.status_code)
