@@ -45,6 +45,31 @@ def download_parquet_to_dataframe(url: str) -> pl.DataFrame:
         raise Exception(f'Error processing parquet file: {str(e)}')
 
 
+def download_csv_gz_to_dataframe(
+    url: str, *, polars_kwargs: dict[str, typing.Any] | None = None
+) -> pl.DataFrame:
+    import io
+    import gzip
+    import requests
+    import polars as pl
+
+    try:
+        response = requests.get(url)
+        if response.status_code != 200:
+            raise Exception(
+                f'Failed to download: HTTP status code {response.status_code}'
+            )
+        # Decompress the gzip content
+        csv_buffer = io.StringIO(
+            gzip.decompress(response.content).decode('utf-8')
+        )
+        if polars_kwargs is None:
+            polars_kwargs = {}
+        return pl.read_csv(csv_buffer, **polars_kwargs)
+    except Exception as e:
+        raise Exception(f'Error processing csv.gz file: {str(e)}')
+
+
 def write_file(*, df: pl.DataFrame, path: str) -> None:
     import os
     import shutil

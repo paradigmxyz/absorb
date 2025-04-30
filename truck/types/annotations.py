@@ -6,6 +6,7 @@ import typing
 RangeFormat = typing.Literal[
     'date',
     'date_range',
+    'per_hour',
     'named_range',
     'block_range',
     'id_range',
