@@ -17,6 +17,7 @@ if typing.TYPE_CHECKING:
 
 class VeraChunkedDataset(truck.Table):
     vera_filetype: str
+    range_format = 'block_range'
 
     def get_available_range(self) -> typing.Any:
         return get_current_files(self.vera_filetype)

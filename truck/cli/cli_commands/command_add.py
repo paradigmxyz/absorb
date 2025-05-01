@@ -17,7 +17,7 @@ def add_command(args: Namespace) -> dict[str, Any]:
 
     # parse inputs
     if args.all:
-        track_datasets = truck.ops.catalog.get_available_tables()
+        track_datasets = truck.ops.get_available_tables(exclude_parameters=True)
     else:
         track_datasets = cli_parsing._parse_datasets(args)
 
