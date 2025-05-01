@@ -166,7 +166,7 @@ def test_range_diff_dates(test: RangeDiffTest) -> None:
         )
         for target_output_str in target_output_strs
     ]
-    actual_output = truck.get_range_diff(
+    actual_output = truck.ops.get_range_diff(
         subtract_this=subtract_this,
         from_this=from_this,
         range_format='date',
@@ -281,7 +281,7 @@ def test_range_diff_date_ranges(test: RangeDiffTest) -> None:
         )
         for target_output_str in target_output_strs
     ]
-    actual_output = truck.get_range_diff(
+    actual_output = truck.ops.get_range_diff(
         subtract_this=subtract_this,
         from_this=from_this,
         range_format='date_range',

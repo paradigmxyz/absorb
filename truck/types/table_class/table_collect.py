@@ -56,7 +56,7 @@ class TableCollect(table_coverage.TableCoverage):
 
                     print('could not collect data for', os.path.basename(path))
             else:
-                truck.ops.collection.write_file(df=df, path=path)
+                truck.ops.write_file(df=df, path=path)
 
     async def async_collect(
         self,
@@ -90,7 +90,7 @@ class TableCollect(table_coverage.TableCoverage):
             self.summarize_chunk(data_range, path)
         df = await self.async_collect_chunk(data_range=data_range)
         if df is not None:
-            truck.ops.collection.write_file(df=df, path=path)
+            truck.ops.write_file(df=df, path=path)
         else:
             if verbose >= 1:
                 import os

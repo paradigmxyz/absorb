@@ -13,12 +13,12 @@ if typing.TYPE_CHECKING:
 def ls_command(args: Namespace) -> dict[str, Any]:
     import toolstr
 
-    tracked_datasets = truck.get_tracked_tables()
+    tracked_datasets = truck.ops.get_tracked_tables()
 
     # available datasets
     cli_outputs._print_title('Available datasets')
-    for source in sorted(truck.get_sources()):
-        source_tables = truck.get_source_tables(source)
+    for source in sorted(truck.ops.get_sources()):
+        source_tables = truck.ops.get_source_tables(source)
         if len(source_tables) > 0:
             cli_outputs._print_source_datasets_bullet(source, source_tables)
 

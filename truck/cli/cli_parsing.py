@@ -212,7 +212,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
             sources.append(source)
             tables.append(table)
         else:
-            for source_dataset in truck.get_source_tables(dataset):
+            for source_dataset in truck.ops.get_source_tables(dataset):
                 sources.append(dataset)
                 tables.append(source_dataset.__name__)
 

@@ -76,7 +76,7 @@ class Transactions(truck.Table):
             url = url_template.format(
                 year=current.year, month=current.month, day=current.day
             )
-            if truck.ops.does_file_exist(url):
+            if truck.ops.does_remote_file_exist(url):
                 break
             current -= datetime.timedelta(days=1)
         return [initial, current]

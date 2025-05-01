@@ -28,7 +28,9 @@ def get_truck_root(*, warn: bool = False) -> str:
 def get_config_path(*, warn: bool = False) -> str:
     import os
 
-    return os.path.join(truck.get_truck_root(warn=warn), 'truck_config.json')
+    return os.path.join(
+        truck.ops.get_truck_root(warn=warn), 'truck_config.json'
+    )
 
 
 def get_source_dir(source: str, *, warn: bool = False) -> str:
@@ -66,7 +68,7 @@ def get_table_metadata_path(
     import os
 
     return os.path.join(
-        truck.get_table_dir(dataset, warn=warn), 'table_metadata.json'
+        truck.ops.get_table_dir(dataset, warn=warn), 'table_metadata.json'
     )
 
 

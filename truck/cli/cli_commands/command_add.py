@@ -33,7 +33,7 @@ def add_command(args: Namespace) -> dict[str, Any]:
     # filter already collected
     tracked = [
         json.dumps(table, sort_keys=True)
-        for table in truck.get_tracked_tables()
+        for table in truck.ops.get_tracked_tables()
     ]
     already_tracked = []
     not_tracked = []
@@ -48,7 +48,7 @@ def add_command(args: Namespace) -> dict[str, Any]:
     sources = set(td['source_name'] for td in track_datasets)
     source_datasets = {
         source: [
-            table.class_name() for table in truck.get_source_tables(source)
+            table.class_name() for table in truck.ops.get_source_tables(source)
         ]
         for source in sources
     }
@@ -75,6 +75,6 @@ def add_command(args: Namespace) -> dict[str, Any]:
         rich.print(
             'to proceed with data collection, use [white bold]truck collect[/white bold]'
         )
-    truck.start_tracking_tables(track_datasets)
+    truck.ops.start_tracking_tables(track_datasets)
 
     return {}

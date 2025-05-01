@@ -109,7 +109,7 @@ def _find_last() -> datetime.datetime:
         year=current.year, month=current.month, day=current.day
     )
     while current > datetime.datetime(year=2021, month=6, day=28):
-        if truck.ops.collection.does_file_exist(get_date_url(current)):
+        if truck.ops.does_remote_file_exist(get_date_url(current)):
             return current
         current = current - datetime.timedelta(days=1)
     raise Exception()
