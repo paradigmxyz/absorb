@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class Fundamentals(truck.Table):
+class Metrics(truck.Table):
     source = 'growthepie'
     write_range = 'overwrite_all'
     range_format = 'date_range'
