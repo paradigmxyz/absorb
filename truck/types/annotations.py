@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from . import table_class
 
 
 RangeFormat = typing.Literal[
@@ -24,11 +25,11 @@ class Context(typing.TypedDict):
 class TrackedTable(typing.TypedDict):
     source_name: str
     table_name: str
-    table_class: TableReference
+    table_class: str
     parameters: dict[str, typing.Any]
 
 
-TableReference = typing.Any
+TableReference = typing.Union[str, TrackedTable, table_class.Table]
 
 
 class TruckConfig(typing.TypedDict):

@@ -51,20 +51,31 @@ def get_source_tables(source: str) -> list[type[truck.Table]]:
 
 def resolve_table(
     reference: truck.TableReference,
+    *,
     parameters: dict[str, typing.Any] | None = None,
 ) -> truck.Table:
-    source, table = reference.split('.')
-    camel_table = names._snake_to_camel(table)
-    snake_table = names._camel_to_snake(table)
-    if parameters is None:
-        parameters = {}
-    tracked_table: truck.TrackedTable = {
-        'source_name': source,
-        'table_name': snake_table,
-        'table_class': 'truck.datasets.' + source + '.' + camel_table,
-        'parameters': parameters,
-    }
-    return truck.Table.instantiate(tracked_table)
+    if isinstance(reference, truck.Table):
+        return reference
+
+    elif isinstance(reference, dict):
+        return truck.Table.instantiate(reference)
+
+    elif isinstance(reference, str):
+        source, table = reference.split('.')
+        camel_table = names._snake_to_camel(table)
+        snake_table = names._camel_to_snake(table)
+        if parameters is None:
+            parameters = {}
+        tracked_table: truck.TrackedTable = {
+            'source_name': source,
+            'table_name': snake_table,
+            'table_class': 'truck.datasets.' + source + '.' + camel_table,
+            'parameters': parameters,
+        }
+        return truck.Table.instantiate(tracked_table)
+
+    else:
+        raise Exception()
 
 
 def get_available_tables() -> list[truck.TrackedTable]:
