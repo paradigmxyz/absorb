@@ -87,6 +87,7 @@ truck.upload('custom_dataset')
 - [blocknative](https://docs.blocknative.com/data-archive/mempool-archive) Ethereum mempool archive
 - [chain_ids](https://github.com/ethereum-lists/chains) chain id's
 - [cryo](https://github.com/paradigmxyz/cryo) EVM datasets
+- [defillama](https://defillama.com) DeFi data
 - [dune](https://dune.com) tables and queries
 - [growthepie](https://www.growthepie.xyz/) L2 metrics
 - [kalshi](https://kalshi.com) prediction market metrics
