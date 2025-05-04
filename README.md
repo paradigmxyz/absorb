@@ -86,6 +86,7 @@ truck.upload('custom_dataset')
 - [4byte](https://www.4byte.directory) function and event signatures
 - [blocknative](https://docs.blocknative.com/data-archive/mempool-archive) Ethereum mempool archive
 - [chain_ids](https://github.com/ethereum-lists/chains) chain id's
+- [coingecko](https://www.coingecko.com/) token prices
 - [cryo](https://github.com/paradigmxyz/cryo) EVM datasets
 - [defillama](https://defillama.com) DeFi data
 - [dune](https://dune.com) tables and queries
