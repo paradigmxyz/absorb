@@ -119,7 +119,7 @@ def get_historical_tvl_per_chain_of_protocol(
             'historical_tvl_of_protocol', {'protocol': protocol}
         )
     rows = [
-        [datum['date'], chain, protocol, datum['totalLiquidityUSD']]
+        [datum['date'], chain, protocol, float(datum['totalLiquidityUSD'])]
         for chain in data['chainTvls']
         for datum in data['chainTvls'][chain]['tvl']
     ]
