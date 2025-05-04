@@ -127,7 +127,6 @@ def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
             continue
         df = (
             activity.join(tvs, on='timestamp', how='full', coalesce=True)
-            .fill_null(0)
             .with_columns(
                 name=pl.lit(project['name']),
                 layer=pl.lit(project['type']),
