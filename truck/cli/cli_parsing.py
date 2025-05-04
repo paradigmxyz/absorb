@@ -206,7 +206,13 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
     # parse datasets
     sources = []
     tables = []
-    for dataset in args.dataset:
+    if isinstance(args.dataset, list):
+        datasets = args.dataset
+    elif isinstance(args.dataset, str):
+        datasets = [args.dataset]
+    else:
+        raise Exception()
+    for dataset in datasets:
         if '.' in dataset:
             source, table = dataset.split('.')
             sources.append(source)
