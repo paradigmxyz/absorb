@@ -196,16 +196,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
-    # parse parameters
-    parameters: dict[str, typing.Any] = {}
-    if args.parameters is not None:
-        for parameter in args.parameters:
-            key, value = parameter.split('=')
-            parameters[key] = value
-
     # parse datasets
     sources = []
     tables = []
+    classes = []
     if isinstance(args.dataset, list):
         datasets = args.dataset
     elif isinstance(args.dataset, str):
@@ -213,6 +207,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
     else:
         raise Exception()
     for dataset in datasets:
+        # get source and table
         if '.' in dataset:
             source, table = dataset.split('.')
             sources.append(source)
@@ -222,6 +217,56 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
                 sources.append(dataset)
                 tables.append(source_dataset.__name__)
 
+        # get table class
+        table_class = truck.ops.get_table_class(
+            source=sources[-1], table_name=tables[-1]
+        )
+        classes.append(table_class)
+
+    # parse parameter types
+    parameter_types = {}
+    for table_class in classes:
+        for parameter, parameter_type in table_class.parameter_types.items():
+            if parameter not in parameter_types:
+                parameter_types[parameter] = parameter_type
+            else:
+                if parameter_type != parameter_types[parameter]:
+                    raise Exception(
+                        'inconsistent parameter types across datasets'
+                    )
+
+    # parse parameters
+    parameters: dict[str, typing.Any] = {}
+    value: typing.Any
+    if args.parameters is not None:
+        for parameter in args.parameters:
+            key, value = parameter.split('=')
+
+            # set parameter type
+            if key not in parameter_types:
+                raise Exception(
+                    'unknown parameter: '
+                    + str(key)
+                    + ' not in '
+                    + str(list(parameters.keys()))
+                )
+            parameter_type = parameter_types[key]
+            if parameter_type == str:
+                pass
+            elif parameter_type == int:
+                value = int(value)
+            elif parameter_type == list[str]:
+                value = value.split(',')
+            elif parameter_type == list[int]:
+                value = [int(subvalue) for subvalue in value.split(',')]
+            else:
+                raise Exception(
+                    'invalid parameter type: ' + str(parameter_type)
+                )
+
+            parameters[key] = value
+
+    # create TrackedTable dicts
     parsed = []
     for source, table in zip(sources, tables):
         camel_table = truck.ops.names._snake_to_camel(table)
@@ -232,6 +277,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[truck.TrackedTable]:
             'parameters': parameters,
         }
         parsed.append(tracked_table)
+
     return parsed
 
 
