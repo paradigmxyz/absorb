@@ -8,6 +8,7 @@ from . import names
 
 if typing.TYPE_CHECKING:
     import types
+    import polars as pl
 
 
 def get_source_module(source: str) -> types.ModuleType:
@@ -97,4 +98,52 @@ def get_available_tables(
                 'parameters': {},
             }
             tables.append(tracked_table)
+    return tables
+
+
+def get_tables_df(
+    include_available_range: bool = False,
+) -> pl.DataFrame:
+    """WIP
+
+    features wanted
+    - is tracked
+    - collected range
+    - available range
+    """
+    import datetime
+    import polars as pl
+
+    rows: list[dict[str, typing.Any]] = []
+    for table in truck.ops.get_available_tables():
+        row: dict[str, typing.Any] = dict(table)
+        table_class = truck.ops.get_table_class(
+            source=table['source_name'],
+            table_name=table['table_name'],
+        )
+        row['parameter_names'] = list(table_class.parameter_types.keys())
+
+        if include_available_range:
+            if len(table_class.parameter_types) > 0:
+                pass
+            else:
+                instance = truck.ops.resolve_table(table)
+                if table_class.range_format == 'date':
+                    start, end = instance.get_available_range()
+                    if start is not None:
+                        start = start.replace(tzinfo=datetime.timezone.utc)
+                    if end is not None:
+                        end = end.replace(tzinfo=datetime.timezone.utc)
+                    row['available_start_time'] = start
+                    row['available_end_time'] = end
+    tables = pl.DataFrame(rows, orient='row').drop('parameters')
+
+    #     tables.join(
+    #         pl.DataFrame(truck.ops.get_tracked_tables())
+    #         .drop("parameters")
+    #         .with_columns(tracked=True),
+    #         on=["source_name", "table_name", "table_class"],
+    #         how="left",
+    #     ).with_columns(pl.col.tracked.fill_null(False))
+
     return tables
