@@ -35,7 +35,7 @@ class Metrics(truck.Table):
             'canonical_tvs': pl.Float64,
             'external_tvs': pl.Float64,
             'total_tvs': pl.Float64,
-            'name': pl.String,
+            'chain': pl.String,
             'layer': pl.String,
             'category': pl.String,
             'da': pl.String,
@@ -128,7 +128,7 @@ def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
         df = (
             activity.join(tvs, on='timestamp', how='full', coalesce=True)
             .with_columns(
-                name=pl.lit(project['name']),
+                chain=pl.lit(project['name']),
                 layer=pl.lit(project['type']),
                 category=pl.lit(project['category']),
                 da=pl.lit(project['hostChain']),
