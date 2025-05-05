@@ -11,12 +11,15 @@ if typing.TYPE_CHECKING:
 
 
 class Stablecoins(truck.Table):
+    range_format = 'date_range'
+
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_total_stablecoins()
 
 
 class StablecoinsOfChains(truck.Table):
     parameter_types = {'chains': list}
+    range_format = 'date_range'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import polars as pl
@@ -30,6 +33,7 @@ class StablecoinsOfChains(truck.Table):
 
 class StablecoinsOfTokens(truck.Table):
     parameter_types = {'tokens': list}
+    range_format = 'date_range'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import polars as pl
@@ -43,6 +47,7 @@ class StablecoinsOfTokens(truck.Table):
 
 class StablecoinPrices(truck.Table):
     write_range = 'overwrite_all'
+    range_format = 'date_range'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_stablecoin_prices()

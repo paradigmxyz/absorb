@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 
 class YieldsOfPools(truck.Table):
     parameter_types = {'pools': list[str]}
+    range_format = 'date_range'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         dfs = []

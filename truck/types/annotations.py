@@ -6,6 +6,7 @@ from . import table_class
 
 RangeFormat = typing.Literal[
     'date',
+    'hour',
     'date_range',
     'per_hour',
     'named_range',

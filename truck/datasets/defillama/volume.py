@@ -11,6 +11,7 @@ from . import common
 
 class DexVolumeOfProtocols(truck.Table):
     parameter_types = {'protocols': list[str]}
+    range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -30,6 +31,7 @@ class DexVolumeOfProtocols(truck.Table):
 
 class DexVolumeOfChains(truck.Table):
     parameter_types = {'chains': list[str]}
+    range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -49,6 +51,7 @@ class DexVolumeOfChains(truck.Table):
 
 class OptionsVolumeOfProtocols(truck.Table):
     parameter_types = {'protocols': list[str]}
+    range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -68,6 +71,7 @@ class OptionsVolumeOfProtocols(truck.Table):
 
 class OptionsVolumeOfChains(truck.Table):
     parameter_types = {'chains': list[str]}
+    range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {

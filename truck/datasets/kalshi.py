@@ -50,6 +50,7 @@ class Metadata(truck.Table):
     source = 'kalshi'
     cadence = None
     write_range = 'overwrite_all'
+    range_format = 'date'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import requests

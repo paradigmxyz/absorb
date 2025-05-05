@@ -11,6 +11,8 @@ if typing.TYPE_CHECKING:
 
 
 class Fees(truck.Table):
+    range_format = 'date_range'
+
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
             'timestamp': pl.Datetime('ms'),
@@ -23,6 +25,7 @@ class Fees(truck.Table):
 
 class FeesOfChains(truck.Table):
     parameter_types = {'protocols': list[str]}
+    range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -43,6 +46,7 @@ class FeesOfChains(truck.Table):
 
 class FeesOfProtocols(truck.Table):
     parameter_types = {'protocols': list[str]}
+    range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
