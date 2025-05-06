@@ -10,7 +10,10 @@ if typing.TYPE_CHECKING:
 
 
 class ChainTvls(truck.Table):
-    parameter_types = {'chains': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'chains': typing.Union[list[str], None]}
+    default_parameters = {'chains': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -21,15 +24,25 @@ class ChainTvls(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_tvl_of_chain(chain)
-            for chain in self.parameters['chains']
-        ]
+        import polars as pl
+
+        chains = self.parameters['chains']
+        if chains is None:
+            chains = _get_tvl_chains()
+        print('collecting', len(chains), 'chains')
+        dfs = []
+        for c, chain in enumerate(chains, start=1):
+            print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+            df = get_historical_tvl_of_chain(chain)
+            dfs.append(df)
         return pl.concat(dfs)
 
 
 class ProtocolTvls(truck.Table):
-    parameter_types = {'protocols': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'protocols': typing.Union[list[str], None]}
+    default_parameters = {'protocols': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -41,15 +54,29 @@ class ProtocolTvls(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_tvl_per_chain_of_protocol(protocol)
-            for protocol in self.parameters['protocols']
-        ]
+        import polars as pl
+
+        protocols = self.parameters['protocols']
+        if protocols is None:
+            protocols = _get_tvl_protocols()
+        dfs = []
+        print('collecting', len(protocols), 'protocols')
+        for p, protocol in enumerate(protocols, start=1):
+            print('[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol)
+            try:
+                df = get_historical_tvl_per_chain_of_protocol(protocol)
+                dfs.append(df)
+            except Exception:
+                print('could not collect', protocol)
+                continue
         return pl.concat(dfs)
 
 
 class TvlPerTokenOfProtocols(truck.Table):
-    parameter_types = {'protocols': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'protocols': typing.Union[list[str], None]}
+    default_parameters = {'protocols': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -62,11 +89,32 @@ class TvlPerTokenOfProtocols(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_tvl_per_token_of_protocol(protocol)
-            for protocol in self.parameters['protocols']
-        ]
+        import polars as pl
+
+        protocols = self.parameters['protocols']
+        if protocols is None:
+            protocols = _get_tvl_protocols()
+        dfs = []
+        print('collecting', len(protocols), 'protocols')
+        for p, protocol in enumerate(protocols, start=1):
+            print('[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol)
+            df = get_historical_tvl_per_token_of_protocol(protocol)
+            dfs.append(df)
         return pl.concat(dfs)
+
+
+def _get_tvl_chains() -> list[str]:
+    return (
+        get_current_project_tvls()['chains']
+        .list.explode()
+        .unique()
+        .sort()
+        .to_list()
+    )
+
+
+def _get_tvl_protocols() -> list[str]:
+    return get_current_project_tvls()['protocol'].unique().sort().to_list()
 
 
 def get_current_project_tvls() -> pl.DataFrame:
@@ -77,7 +125,7 @@ def get_current_project_tvls() -> pl.DataFrame:
     return pl.DataFrame(
         data, orient='row', infer_schema_length=len(data), strict=False
     ).select(
-        'name',
+        pl.col('name').alias('protocol'),
         'slug',
         pl.col.parentProtocol.str.strip_prefix('parent#').alias('parent'),
         'category',
@@ -87,7 +135,7 @@ def get_current_project_tvls() -> pl.DataFrame:
         'chains',
         'url',
         'github',
-        pl.col.tvl.alias('tvl_usd'),
+        pl.col.tvl.cast(pl.Float64).alias('tvl_usd'),
     )
 
 
@@ -97,7 +145,7 @@ def get_historical_tvl() -> pl.DataFrame:
     data = common._fetch('historical_tvl')
     return pl.DataFrame(data, orient='row').select(
         timestamp=(pl.col.date * 1000).cast(pl.Datetime('ms')),
-        tvl_usd='tvl',
+        tvl_usd=pl.col.tvl.cast(pl.Float64),
     )
 
 
@@ -108,7 +156,7 @@ def get_historical_tvl_of_chain(chain: str) -> pl.DataFrame:
     return pl.DataFrame(data).select(
         timestamp=(pl.col.date * 1000).cast(pl.Datetime('ms')),
         chain=pl.lit(chain),
-        tvl_usd='tvl',
+        tvl_usd=pl.col.tvl.cast(pl.Float64),
     )
 
 
@@ -126,7 +174,12 @@ def get_historical_tvl_per_chain_of_protocol(
         for chain in data['chainTvls']
         for datum in data['chainTvls'][chain]['tvl']
     ]
-    schema = ['timestamp', 'chain', 'protocol', 'tvl_usd']
+    schema = {
+        'timestamp': pl.Float64,
+        'chain': pl.String,
+        'protocol': pl.String,
+        'tvl_usd': pl.Float64,
+    }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
         (pl.col.timestamp * 1000).cast(pl.Datetime('ms'))
     )
@@ -143,7 +196,7 @@ def get_historical_tvl_per_token_of_protocol(
         )
 
     rows = [
-        [datum['date'], protocol, symbol, value]
+        [datum['date'], protocol, symbol, float(value)]
         for datum in data['tokens']
         for symbol, value in datum['tokens'].items()
     ]
@@ -155,7 +208,7 @@ def get_historical_tvl_per_token_of_protocol(
     )
 
     rows = [
-        [datum['date'], protocol, symbol, value]
+        [datum['date'], protocol, symbol, float(value)]
         for datum in data['tokensInUsd']
         for symbol, value in datum['tokens'].items()
     ]

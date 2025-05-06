@@ -10,7 +10,10 @@ from . import common
 
 
 class ProtocolDexVolumes(truck.Table):
-    parameter_types = {'protocols': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'protocols': typing.Union[list[str], None]}
+    default_parameters = {'protocols': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -22,15 +25,28 @@ class ProtocolDexVolumes(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_dex_volume_per_chain_of_protocol(protocol)
-            for protocol in self.parameters['protocols']
-        ]
+        import polars as pl
+
+        protocols = self.parameters['protocols']
+        if protocols is None:
+            protocols = _get_dex_protocols()
+        dfs = []
+        print('collecting', len(protocols), 'protocols')
+        for p, protocol in enumerate(protocols, start=1):
+            print('[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol)
+            try:
+                df = get_historical_dex_volume_per_chain_of_protocol(protocol)
+                dfs.append(df)
+            except Exception:
+                print('could not collect', protocol)
         return pl.concat(dfs)
 
 
 class ChainDexVolumes(truck.Table):
-    parameter_types = {'chains': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'chains': typing.Union[list[str], None]}
+    default_parameters = {'chains': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -42,15 +58,28 @@ class ChainDexVolumes(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_dex_volume_per_protocol_of_chain(chain)
-            for chain in self.parameters['chains']
-        ]
+        import polars as pl
+
+        chains = self.parameters['chains']
+        if chains is None:
+            chains = _get_dex_chains()
+        dfs = []
+        print('collecting', len(chains), 'chains')
+        for c, chain in enumerate(chains, start=1):
+            print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+            try:
+                df = get_historical_dex_volume_per_protocol_of_chain(chain)
+                dfs.append(df)
+            except Exception:
+                print('could not collect', chain)
         return pl.concat(dfs)
 
 
 class ProtocolOptionsVolumes(truck.Table):
-    parameter_types = {'protocols': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'protocols': typing.Union[list[str], None]}
+    default_parameters = {'protocols': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -62,15 +91,25 @@ class ProtocolOptionsVolumes(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_options_volume_per_chain_of_protocol(protocol)
-            for protocol in self.parameters['protocols']
-        ]
+        import polars as pl
+
+        protocols = self.parameters['protocols']
+        if protocols is None:
+            protocols = _get_options_protocols()
+        dfs = []
+        print('collecting', len(protocols), 'protocols')
+        for p, protocol in enumerate(protocols, start=1):
+            print('[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol)
+            df = get_historical_options_volume_per_chain_of_protocol(protocol)
+            dfs.append(df)
         return pl.concat(dfs)
 
 
 class ChainOptionsVolumes(truck.Table):
-    parameter_types = {'chains': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'chains': typing.Union[list[str], None]}
+    default_parameters = {'chains': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -82,16 +121,61 @@ class ChainOptionsVolumes(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        dfs = [
-            get_historical_options_volume_per_protocol_of_chain(chain)
-            for chain in self.parameters['chains']
-        ]
+        import polars as pl
+
+        chains = self.parameters['chains']
+        if chains is None:
+            chains = _get_options_chains()
+        dfs = []
+        print('collecting', len(chains), 'chains')
+        for c, chain in enumerate(chains, start=1):
+            print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+            df = get_historical_options_volume_per_protocol_of_chain(chain)
+            dfs.append(df)
         return pl.concat(dfs)
 
 
 #
 # # dex volumes
 #
+
+
+def _get_dex_chains() -> list[str]:
+    return (
+        get_current_dex_volume_per_protocol()['chains']
+        .list.explode()
+        .unique()
+        .sort()
+        .to_list()
+    )
+
+
+def _get_dex_protocols() -> list[str]:
+    return (
+        get_current_dex_volume_per_protocol()['protocol']
+        .unique()
+        .sort()
+        .to_list()
+    )
+
+
+def _get_options_chains() -> list[str]:
+    return (
+        get_current_options_volume_per_protocol()['chains']
+        .list.explode()
+        .unique()
+        .sort()
+        .to_list()
+    )
+
+
+def _get_options_protocols() -> list[str]:
+    return (
+        get_current_options_volume_per_protocol()['protocol']
+        .unique()
+        .sort()
+        .to_list()
+    )
 
 
 def get_current_dex_volume_per_protocol(
@@ -120,7 +204,7 @@ def get_current_dex_volume_per_protocol(
         for protocol in data['protocols']
     ]
     schema = {
-        'name': pl.String,
+        'protocol': pl.String,
         'displayName': pl.String,
         'slug': pl.String,
         'category': pl.String,
@@ -163,7 +247,7 @@ def get_current_dex_volume_per_chain_per_protocol(
 
     schema = {
         'chain': pl.String,
-        'name': pl.String,
+        'protocol': pl.String,
         'displayName': pl.String,
         'slug': pl.String,
         'category': pl.String,

@@ -11,7 +11,10 @@ if typing.TYPE_CHECKING:
 
 
 class PoolYields(truck.Table):
-    parameter_types = {'pools': list[str]}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'pools': typing.Union[list[str], None], 'top_n': int}
+    default_parameters = {'pools': None, 'top_n': 5000}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
@@ -32,15 +35,30 @@ class PoolYields(truck.Table):
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        import time
+
+        current_yields = get_current_yields()
+
+        pools = self.parameters['pools']
+        if pools is None:
+            pools = current_yields.sort('tvl_usd', descending=True)['pool'][
+                : self.parameters['top_n']
+            ]
+
         # get yields
+        next_time = time.time()
         dfs = []
-        for pool in self.parameters['pools']:
+        print('collecting', len(pools), 'pools')
+        for p, pool in enumerate(pools, start=1):
+            while time.time() < next_time:
+                time.sleep(0.05)
+            print('[' + str(p) + ' / ' + str(len(pools)) + ']', pool)
             df = get_historical_yields_of_pool(pool)
+            next_time = next_time + 4.0
             dfs.append(df)
         df = pl.concat(dfs)
 
         # get labels
-        current_yields = get_current_yields()
         current_yields = current_yields[['pool', 'chain', 'project', 'symbol']]
 
         return df.join(current_yields, on='pool', how='left').select(
@@ -102,8 +120,11 @@ def get_historical_yields_of_pool(pool: str) -> pl.DataFrame:
         'apy_base_7d': 'apyBase7d',
         'apy_reward': 'apyReward',
         'il_7d': 'il7d',
-        'revenue': pl.col.tvl_usd * (pl.col.apy_base + pl.col.apy_reward),
     }
-    return pl.DataFrame(data['data'], infer_schema_length=9999999999).select(
-        **columns
+    return (
+        pl.DataFrame(data['data'], infer_schema_length=9999999999)
+        .select(**columns)
+        .with_columns(
+            revenue=pl.col.tvl_usd * (pl.col.apy_base + pl.col.apy_reward),
+        )
     )

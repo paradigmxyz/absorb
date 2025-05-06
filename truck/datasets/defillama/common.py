@@ -57,7 +57,7 @@ def _fetch(
     import requests
 
     url = _get_url(endpoint, parameters)
-    response = requests.get(url)
+    response = requests.get(url, timeout=(5, 60))
     response.raise_for_status()
     return response.json()
 

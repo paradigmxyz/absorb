@@ -26,10 +26,15 @@ class TableBase:
         if parameters is None:
             parameters = {}
         for parameter in self.parameter_types.keys():
-            if parameter not in parameters and parameter in self.default_parameters:
+            if (
+                parameter not in parameters
+                and parameter in self.default_parameters
+            ):
                 parameters[parameter] = self.default_parameters[parameter]
         if set(parameters.keys()) != set(self.parameter_types.keys()):
-            raise Exception(self.name() + ': parameters must match parameter_types spec')
+            raise Exception(
+                self.name() + ': parameters must match parameter_types spec'
+            )
         self.parameters = parameters
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:

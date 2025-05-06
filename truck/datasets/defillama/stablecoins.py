@@ -18,28 +18,46 @@ class Stablecoins(truck.Table):
 
 
 class StablecoinsOfChains(truck.Table):
-    parameter_types = {'chains': list}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'chains': typing.Union[list[str], None]}
+    default_parameters = {'tokens': None}
     range_format = 'date_range'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import polars as pl
 
+        chains = self.parameters['chains']
+        if chains is None:
+            chains = _get_stablecoin_chains()
+
         dfs = []
-        for chain in self.parameters['chains']:
+        print('collecting', len(chains), 'chains')
+        for c, chain in enumerate(chains, start=1):
+            print('p' + str(c) + ' / ' + str(len(chains)) + ']', chain)
             df = get_historical_stablecoins_of_chain(chain)
             dfs.append(df)
         return pl.concat(dfs)
 
 
 class StablecoinsOfTokens(truck.Table):
-    parameter_types = {'tokens': list}
+    source = 'defillama'
+    write_range = 'overwrite_all'
+    parameter_types = {'tokens': typing.Union[list[str], None]}
+    default_parameters = {'tokens': None}
     range_format = 'date_range'
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import polars as pl
 
+        tokens = self.parameters['tokens']
+        if tokens is None:
+            tokens = _get_stablecoin_tokens()
+
         dfs = []
-        for token in self.parameters['tokens']:
+        print('collecting', len(tokens), 'tokens')
+        for t, token in enumerate(tokens, start=1):
+            print('[' + str(t) + ' / ' + str(len(tokens)) + ']', token)
             df = get_historical_stablecoins_per_chain_of_token(token)
             dfs.append(df)
         return pl.concat(dfs)
@@ -58,6 +76,16 @@ class StablecoinPrices(truck.Table):
 #
 
 
+def _get_stablecoin_chains() -> list[str]:
+    data = common._fetch('current_stablecoins')
+    return sorted(chain['name'] for chain in data['chains'])
+
+
+def _get_stablecoin_tokens() -> list[str]:
+    data = common._fetch('current_stablecoins')
+    return sorted(asset['id'] for asset in data['peggedAssets'])
+
+
 def get_historical_total_stablecoins() -> pl.DataFrame:
     import polars as pl
 
@@ -66,7 +94,7 @@ def get_historical_total_stablecoins() -> pl.DataFrame:
         [datum['date'], sum(datum['totalCirculatingUSD'].values())]
         for datum in data
     ]
-    schema = ['timestamp', 'circulating_usd']
+    schema = {'timestamp': pl.Float64, 'circulating_usd': pl.Float64}
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
         (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
     )
@@ -88,14 +116,13 @@ def get_historical_stablecoins_of_chain(chain: str) -> pl.DataFrame:
         ]
         for datum in data
     ]
-    schema = [
-        'timestamp',
-        'chain',
-        'circulating_usd',
-        'minted_usd',
-        'bridged_usd',
-    ]
-
+    schema = {
+        'timestamp': pl.Float64,
+        'chain': pl.String,
+        'circulating_usd': pl.Float64,
+        'minted_usd': pl.Float64,
+        'bridged_Usd': pl.Float64,
+    }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
         (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
     )
@@ -109,7 +136,11 @@ def get_historical_stablecoins_of_token(token: str) -> pl.DataFrame:
         [datum['date'], data['symbol'], datum['circulating'][data['pegType']]]
         for datum in data['tokens']
     ]
-    schema = ['timestamp', 'token', 'circulating']
+    schema = {
+        'timestamp': pl.Float64,
+        'token': pl.String,
+        'circulating': pl.Float64,
+    }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
         (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
     )
@@ -135,15 +166,15 @@ def get_historical_stablecoins_per_chain_of_token(token: str) -> pl.DataFrame:
         for chain in balances.keys()
         for datum in balances[chain]['tokens']
     ]
-    schema = [
-        'timestamp',
-        'token',
-        'chain',
-        'circulating',
-        'unreleased',
-        'minted',
-        'bridged_to',
-    ]
+    schema = {
+        'timestamp': pl.Float64,
+        'token': pl.String,
+        'chain': pl.String,
+        'circulating': pl.Float64,
+        'unreleased': pl.Float64,
+        'minted': pl.Float64,
+        'bridged_to': pl.Float64,
+    }
 
     return (
         pl.DataFrame(rows, schema=schema, orient='row')
@@ -163,8 +194,9 @@ def get_historical_stablecoin_prices() -> pl.DataFrame:
         for datum in data
         for token, price in datum['prices'].items()
     ]
+    schema = {'timestamp': pl.Float64, 'token': pl.String, 'price': pl.Float64}
     return (
-        pl.DataFrame(rows, schema=['timestamp', 'token', 'price'], orient='row')
+        pl.DataFrame(rows, schema=schema, orient='row')
         .filter(pl.col.timestamp > 0)
         .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
     )
