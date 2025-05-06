@@ -21,6 +21,7 @@ class CoinMetrics(truck.Table):
     write_range = 'overwrite_all'
     range_format = 'date_range'
     parameter_types = {'top_n': int}
+    default_parameters = {'top_n': 1000}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -48,7 +49,8 @@ class Categories(truck.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
     range_format = 'date_range'
-    parameter_types = {'catgories': list[str]}
+    parameter_types = {'categories': typing.Union[list[str], None]}
+    default_parameters = {'categories': None}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -72,7 +74,8 @@ class CategoryMetrics(truck.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
     range_format = 'date_range'
-    parameter_types = {'catgories': list[str]}
+    parameter_types = {'categories': typing.Union[list[str], None]}
+    default_parameters = {'categories': None}
     dependencies = [CoinMetrics, Categories]
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
