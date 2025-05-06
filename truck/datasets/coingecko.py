@@ -289,3 +289,50 @@ def get_historical_category_metrics(
         .group_by('timestamp', 'category')
         .agg(pl.sum('market_cap_usd'), pl.sum('volume_usd'))
     )
+
+
+def _convert_current_prices_to_changes(prices: pl.DataFrame) -> pl.DataFrame:
+    import datetime
+
+    intervals = ['7d', '14d', '30d', '200d', '1y']
+
+    volume_columns = {
+        ('value_' + interval): pl.col.current_price
+        / (
+            1
+            + pl.col('price_change_percentage_' + interval + '_in_currency')
+            / 100
+        )
+        for interval in intervals
+    }
+    abs_delta_columns = {
+        'abs_delta_' + interval: pl.col.value_now - pl.col('value_' + interval)
+        for interval in intervals
+    }
+    rel_delta_columns = {
+        'rel_delta_' + interval: (
+            pl.col.value_now - pl.col('value_' + interval)
+        )
+        / pl.col('value_' + interval)
+        for interval in intervals
+    }
+    t_columns = {
+        't_' + interval: pl.col.t_now.dt.offset_by('-' + interval)
+        for interval in intervals
+    }
+
+    return (
+        prices.select(
+            token='id',
+            value_now='current_price',
+            **volume_columns,
+        )
+        .with_columns(
+            **abs_delta_columns,
+            **rel_delta_columns,
+            t_now=pl.lit(datetime.datetime.now()),
+        )
+        .with_columns(
+            **t_columns,
+        )
+    )
