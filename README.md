@@ -93,11 +93,11 @@ truck.upload('custom_dataset')
 - [growthepie](https://www.growthepie.xyz/) L2 metrics
 - [kalshi](https://kalshi.com) prediction market metrics
 - [l2beat](https://l2beat.com) L2 metrics
-- [mempool dumpster](https://mempool-dumpster.flashbots.net) Ethereum mempool history
+- [mempool dumpster](https://mempool-dumpster.flashbots.net) Ethereum mempool archive
 - [sourcify](https://sourcify.dev) verified contracts
 - [tix](https://github.com/paradigmxyz/tix) price feeds
 - [vera](https://verifieralliance.org) verified contract archives
-- [xatu](https://github.com/ethpandaops/xatu-data) Ethereum mempool datasets
+- [xatu](https://github.com/ethpandaops/xatu-data) many Ethereum datasets
 
 
 ## Filesystem Layout
