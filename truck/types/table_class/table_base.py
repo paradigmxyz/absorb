@@ -18,14 +18,19 @@ class TableBase:
     index_by: typing.Literal['time', 'block', 'id']
     cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
     parameter_types: dict[str, typing.Any] = {}
+    default_parameters: dict[str, typing.Any] = {}
     parameters: dict[str, typing.Any] = {}
     filename_template = '{source}__{table}__{data_range}.parquet'
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
-        if parameters is not None:
-            if set(parameters.keys()) != set(self.parameter_types.keys()):
-                raise Exception('parameters must match parameter_types spec')
-            self.parameters = parameters
+        if parameters is None:
+            parameters = {}
+        for parameter in self.parameter_types.keys():
+            if parameter not in parameters and parameter in self.default_parameters:
+                parameters[parameter] = self.default_parameters[parameter]
+        if set(parameters.keys()) != set(self.parameter_types.keys()):
+            raise Exception(self.name() + ': parameters must match parameter_types spec')
+        self.parameters = parameters
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()
