@@ -10,16 +10,42 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class YieldsOfPools(truck.Table):
+class PoolYields(truck.Table):
     parameter_types = {'pools': list[str]}
     range_format = 'date_range'
 
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Datetime('ms'),
+            'pool': pl.String,
+            'chain': pl.String,
+            'project': pl.String,
+            'symbol': pl.String,
+            'tvl_usd': pl.Float64,
+            'apy_base': pl.Float64,
+            'apy_base_7d': pl.Float64,
+            'apy_reward': pl.Float64,
+            'il_7d': pl.Float64,
+            'revenue': pl.Float64,
+        }
+
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        # get yields
         dfs = []
         for pool in self.parameters['pools']:
             df = get_historical_yields_of_pool(pool)
             dfs.append(df)
-        return pl.concat(dfs)
+        df = pl.concat(dfs)
+
+        # get labels
+        current_yields = get_current_yields()
+        current_yields = current_yields[['pool', 'chain', 'project', 'symbol']]
+
+        return df.join(current_yields, on='pool', how='left').select(
+            self.get_schema().keys()
+        )
 
 
 def get_current_yields() -> pl.DataFrame:
@@ -76,6 +102,7 @@ def get_historical_yields_of_pool(pool: str) -> pl.DataFrame:
         'apy_base_7d': 'apyBase7d',
         'apy_reward': 'apyReward',
         'il_7d': 'il7d',
+        'revenue': pl.col.tvl_usd * (pl.col.apy_base + pl.col.apy_reward),
     }
     return pl.DataFrame(data['data'], infer_schema_length=9999999999).select(
         **columns

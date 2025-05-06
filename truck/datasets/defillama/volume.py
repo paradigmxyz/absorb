@@ -9,7 +9,7 @@ import truck
 from . import common
 
 
-class DexVolumeOfProtocols(truck.Table):
+class ProtocolDexVolumes(truck.Table):
     parameter_types = {'protocols': list[str]}
     range_format = 'date_range'
 
@@ -29,7 +29,7 @@ class DexVolumeOfProtocols(truck.Table):
         return pl.concat(dfs)
 
 
-class DexVolumeOfChains(truck.Table):
+class ChainDexVolumes(truck.Table):
     parameter_types = {'chains': list[str]}
     range_format = 'date_range'
 
@@ -49,7 +49,7 @@ class DexVolumeOfChains(truck.Table):
         return pl.concat(dfs)
 
 
-class OptionsVolumeOfProtocols(truck.Table):
+class ProtocolOptionsVolumes(truck.Table):
     parameter_types = {'protocols': list[str]}
     range_format = 'date_range'
 
@@ -69,7 +69,7 @@ class OptionsVolumeOfProtocols(truck.Table):
         return pl.concat(dfs)
 
 
-class OptionsVolumeOfChains(truck.Table):
+class ChainOptionsVolumes(truck.Table):
     parameter_types = {'chains': list[str]}
     range_format = 'date_range'
 

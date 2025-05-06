@@ -9,7 +9,7 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class TvlOfChains(truck.Table):
+class ChainTvls(truck.Table):
     parameter_types = {'chains': list[str]}
     range_format = 'date_range'
 
@@ -28,7 +28,7 @@ class TvlOfChains(truck.Table):
         return pl.concat(dfs)
 
 
-class TvlOfProtocols(truck.Table):
+class ProtocolTvls(truck.Table):
     parameter_types = {'protocols': list[str]}
     range_format = 'date_range'
 
