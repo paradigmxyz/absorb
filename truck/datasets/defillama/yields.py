@@ -36,6 +36,7 @@ class PoolYields(truck.Table):
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import time
+        import polars as pl
 
         current_yields = get_current_yields()
 
@@ -53,9 +54,12 @@ class PoolYields(truck.Table):
             while time.time() < next_time:
                 time.sleep(0.05)
             print('[' + str(p) + ' / ' + str(len(pools)) + ']', pool)
-            df = get_historical_yields_of_pool(pool)
+            try:
+                df = get_historical_yields_of_pool(pool)
+                dfs.append(df)
+            except Exception:
+                pass
             next_time = next_time + 4.0
-            dfs.append(df)
         df = pl.concat(dfs)
 
         # get labels
@@ -114,15 +118,23 @@ def get_historical_yields_of_pool(pool: str) -> pl.DataFrame:
     data = common._fetch('historical_yields_per_pool', {'pool': pool})
     columns: dict[str, str | pl.Expr] = {
         'timestamp': pl.col.timestamp.str.to_datetime(),
-        'pool': pl.lit(pool),
+        'pool': pl.lit(pool, dtype=pl.String),
         'tvl_usd': 'tvlUsd',
         'apy_base': 'apyBase',
         'apy_base_7d': 'apyBase7d',
         'apy_reward': 'apyReward',
         'il_7d': 'il7d',
     }
+    raw_schema = {
+        'timestamp': pl.String,
+        'tvlUsd': pl.Float64,
+        'apyBase': pl.Float64,
+        'apyBase7d': pl.Float64,
+        'apyReward': pl.Float64,
+        'il7d': pl.Float64,
+    }
     return (
-        pl.DataFrame(data['data'], infer_schema_length=9999999999)
+        pl.DataFrame(data['data'], schema=raw_schema)
         .select(**columns)
         .with_columns(
             revenue=pl.col.tvl_usd * (pl.col.apy_base + pl.col.apy_reward),
