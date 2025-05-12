@@ -27,6 +27,18 @@ def get_subcommands() -> (
             ],
         ),
         (
+            'help',
+            'show info about a specific dataset or data source',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'help': 'dataset or data source',
+                    },
+                )
+            ],
+        ),
+        (
             'collect',
             'collect datasets',
             [

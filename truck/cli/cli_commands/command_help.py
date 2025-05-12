@@ -1,0 +1,48 @@
+from __future__ import annotations
+
+import typing
+import truck
+
+if typing.TYPE_CHECKING:
+    import argparse
+
+
+def help_command(args: argparse.Namespace) -> dict[str, typing.Any]:
+    import toolstr
+
+    table = truck.ops.resolve_table(args.dataset)
+    schema = table.get_schema()
+
+    toolstr.print_text_box(
+        'dataset = ' + args.dataset, style='green', text_style='bold white'
+    )
+    for attr in [
+        'source',
+        'write_range',
+        'index_by',
+        'cadence',
+    ]:
+        if hasattr(table, attr):
+            value = getattr(table, attr)
+        else:
+            value = None
+        truck.ops.print_bullet(key=attr, value=value)
+    print()
+    toolstr.print('[green bold]parameters[/green bold]')
+    if table.parameters is None or len(table.parameter_types) == 0:
+        print('- [none]')
+    else:
+        for key, value in table.parameter_types.items():
+            if key in table.default_parameters:
+                default = (
+                    ' \[default = ' + str(table.default_parameters[key]) + ']'
+                )
+            else:
+                default = ''
+            truck.ops.print_bullet(key=key, value=str(value) + default)
+    print()
+    toolstr.print('[green bold]schema[/green bold]')
+    for key, value in schema.items():
+        truck.ops.print_bullet(key=key, value=value)
+
+    return {}
