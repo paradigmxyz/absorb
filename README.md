@@ -22,8 +22,9 @@ simple interface for collecting, managing, and loading datasets
 2. Example Usage
     i. Command Line
     ii. Python
-3. Supported Datasets
-4. Filesystem Layout
+3. Supported Data sources
+4. Output Format
+5. Configuration
 
 
 ## Installation
@@ -79,11 +80,12 @@ truck.upload('custom_dataset')
 ```
 
 
-## Supported Datasets
+## Supported Data Sources
 
-`truck` collects each of these datasets as a collection of parquet files:
+`truck` collects data from each of these sources:
 
 - [4byte](https://www.4byte.directory) function and event signatures
+- [binance](https://data.binance.vision/) trades and OHLC candles on the Binance CEX
 - [blocknative](https://docs.blocknative.com/data-archive/mempool-archive) Ethereum mempool archive
 - [chain_ids](https://github.com/ethereum-lists/chains) chain id's
 - [coingecko](https://www.coingecko.com/) token prices
@@ -99,12 +101,16 @@ truck.upload('custom_dataset')
 - [vera](https://verifieralliance.org) verified contract archives
 - [xatu](https://github.com/ethpandaops/xatu-data) many Ethereum datasets
 
+To list all available datasets and data sources, type `truck ls` on the command line.
 
-## Filesystem Layout
 
-truck stores all datasets as parquet files
+## Output Format
 
-datasets can be stored in any location on your disks, and truck will use symlinks to organize those files in the `TRUCK_ROOT` tree
+To display information about the schema and other metadata of a dataset, type `truck help <DATASET>` on the command line.
+
+`truck` stores each dataset as a collection of parquet files.
+
+Datasets can be stored in any location on your disks, and truck will use symlinks to organize those files in the `TRUCK_ROOT` tree.
 
 the `TRUCK_ROOT` filesystem directory is organized as:
 
@@ -121,7 +127,11 @@ the `TRUCK_ROOT` filesystem directory is organized as:
     truck_config.json
 ```
 
-schema of `truck_config.json`:
+## Configuration
+
+`truck` uses a config file to specify which datasets to track.
+
+Schema of `truck_config.json`:
 
 ```python
 {
