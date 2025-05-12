@@ -28,6 +28,101 @@ CandlestickInterval = typing.Literal[
 ]
 
 
+class Candlesticks(truck.Table):
+    source = 'binance'
+    write_range = 'append_only'
+    parameters = {'pair': str, 'interval': str, 'market': str}
+    default_parameters = {'market': 'spot'}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Datetime('us'),
+            'open': pl.Float64,
+            'high': pl.Float64,
+            'low': pl.Float64,
+            'close': pl.Float64,
+            'n_trades': pl.Int64,
+            'base_volume': pl.Float64,
+            'quote_volume': pl.Float64,
+            'taker_buy_base_volume': pl.Float64,
+            'taker_buy_quote_volume': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        if self.parameters['market'] == 'spot':
+            return get_spot_candlesticks(
+                pair=self.parameters['pair'],
+                timestamp=data_range,
+                interval=self.parameters['interval'],
+                duration='daily',
+            )
+        else:
+            raise Exception('invalid market')
+
+
+class Trades(truck.Table):
+    source = 'binance'
+    write_range = 'append_only'
+    parameters = {'pair': str, 'market': str}
+    default_parameters = {'market': 'spot'}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Datetime('us'),
+            'price': pl.Float64,
+            'quantity_base': pl.Float64,
+            'quantity_quote': pl.Float64,
+            'buyer_is_maker': pl.Boolean,
+            'best_price_match': pl.Boolean,
+            'trade_id': pl.Int64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        if self.parameters['market'] == 'spot':
+            return get_spot_trades(
+                pair=self.parameters['pair'],
+                timestamp=data_range,
+                duration='daily',
+            )
+        else:
+            raise Exception('invalid market')
+
+
+class AggregateTrades(truck.Table):
+    source = 'binance'
+    write_range = 'append_only'
+    parameters = {'pair': str, 'market': str}
+    default_parameters = {'market': 'spot'}
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Datetime('us'),
+            'price': pl.Float64,
+            'quantity': pl.Float64,
+            'buyer_is_maker': pl.Boolean,
+            'best_price_match': pl.Boolean,
+            'aggregate_trade_id': pl.Int64,
+            'first_trade_id': pl.Int64,
+            'last_trade_id': pl.Int64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        if self.parameters['market'] == 'spot':
+            return get_spot_aggregate_trades(
+                pair=self.parameters['pair'],
+                timestamp=data_range,
+                duration='daily',
+            )
+        else:
+            raise Exception('invalid market')
+
+
 def get_spot_url(
     *,
     pair: str,
