@@ -5,14 +5,38 @@ import truck
 
 if typing.TYPE_CHECKING:
     import polars as pl
-    import tooltime
 
 url_template = 'https://mempool-dumpster.flashbots.net/ethereum/mainnet/{year}-{month:02}/{year}-{month:02}-{day:02}.parquet'
 
 
 class Transactions(truck.Table):
+    source = 'mempool_dumpster'
     range_format = 'date'
     write_range = 'append_only'
+
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
+        import polars as pl
+
+        return {
+            'inclusion_block_number': pl.Int64,
+            'inclusion_delay': pl.Int64,
+            'inclusion_timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('ms'),
+            'hash': pl.Binary,
+            'from': pl.Binary,
+            'to': pl.Binary,
+            'value': pl.Float64,
+            'nonce': pl.Int64,
+            'gas': pl.Int64,
+            'gas_price': pl.Float64,
+            'gas_tip_cap': pl.Float64,
+            'gas_fee_cap': pl.Float64,
+            'data_size': pl.Int64,
+            'data_byte': pl.Binary,
+            'sources': pl.List(pl.String),
+            'raw_transaction': pl.String,
+            'chain_id': pl.String,
+        }
 
     source = 'mempool_dumpster'
     renamed = {
@@ -33,27 +57,6 @@ class Transactions(truck.Table):
         'includedBlockTimestamp': 'inclusion_timestamp',
         'inclusionDelayMs': 'inclusion_delay',
     }
-
-    reordered = [
-        'includedAtBlockHeight',
-        'inclusionDelayMs',
-        'includedBlockTimestamp',
-        'timestamp',
-        'hash',
-        'from',
-        'to',
-        'value',
-        'nonce',
-        'gas',
-        'gasPrice',
-        'gasTipCap',
-        'gasFeeCap',
-        'dataSize',
-        'data4Bytes',
-        'sources',
-        'rawTx',
-        'chainId',
-    ]
 
     binary_columns = [
         'hash',

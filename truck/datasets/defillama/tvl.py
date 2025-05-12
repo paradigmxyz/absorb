@@ -46,6 +46,8 @@ class ProtocolTvls(truck.Table):
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
         return {
             'timestamp': pl.Datetime('ms'),
             'chain': pl.String,

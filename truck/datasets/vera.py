@@ -19,6 +19,9 @@ class VeraChunkedDataset(truck.Table):
     vera_filetype: str
     range_format = 'block_range'
 
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.Datatype]]:
+        raise NotImplementedError()
+
     def get_available_range(self) -> typing.Any:
         return get_current_files(self.vera_filetype)
 
@@ -28,30 +31,44 @@ class VeraChunkedDataset(truck.Table):
 
 
 class Code(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'code'
 
 
 class Contracts(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'contracts'
 
 
 class ContractDeployments(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'contract_deployments'
 
 
 class CompiledContracts(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'compiled_contracts'
 
 
 class CompiledContractsSources(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'compiled_contracts_sources'
 
 
 class Sources(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'sources'
 
 
 class VerifiedContracts(VeraChunkedDataset):
+    source = 'vera'
+    write_range = 'overwrite_all'
     vera_filetype = 'verified_contracts'
 
 

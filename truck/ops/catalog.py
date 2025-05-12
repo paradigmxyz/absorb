@@ -50,6 +50,14 @@ def get_source_tables(source: str) -> list[type[truck.Table]]:
         ]
 
 
+def get_table_classes() -> list[type[truck.Table]]:
+    return [
+        table_class
+        for source in get_sources()
+        for table_class in get_source_tables(source)
+    ]
+
+
 def resolve_table(
     reference: truck.TableReference,
     *,

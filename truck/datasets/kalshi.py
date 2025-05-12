@@ -19,6 +19,23 @@ class Metrics(truck.Table):
     cadence = 'daily'
     range_format = 'date'
 
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'date': pl.String,
+            'ticker_name': pl.String,
+            'old_ticker_name': pl.String,
+            'report_ticker': pl.String,
+            'payout_type': pl.String,
+            'open_interest': pl.Float64,
+            'daily_volume': pl.Int64,
+            'block_volume': pl.Int64,
+            'high': pl.Int64,
+            'low': pl.Int64,
+            'status': pl.String,
+        }
+
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         import requests
         import polars as pl
@@ -51,6 +68,28 @@ class Metadata(truck.Table):
     cadence = None
     write_range = 'overwrite_all'
     range_format = 'date'
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'series_ticker': pl.String,
+            'series_title': pl.String,
+            'total_series_volume': pl.Int64,
+            'total_volume': pl.Int64,
+            'event_ticker': pl.String,
+            'event_subtitle': pl.String,
+            'event_title': pl.String,
+            'category': pl.String,
+            'total_market_count': pl.Int64,
+            'product_metadata': pl.Struct,
+            'markets': pl.List,
+            'is_trending': pl.Boolean,
+            'is_new': pl.Boolean,
+            'is_closing': pl.Boolean,
+            'is_price_delta': pl.Boolean,
+            'search_score': pl.Int64,
+        }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import requests

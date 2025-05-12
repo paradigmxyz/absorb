@@ -37,7 +37,7 @@ class FullQuery(BaseQuery):
         )
 
 
-class AppendOnlyQuery(truck.Table):
+class AppendOnlyQuery(BaseQuery):
     """collect the output of a query, time-partitioned"""
 
     write_range = 'append_only'

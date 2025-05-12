@@ -11,7 +11,14 @@ if typing.TYPE_CHECKING:
 
 
 class Stablecoins(truck.Table):
+    source = 'defillama'
+    write_range = 'overwrite_all'
     range_format = 'date_range'
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {'timestamp': pl.Float64, 'circulating_usd': pl.Float64}
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_total_stablecoins()
@@ -23,6 +30,17 @@ class StablecoinsOfChains(truck.Table):
     parameter_types = {'chains': typing.Union[list[str], None]}
     default_parameters = {'tokens': None}
     range_format = 'date_range'
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Float64,
+            'chain': pl.String,
+            'circulating_usd': pl.Float64,
+            'minted_usd': pl.Float64,
+            'bridged_Usd': pl.Float64,
+        }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import polars as pl
@@ -47,6 +65,19 @@ class StablecoinsOfTokens(truck.Table):
     default_parameters = {'tokens': None}
     range_format = 'date_range'
 
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Datetime(time_unit='ms', time_zone=None),
+            'token': pl.String,
+            'chain': pl.String,
+            'circulating': pl.Float64,
+            'unreleased': pl.Float64,
+            'minted': pl.Float64,
+            'bridged_to': pl.Float64,
+        }
+
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         import polars as pl
 
@@ -64,8 +95,18 @@ class StablecoinsOfTokens(truck.Table):
 
 
 class StablecoinPrices(truck.Table):
+    source = 'defillama'
     write_range = 'overwrite_all'
     range_format = 'date_range'
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'timestamp': pl.Float64,
+            'token': pl.String,
+            'price': pl.Float64,
+        }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_stablecoin_prices()
