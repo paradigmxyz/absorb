@@ -23,7 +23,8 @@ class XatuTable(truck.Table):
     source: str
     datatype: str
     per: typing.Literal['day', 'hour']
-    parameter_types = {'network': list[str]}
+    parameter_types = {'network': str}
+    name_template = {'custom': '{base_name}_{network}'}
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         return _fetch(

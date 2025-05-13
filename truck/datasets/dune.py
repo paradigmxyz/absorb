@@ -7,6 +7,7 @@ import truck
 
 class BaseQuery(truck.Table):
     source = 'dune'
+    name_template = {'custom': '{name}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import spice

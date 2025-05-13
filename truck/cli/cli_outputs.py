@@ -27,7 +27,7 @@ def _print_source_datasets_bullet(
 ) -> None:
     import toolstr
 
-    names = [cls.class_name(snake=True) for cls in datasets]
+    names = [cls.class_name(allow_generic=True) for cls in datasets]
     toolstr.print_bullet(
         key=source,
         value='[green],[/green] '.join(names),

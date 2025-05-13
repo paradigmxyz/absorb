@@ -28,11 +28,12 @@ CandlestickInterval = typing.Literal[
 ]
 
 
-class Candlesticks(truck.Table):
+class Candles(truck.Table):
     source = 'binance'
     write_range = 'append_only'
-    parameters = {'pair': str, 'interval': str, 'market': str}
+    parameter_types = {'pair': str, 'interval': str, 'market': str}
     default_parameters = {'market': 'spot'}
+    name_template = {'custom': 'candles_{market}_{pair}_{interval}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -65,8 +66,9 @@ class Candlesticks(truck.Table):
 class Trades(truck.Table):
     source = 'binance'
     write_range = 'append_only'
-    parameters = {'pair': str, 'market': str}
+    parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
+    name_template = {'custom': 'trades_{market}_{pair}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -95,8 +97,9 @@ class Trades(truck.Table):
 class AggregateTrades(truck.Table):
     source = 'binance'
     write_range = 'append_only'
-    parameters = {'pair': str, 'market': str}
+    parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
+    name_template = {'custom': 'aggregate_trades_{market}_{pair}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

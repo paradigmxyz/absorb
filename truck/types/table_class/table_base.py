@@ -14,23 +14,28 @@ class TableBase:
     write_range: typing.Literal[
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]
-    range_format: truck.types.annotations.RangeFormat
+    range_format: truck.types.RangeFormat
     index_by: typing.Literal['time', 'block', 'id']
     cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
     parameter_types: dict[str, typing.Any] = {}
     default_parameters: dict[str, typing.Any] = {}
     parameters: dict[str, typing.Any] = {}
+    static_parameters: list[str] = []
     filename_template = '{source}__{table}__{data_range}.parquet'
+    name_template: truck.types.NameTemplate = {}
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
+        # set parameters
         if parameters is None:
             parameters = {}
-        for parameter in self.parameter_types.keys():
-            if (
-                parameter not in parameters
-                and parameter in self.default_parameters
-            ):
-                parameters[parameter] = self.default_parameters[parameter]
+        else:
+            parameters = parameters.copy()
+        for parameter in parameters.keys():
+            if parameter in self.static_parameters:
+                raise Exception('cannot change parameter: ' + parameter)
+        parameters = dict(self.parameters, **parameters)
+        for key, value in self.default_parameters.items():
+            parameters.setdefault(key, value)
         if set(parameters.keys()) != set(self.parameter_types.keys()):
             raise Exception(
                 self.name() + ': parameters must match parameter_types spec'
@@ -41,17 +46,36 @@ class TableBase:
         raise NotImplementedError()
 
     @classmethod
-    def class_name(cls, snake: bool = True) -> str:
-        if snake:
-            return truck.ops.names._camel_to_snake(cls.__name__)
+    def class_name(
+        cls,
+        allow_generic: bool = False,
+        parameters: dict[str, typing.Any] | None = None,
+    ) -> str:
+        if parameters is not None:
+            parameters = dict(
+                cls.default_parameters, **cls.parameters, **parameters
+            )
         else:
-            return cls.__name__
+            parameters = dict(cls.default_parameters, **cls.parameters)
+        return truck.ops.get_table_name(
+            base_name=truck.ops.names._camel_to_snake(cls.__name__),
+            name_template=cls.name_template,
+            parameter_types=cls.parameter_types,
+            parameters=parameters,
+            default_parameters=cls.default_parameters,
+            static_parameters=cls.static_parameters,
+            allow_generic=allow_generic,
+        )
 
-    def name(self, snake: bool = True) -> str:
-        if snake:
-            return truck.ops.names._camel_to_snake(type(self).__name__)
-        else:
-            return type(self).__name__
+    def name(self) -> str:
+        return truck.ops.get_table_name(
+            base_name=truck.ops.names._camel_to_snake(type(self).__name__),
+            name_template=self.name_template,
+            parameter_types=self.parameter_types,
+            parameters=self.parameters,
+            default_parameters=self.default_parameters,
+            static_parameters=self.static_parameters,
+        )
 
     # defaults
 

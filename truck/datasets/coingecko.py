@@ -22,6 +22,10 @@ class CoinMetrics(truck.Table):
     range_format = 'date_range'
     parameter_types = {'top_n': int}
     default_parameters = {'top_n': 1000}
+    name_template = {
+        'default': 'coin_metrics',
+        'custom': 'coin_metrics_top_{top_n}',
+    }
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -51,6 +55,10 @@ class Categories(truck.Table):
     range_format = 'date_range'
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
+    name_template = {
+        'default': 'categories',
+        'custom': 'coin_metrics_{categories}',
+    }
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -77,6 +85,10 @@ class CategoryMetrics(truck.Table):
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
     dependencies = [CoinMetrics, Categories]
+    name_template = {
+        'default': 'category_metrics',
+        'custom': 'category_metrics_{categories}',
+    }
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

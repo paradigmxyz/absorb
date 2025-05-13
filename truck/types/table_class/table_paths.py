@@ -11,9 +11,7 @@ if typing.TYPE_CHECKING:
 class TablePaths(table_base.TableBase):
     def get_dir_path(self, warn: bool = True) -> str:
         return truck.ops.paths.get_table_dir(
-            source=self.source,
-            table=self.name(snake=True),
-            warn=warn,
+            source=self.source, table=self.name(), warn=warn
         )
 
     def get_glob(self, warn: bool = True) -> str:
@@ -34,7 +32,7 @@ class TablePaths(table_base.TableBase):
             data_range=data_range,
             range_format=range_format,
             filename_template=self.filename_template,
-            table=self.name(snake=True),
+            table=self.name(),
             source=self.source,
             parameters=self.parameters,
             glob=glob,
@@ -48,7 +46,7 @@ class TablePaths(table_base.TableBase):
             data_ranges=data_ranges,
             range_format=self.range_format,
             filename_template=self.filename_template,
-            table=self.name(snake=True),
+            table=self.name(),
             source=self.source,
             parameters=self.parameters,
             warn=warn,
@@ -66,7 +64,7 @@ class TablePaths(table_base.TableBase):
             data_range=data_range,
             range_format=range_format,
             filename_template=self.filename_template,
-            table=self.name(snake=True),
+            table=self.name(),
             source=self.source,
             parameters=self.parameters,
             glob=glob,

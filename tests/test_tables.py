@@ -37,3 +37,14 @@ def test_tables_implement_collect_chunk(table: type[truck.Table]) -> None:
         + '.'
         + str(table.__name__)
     )
+
+
+@pytest.mark.parametrize('table', truck.ops.get_table_classes())
+def test_table_parameter_names_valid(table: type[truck.Table]) -> None:
+    for name in table.parameter_types.keys():
+        assert name not in [
+            'base_name',
+        ]
+        assert '__' not in name
+        assert not name.startswith('_')
+        assert not name.endswith('_')

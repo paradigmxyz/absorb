@@ -3,6 +3,9 @@ from __future__ import annotations
 import typing
 from . import table_class
 
+if typing.TYPE_CHECKING:
+    from typing_extensions import NotRequired
+
 
 RangeFormat = typing.Literal[
     'date',
@@ -36,3 +39,8 @@ TableReference = typing.Union[str, TrackedTable, table_class.Table]
 class TruckConfig(typing.TypedDict):
     version: str
     tracked_tables: list[TrackedTable]
+
+
+class NameTemplate(typing.TypedDict):
+    default: NotRequired[str]
+    custom: NotRequired[str | dict[str | tuple[str], str]]
