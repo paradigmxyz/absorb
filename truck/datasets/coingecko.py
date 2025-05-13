@@ -283,14 +283,17 @@ def get_historical_category_metrics(
     coin_metrics: pl.DataFrame | None = None,
     coin_categories: pl.DataFrame | None = None,
 ) -> pl.DataFrame:
+    import polars as pl
+
     if coin_metrics is None:
         coin_metrics = get_historical_coin_metrics()
     if coin_categories is None:
         coin_categories = get_current_coin_categories()
     return (
-        coin_metrics.join(coin_categories, on='coin', how='full')
+        coin_metrics.join(coin_categories, on='coin', how='left')
         .group_by('timestamp', 'category')
         .agg(pl.sum('market_cap_usd'), pl.sum('volume_usd'))
+        .sort('timestamp', 'category')
     )
 
 
