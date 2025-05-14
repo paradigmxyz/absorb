@@ -62,5 +62,35 @@ class AppendOnlyQuery(BaseQuery):
         )
 
 
+class CexLabels(truck.Table):
+    source = 'dune'
+    write_range = 'overwrite_all'
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'address': pl.String,
+            'cex_name': pl.String,
+            'distinct_name': pl.String,
+            'added_by': pl.String,
+            'added_date': pl.Datetime('ms'),
+            'ecosystem': pl.String,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+        import spice
+
+        evm_cex_query = 'https://dune.com/queries/3237025'
+        solana_cex_query = 'https://dune.com/queries/5124188'
+        evm_cexes = spice.query(evm_cex_query).with_columns(ecosystem='EVM')
+        solana_cexes = (
+            spice.query(solana_cex_query)
+            .drop('blockchain')
+            .with_columns(ecosystem=pl.lit('solana'))
+        )
+        return pl.concat([evm_cexes, solana_cexes])
+
+
 def get_tables() -> list[type[truck.Table]]:
-    return [FullQuery, AppendOnlyQuery]
+    return [CexLabels]
