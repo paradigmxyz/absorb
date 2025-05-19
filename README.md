@@ -99,6 +99,7 @@ truck.upload('custom_dataset')
 - [kalshi](https://kalshi.com) prediction market metrics
 - [l2beat](https://l2beat.com) L2 metrics
 - [mempool dumpster](https://mempool-dumpster.flashbots.net) Ethereum mempool archive
+- [snowflake](https://www.snowflake.com/) generalized data platform
 - [sourcify](https://sourcify.dev) verified contracts
 - [tix](https://github.com/paradigmxyz/tix) price feeds
 - [vera](https://verifieralliance.org) verified contract archives
