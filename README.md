@@ -86,6 +86,7 @@ truck.upload('custom_dataset')
 
 - [4byte](https://www.4byte.directory) function and event signatures
 - [allium](https://www.allium.so) crypto data platform
+- [bigquery](https://cloud.google.com/blockchain-analytics/docs/supported-datasets) crypto ETL datasets
 - [binance](https://data.binance.vision) trades and OHLC candles on the Binance CEX
 - [blocknative](https://docs.blocknative.com/data-archive/mempool-archive) Ethereum mempool archive
 - [chain_ids](https://github.com/ethereum-lists/chains) chain id's
