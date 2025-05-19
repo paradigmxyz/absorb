@@ -158,6 +158,32 @@ def get_subcommands() -> (
                 ),
             ],
         ),
+        (
+            'new',
+            'create new dataset',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '?',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--path'],
+                    {
+                        'help': 'path where to store new table definition',
+                    },
+                ),
+                (
+                    ['--native'],
+                    {
+                        'action': 'store_true',
+                        'help': 'create definition directly in truck repo',
+                    },
+                ),
+            ],
+        ),
     ]
 
 

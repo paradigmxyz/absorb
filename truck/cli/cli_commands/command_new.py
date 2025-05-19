@@ -9,7 +9,7 @@ if typing.TYPE_CHECKING:
     from typing import Any
 
 
-def add_command(args: Namespace) -> dict[str, Any]:
+def new_command(args: Namespace) -> dict[str, Any]:
     import os
     import subprocess
 
@@ -20,10 +20,9 @@ def add_command(args: Namespace) -> dict[str, Any]:
 
     # create template content
     table_template = get_table_class_template()
-    table_content = table_template.format(
-        source_name=source_name,
-        class_name=camel_table_name,
-    )
+    table_content = table_template.replace(
+        '{source_name}', source_name
+    ).replace('{class_name}', camel_table_name)
 
     # determine path
     if args.path is not None:
@@ -33,19 +32,22 @@ def add_command(args: Namespace) -> dict[str, Any]:
         if os.path.isdir(source_path):
             path = os.path.join(source_path, snake_table_name + '.py')
         else:
-            path = os.path.join(source_path, table_name)
+            path = os.path.join(source_path + '.py')
     else:
-        raise NotImplementedError('creating table definitions in TRUCK_ROOT')
+        raise NotImplementedError(
+            'creating table definitions in TRUCK_ROOT, use --native or --path'
+        )
+    print('adding table to file: ' + path)
 
     # edit file
     os.makedirs(os.path.dirname(path), exist_ok=True)
     if os.path.isfile(path):
-        content = get_data_source_template() + '\n\n' + table_content
+        content = '\n\n' + table_content
         with open(path, 'a') as f:
             f.write(content)
     else:
-        content = '\n\n' + table_content
-        with open(path) as f:
+        content = get_data_source_template() + '\n\n\n' + table_content
+        with open(path, 'w') as f:
             f.write(content)
 
     # edit file if EDITOR set
@@ -68,15 +70,13 @@ import typing
 import truck
 
 if typing.TYPE_CHECKING:
-    import polars as pl
-    """
+    import polars as pl"""
 
 
 def get_table_class_template() -> str:
-    template = """class {class_name}(truck.Truck):
+    template = """class {class_name}(truck.Table):
     source = '{source_name}'
     write_range = 'overwrite_all'
-    range_format = 'per_hour'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -84,10 +84,10 @@ def get_table_class_template() -> str:
         return {}
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
-        pass
+        raise NotImplementedError()
 
     def get_available_range(self) -> typing.Any:
-        pass
+        raise NotImplementedError()
 """
     return template
 
