@@ -85,14 +85,15 @@ truck.upload('custom_dataset')
 `truck` collects data from each of these sources:
 
 - [4byte](https://www.4byte.directory) function and event signatures
-- [binance](https://data.binance.vision/) trades and OHLC candles on the Binance CEX
+- [binance](https://data.binance.vision) trades and OHLC candles on the Binance CEX
 - [blocknative](https://docs.blocknative.com/data-archive/mempool-archive) Ethereum mempool archive
 - [chain_ids](https://github.com/ethereum-lists/chains) chain id's
 - [coingecko](https://www.coingecko.com/) token prices
 - [cryo](https://github.com/paradigmxyz/cryo) EVM datasets
 - [defillama](https://defillama.com) DeFi data
 - [dune](https://dune.com) tables and queries
-- [growthepie](https://www.growthepie.xyz/) L2 metrics
+- [flipside](https://flipsidecrypto.xyz) crypto data platform
+- [growthepie](https://www.growthepie.xyz) L2 metrics
 - [kalshi](https://kalshi.com) prediction market metrics
 - [l2beat](https://l2beat.com) L2 metrics
 - [mempool dumpster](https://mempool-dumpster.flashbots.net) Ethereum mempool archive
