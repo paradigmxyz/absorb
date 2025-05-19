@@ -243,7 +243,7 @@ def get_historical_coin_metrics(
     print('getting historical data for', len(coins), 'coins')
     dfs = []
     for t, coin in enumerate(coins, start=1):
-        print(str(t) + '. ' + coin)
+        print('[' + str(t) + ' / ' + str(len(coins)) + '] ' + coin)
 
         # get data
         params = {'vs_currency': 'usd', 'days': 365, 'interval': 'daily'}

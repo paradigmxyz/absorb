@@ -9,6 +9,123 @@ import truck
 from . import common
 
 
+# class DexVolumes(truck.Table):
+#     source = 'defillama'
+#     write_range = 'overwrite_all'
+#     parameter_types = {
+#         'protocols': typing.Union[list[str], None],
+#         'chains': typing.Union[list[str], None],
+#         'top_n_protocols': typing.Union[int, None],
+#         'top_n_chains': typing.Union[int, None],
+#     }
+#     default_parameters = {'protocols': None, 'chains': None}
+#     name_template = {
+#         'default': 'dex_volumes',
+#         'custom': {
+#             'protocols': 'dex_volumes_{protocols}',
+#             'chains': 'dex_volumes_{chains}',
+#             'top_n_protocols': 'dex_volumes_top_{top_n_protocols}_protocols',
+#             'top_n_chains': 'dex_volumes_top_{top_n_chains}_chains',
+#         },
+#     }
+#     range_format = 'date_range'
+
+#     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+#         return {
+#             'timestamp': pl.Datetime('ms'),
+#             'chain': pl.String,
+#             'protocol': pl.String,
+#             'volume_usd': pl.Float64,
+#         }
+
+#     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+#         import polars as pl
+
+#         chains = self.parameters['chains']
+#         protocols = self.parameters['protocols']
+
+#         dfs = []
+#         if protocols is not None:
+#             print('collecting', len(protocols), 'protocols')
+#             for p, protocol in enumerate(protocols, start=1):
+#                 print(
+#                     '[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol
+#                 )
+#                 try:
+#                     df = get_historical_dex_volume_per_chain_of_protocol(
+#                         protocol
+#                     )
+#                     dfs.append(df)
+#                 except Exception:
+#                     print('could not collect', protocol)
+#         else:
+#             if chains is None:
+#                 chains = _get_dex_chains()
+#             print('collecting', len(chains), 'chains')
+#             for c, chain in enumerate(chains, start=1):
+#                 print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+#                 try:
+#                     df = get_historical_dex_volume_per_protocol_of_chain(chain)
+#                     dfs.append(df)
+#                 except Exception:
+#                     print('could not collect', chain)
+#         return pl.concat(dfs)
+
+
+# class OptionsVolumes(truck.Table):
+#     source = 'defillama'
+#     write_range = 'overwrite_all'
+#     parameter_types = {
+#         'protocols': typing.Union[list[str], None],
+#         'chains': typing.Union[list[str], None],
+#     }
+#     default_parameters = {'protocols': None, 'chains': None}
+#     range_format = 'date_range'
+
+#     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+#         return {
+#             'timestamp': pl.Datetime('ms'),
+#             'chain': pl.String,
+#             'protocol': pl.String,
+#             'volume_usd': pl.Float64,
+#         }
+
+#     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+#         import polars as pl
+
+#         chains = self.parameters['chains']
+#         protocols = self.parameters['protocols']
+
+#         dfs = []
+#         if protocols is not None:
+#             print('collecting', len(protocols), 'protocols')
+#             for p, protocol in enumerate(protocols, start=1):
+#                 print(
+#                     '[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol
+#                 )
+#                 try:
+#                     df = get_historical_options_volume_per_chain_of_protocol(
+#                         protocol
+#                     )
+#                     dfs.append(df)
+#                 except Exception:
+#                     print('could not collect', protocol)
+#         else:
+#             if chains is None:
+#                 chains = _get_options_chains()
+#             print('collecting', len(chains), 'chains')
+#             for c, chain in enumerate(chains, start=1):
+#                 print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+#                 try:
+#                     df = get_historical_options_volume_per_protocol_of_chain(
+#                         chain
+#                     )
+#                     dfs.append(df)
+#                 except Exception:
+#                     print('could not collect', chain)
+#         return pl.concat(dfs)
+
+
 class ProtocolDexVolumes(truck.Table):
     source = 'defillama'
     write_range = 'overwrite_all'

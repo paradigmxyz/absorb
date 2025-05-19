@@ -10,6 +10,64 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
+# class Fees(truck.Table):
+#     source = 'defillama'
+#     write_range = 'overwrite_all'
+#     range_format = 'date_range'
+#     parameter_types = {
+#         'chains': typing.Union[list[str], None],
+#         'parameters': typing.Union[list[str], None],
+#     }
+#     default_parameters = {'chains': None, 'protocols': None}
+#     name_template = {
+#         'default': 'fees',
+#         'custom': {
+#             '{chains}': 'chains_fees_{chains}',
+#             '{protocols}': 'protocol_fees_{protocols}',
+#         },
+#     }
+
+#     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+#         import polars as pl
+
+#         return {
+#             'timestamp': pl.Datetime('ms'),
+#             'chain': pl.String,
+#             'protocol': pl.String,
+#             'revenue_usd': pl.Int64,
+#         }
+
+#     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+#         import polars as pl
+
+#         if self.parameters['protocols'] is not None:
+#             protocols = self.parameters['protocols']
+#             if protocols is None:
+#                 protocols = _get_fee_protocols()
+#             dfs = []
+#             print('collecting fees of', len(protocols), 'protocols')
+#             for p, protocol in enumerate(protocols, start=1):
+#                 print(
+#                     '[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol
+#                 )
+#                 df = get_historical_fees_per_chain_of_protocol(protocol)
+#                 dfs.append(df)
+#             print('done')
+#             return pl.concat(dfs)
+#         else:
+#             chains = self.parameters['chains']
+#             if chains is None:
+#                 chains = _get_fee_chains()
+#             dfs = []
+#             print('collecting fees of', len(chains), 'chains')
+#             for c, chain in enumerate(chains, start=1):
+#                 print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+#                 df = get_historical_fees_per_protocol_of_chain(chain)
+#                 dfs.append(df)
+#             print('done')
+#             return pl.concat(dfs)
+
+
 class Fees(truck.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
@@ -68,6 +126,7 @@ class FeesOfProtocols(truck.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
+    default_parameters = {'protocols': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:

@@ -10,12 +10,19 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class PoolYields(truck.Table):
+class Yields(truck.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
     parameter_types = {'pools': typing.Union[list[str], None], 'top_n': int}
     default_parameters = {'pools': None, 'top_n': 5000}
     range_format = 'date_range'
+    name_template = {
+        'default': 'yields',
+        'custom': {
+            'top_n': 'pool_yields_top_{top_n}',
+            'pools': 'pool_yields_{pools}',
+        },
+    }
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

@@ -33,7 +33,11 @@ class ChainTvls(truck.Table):
         dfs = []
         for c, chain in enumerate(chains, start=1):
             print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
-            df = get_historical_tvl_of_chain(chain)
+            try:
+                df = get_historical_tvl_of_chain(chain)
+            except Exception:
+                print('could not collect ' + chain)
+                continue
             dfs.append(df)
         return pl.concat(dfs)
 
@@ -74,7 +78,7 @@ class ProtocolTvls(truck.Table):
         return pl.concat(dfs)
 
 
-class TvlPerTokenOfProtocols(truck.Table):
+class ProtocolTvlsPerToken(truck.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
@@ -111,12 +115,19 @@ def _get_tvl_chains() -> list[str]:
         .list.explode()
         .unique()
         .sort()
+        .drop_nulls()
         .to_list()
     )
 
 
 def _get_tvl_protocols() -> list[str]:
-    return get_current_project_tvls()['protocol'].unique().sort().to_list()
+    return (
+        get_current_project_tvls()['protocol']
+        .unique()
+        .sort()
+        .drop_nulls()
+        .to_list()
+    )
 
 
 def get_current_project_tvls() -> pl.DataFrame:

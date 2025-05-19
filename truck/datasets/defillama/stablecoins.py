@@ -28,7 +28,7 @@ class StablecoinsOfChains(truck.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
     parameter_types = {'chains': typing.Union[list[str], None]}
-    default_parameters = {'tokens': None}
+    default_parameters = {'chains': None}
     range_format = 'date_range'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -39,7 +39,7 @@ class StablecoinsOfChains(truck.Table):
             'chain': pl.String,
             'circulating_usd': pl.Float64,
             'minted_usd': pl.Float64,
-            'bridged_Usd': pl.Float64,
+            'bridged_usd': pl.Float64,
         }
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
@@ -52,9 +52,12 @@ class StablecoinsOfChains(truck.Table):
         dfs = []
         print('collecting', len(chains), 'chains')
         for c, chain in enumerate(chains, start=1):
-            print('p' + str(c) + ' / ' + str(len(chains)) + ']', chain)
-            df = get_historical_stablecoins_of_chain(chain)
-            dfs.append(df)
+            print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
+            try:
+                df = get_historical_stablecoins_of_chain(chain)
+                dfs.append(df)
+            except Exception:
+                print('could not collect', chain)
         return pl.concat(dfs)
 
 
