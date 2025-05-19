@@ -1,21 +1,14 @@
-# truck 🚛
+# absorb 🧽
 
-simple interface for collecting, managing, and loading datasets
+*the sovereign dataset manager*
 
-## Features
-- coverage
-    - access > 1 million public datasets
-    - integrate new datasets with minimal code
-- collection
-    - collect any dataset with a single cli command
-    - maintain dataset freshness as they update over time
-- loading
-    - load any dataset as polars dataframe with a single function call
-- customization
-    - define custom datasets, either from scratch, or as views of other datasets
-    - share custom datasets by uploading with single cli commnand
-    - define custom cli for each dataset
+`absorb` makes it easy to 1) collect, 2) query, 3) manage, and 4) customize datasets from nearly any data source
 
+## features
+- **limitless dataset library**: access to millions of datasets across 16 diverse data sources
+- **intuitive cli+python interfaces**: collect or query any dataset in a single line of code
+- **maximal modularity**: built on open standards for frictionless integration with other tools
+- **easy extensibility**: add new datasets or data sources with just a few lines of code
 
 ## Contents
 1. Installation
@@ -28,7 +21,7 @@ simple interface for collecting, managing, and loading datasets
 
 
 ## Installation
-`uv install truck`
+`uv install absorb`
 
 
 ## Example Usage
@@ -37,52 +30,52 @@ simple interface for collecting, managing, and loading datasets
 
 ```bash
 # collect dataset and save as local files
-truck collect kalshi
+absorb collect kalshi
 
 # list datasets that are collected or available
-truck ls
+absorb ls
 
 # show schemas of dataset
-truck schema kalshi
+absorb schema kalshi
 
 # create new custom dataset
-truck new custom_dataset
+absorb new custom_dataset
 
 # upload custom dataset
-truck upload custom_dataset
+absorb upload custom_dataset
 ```
 
 #### Example Python Usage
 
 ```python
-import truck
+import absorb
 
 # collect dataset and save as local files
-truck.collect('kalshi')
+absorb.collect('kalshi')
 
 # list datasets that are collected or available
-datasets = truck.list()
+datasets = absorb.list()
 
 # get schemas of dataset
-schema = truck.schema('kalshi')
+schema = absorb.schema('kalshi')
 
 # load dataset as polars DataFrame
-df = truck.load('kalshi')
+df = absorb.load('kalshi')
 
 # scan dataset as polars LazyFrame
-lf = truck.scan('kalshi')
+lf = absorb.scan('kalshi')
 
 # create new custom dataset
-truck.new('custom_dataset')
+absorb.new('custom_dataset')
 
 # upload custom dataset
-truck.upload('custom_dataset')
+absorb.upload('custom_dataset')
 ```
 
 
 ## Supported Data Sources
 
-`truck` collects data from each of these sources:
+`absorb` collects data from each of these sources:
 
 - [4byte](https://www.4byte.directory) function and event signatures
 - [allium](https://www.allium.so) crypto data platform
@@ -105,16 +98,16 @@ truck.upload('custom_dataset')
 - [vera](https://verifieralliance.org) verified contract archives
 - [xatu](https://github.com/ethpandaops/xatu-data) many Ethereum datasets
 
-To list all available datasets and data sources, type `truck ls` on the command line.
+To list all available datasets and data sources, type `absorb ls` on the command line.
 
 
 ## Output Format
 
-To display information about the schema and other metadata of a dataset, type `truck help <DATASET>` on the command line.
+To display information about the schema and other metadata of a dataset, type `absorb help <DATASET>` on the command line.
 
-`truck` stores each dataset as a collection of parquet files.
+`absorb` stores each dataset as a collection of parquet files.
 
-Datasets can be stored in any location on your disks, and truck will use symlinks to organize those files in the `TRUCK_ROOT` tree.
+Datasets can be stored in any location on your disks, and absorb will use symlinks to organize those files in the `TRUCK_ROOT` tree.
 
 the `TRUCK_ROOT` filesystem directory is organized as:
 
@@ -128,14 +121,14 @@ the `TRUCK_ROOT` filesystem directory is organized as:
                 table_metadata.json
             repos/
                 {repo_name}/
-    truck_config.json
+    absorb_config.json
 ```
 
 ## Configuration
 
-`truck` uses a config file to specify which datasets to track.
+`absorb` uses a config file to specify which datasets to track.
 
-Schema of `truck_config.json`:
+Schema of `absorb_config.json`:
 
 ```python
 {

@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "paradigm_truck"
+name = "paradigm_absorb"
 readme = "README.md"
 requires-python = ">=3.7"
 dynamic = ["version", "description"]
@@ -36,11 +36,11 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/paradigmxyz/truck"
-Source = "https://github.com/paradigmxyz/truck"
+Documentation = "https://github.com/paradigmxyz/absorb"
+Source = "https://github.com/paradigmxyz/absorb"
 
 [tool.flit.module]
-name = "truck"
+name = "absorb"
 
 [project.optional-dependencies]
 test = [
@@ -55,7 +55,7 @@ pytest-asyncio = "^0.18.3"  # Add this line for pytest-asyncio
 python_version = "3.9"
 strict = true
 implicit_reexport = true
-files = ["truck", "tests"]
+files = ["absorb", "tests"]
 
 [tool.pytest.ini_options]
 testpaths = [
@@ -63,7 +63,7 @@ testpaths = [
 ]
 
 [project.scripts]
-truck = "truck.cli:run_cli"
+absorb = "absorb.cli:run_cli"
 
 [tool.ruff]
 line-length = 80

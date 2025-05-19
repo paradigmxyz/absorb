@@ -1,10 +1,10 @@
-import truck
+import absorb
 
 import pytest
 
 
-@pytest.mark.parametrize('table', truck.ops.get_table_classes())
-def test_tables_have_attrs(table: type[truck.Table]) -> None:
+@pytest.mark.parametrize('table', absorb.ops.get_table_classes())
+def test_tables_have_attrs(table: type[absorb.Table]) -> None:
     for attr in [
         'source',
         'write_range',
@@ -19,9 +19,9 @@ def test_tables_have_attrs(table: type[truck.Table]) -> None:
         )
 
 
-@pytest.mark.parametrize('table', truck.ops.get_table_classes())
-def test_tables_implement_get_schema(table: type[truck.Table]) -> None:
-    assert table.get_schema != truck.Table.get_schema, (
+@pytest.mark.parametrize('table', absorb.ops.get_table_classes())
+def test_tables_implement_get_schema(table: type[absorb.Table]) -> None:
+    assert table.get_schema != absorb.Table.get_schema, (
         'missing get_schema() for '
         + str(table.source)
         + '.'
@@ -29,9 +29,9 @@ def test_tables_implement_get_schema(table: type[truck.Table]) -> None:
     )
 
 
-@pytest.mark.parametrize('table', truck.ops.get_table_classes())
-def test_tables_implement_collect_chunk(table: type[truck.Table]) -> None:
-    assert table.collect_chunk != truck.Table.collect_chunk, (
+@pytest.mark.parametrize('table', absorb.ops.get_table_classes())
+def test_tables_implement_collect_chunk(table: type[absorb.Table]) -> None:
+    assert table.collect_chunk != absorb.Table.collect_chunk, (
         'missing collect_chunk() for '
         + str(table.source)
         + '.'
@@ -39,8 +39,8 @@ def test_tables_implement_collect_chunk(table: type[truck.Table]) -> None:
     )
 
 
-@pytest.mark.parametrize('table', truck.ops.get_table_classes())
-def test_table_parameter_names_valid(table: type[truck.Table]) -> None:
+@pytest.mark.parametrize('table', absorb.ops.get_table_classes())
+def test_table_parameter_names_valid(table: type[absorb.Table]) -> None:
     for name in table.parameter_types.keys():
         assert name not in [
             'base_name',
