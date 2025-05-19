@@ -1,4 +1,4 @@
-![image (15)](https://github.com/user-attachments/assets/bf36710a-de2f-4e1e-acfe-2fd2b713c408)
+![image](https://github.com/user-attachments/assets/7323b83e-fc5b-496c-b67b-bad6a188873b)
 
 # absorb 🧽
 
