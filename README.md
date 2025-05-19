@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/c53bfa3f-aa81-4a5a-a3f4-e9ad3b500359)
+
 # absorb 🧽
 
 *the sovereign dataset manager*
