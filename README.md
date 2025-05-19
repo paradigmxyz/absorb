@@ -23,7 +23,7 @@
 
 
 ## Installation
-`uv install absorb`
+`uv install paradigm_absorb`
 
 
 ## Example Usage
