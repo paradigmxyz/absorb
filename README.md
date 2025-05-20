@@ -6,20 +6,20 @@
 
 `absorb` makes it easy to 1) collect, 2) query, 3) manage, and 4) customize datasets from nearly any data source
 
-## features
-- **limitless dataset library**: access to millions of datasets across 16 diverse data sources
+## Features
+- **limitless dataset library**: access to millions of datasets across 20 diverse data sources
 - **intuitive cli+python interfaces**: collect or query any dataset in a single line of code
 - **maximal modularity**: built on open standards for frictionless integration with other tools
 - **easy extensibility**: add new datasets or data sources with just a few lines of code
 
 ## Contents
-1. Installation
-2. Example Usage
-    i. Command Line
-    ii. Python
-3. Supported Data sources
-4. Output Format
-5. Configuration
+1. [Installation](#installation)
+2. [Example Usage](#example-usage)
+    1. [Command Line](#example-command-line-usage)
+    2. [Python](#example-python-usage)
+3. [Supported Data Sources](#supported-data-sources)
+4. [Output Format](#output-format)
+5. [Configuration](#configuration)
 
 
 ## Installation
