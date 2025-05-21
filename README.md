@@ -7,7 +7,7 @@
 `absorb` makes it easy to 1) collect, 2) query, 3) manage, and 4) customize datasets from nearly any data source
 
 ## Features
-- **limitless dataset library**: access to millions of datasets across 20 diverse data sources
+- **limitless dataset library**: access to millions of datasets across 20+ diverse data sources
 - **intuitive cli+python interfaces**: collect or query any dataset in a single line of code
 - **maximal modularity**: built on open standards for frictionless integration with other tools
 - **easy extensibility**: add new datasets or data sources with just a few lines of code
@@ -91,6 +91,7 @@ absorb.upload('custom_dataset')
 - [dune](https://dune.com) tables and queries
 - [fred](https://fred.stlouisfed.org) federal macroeonomic data
 - [flipside](https://flipsidecrypto.xyz) crypto data platform
+- [git](https://git-scm.com) commits, authors, and file diffs of a repo
 - [growthepie](https://www.growthepie.xyz) L2 metrics
 - [kalshi](https://kalshi.com) prediction market metrics
 - [l2beat](https://l2beat.com) L2 metrics
