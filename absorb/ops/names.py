@@ -50,6 +50,11 @@ def get_table_name(
     if name_template.get('default') is None:
         pass
 
+    if base_name.isupper():
+        base_name = base_name.lower()
+    else:
+        base_name = absorb.ops.names._camel_to_snake(base_name)
+
     if len(parameter_types) == 0:
         if len(name_template) == 0:
             return base_name

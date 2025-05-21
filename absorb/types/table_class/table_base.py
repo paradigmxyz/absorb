@@ -58,7 +58,7 @@ class TableBase:
         else:
             parameters = dict(cls.default_parameters, **cls.parameters)
         return absorb.ops.get_table_name(
-            base_name=absorb.ops.names._camel_to_snake(cls.__name__),
+            base_name=cls.__name__,
             name_template=cls.name_template,
             parameter_types=cls.parameter_types,
             parameters=parameters,
@@ -69,7 +69,7 @@ class TableBase:
 
     def name(self) -> str:
         return absorb.ops.get_table_name(
-            base_name=absorb.ops.names._camel_to_snake(type(self).__name__),
+            base_name=type(self).__name__,
             name_template=self.name_template,
             parameter_types=self.parameter_types,
             parameters=self.parameters,
