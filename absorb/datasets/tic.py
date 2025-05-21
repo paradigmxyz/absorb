@@ -1,0 +1,84 @@
+from __future__ import annotations
+
+import typing
+
+import absorb
+
+if typing.TYPE_CHECKING:
+    import polars as pl
+
+
+class TreasuryHoldings(absorb.Table):
+    source = 'tic'
+    write_range = 'overwrite_all'
+
+    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
+        return {
+            'date': pl.Date,
+            'country': pl.String,
+            'for_treas_pos': pl.Float64,
+        }
+
+    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+        return get_post_2019_holdings()
+
+    def get_available_range(self) -> typing.Any:
+        raise NotImplementedError()
+
+
+def get_post_2019_holdings() -> pl.DataFrame:
+    import io
+    import requests
+    import polars as pl
+
+    # TODO: get pre-2019 data from https://treasury.gov/resource-center/data-chart-center/tic/Documents/slt3d_globl.csv  # noqa
+
+    url = 'https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table3.txt'  # noqa
+    response = requests.get(url)
+    end_index = response.text.index('Notes:	')
+    file = io.StringIO(response.text[:end_index])
+
+    schema = {
+        'country': pl.String,
+        'country_code': pl.String,
+        'date': pl.String,
+        'for_treas_pos': pl.String,
+        'for_treas_net': pl.String,
+        'for_lt_treas_pos': pl.String,
+        'for_lt_treas_net': pl.String,
+        'for_lt_treas_valchg': pl.String,
+        'for_st_treas_pos': pl.String,
+        'for_st_treas_net': pl.String,
+    }
+
+    holders = (
+        pl.read_csv(
+            file,
+            separator='\t',
+            schema=schema,
+            skip_rows=10,
+            truncate_ragged_lines=True,
+        )[:-1]
+        .with_columns(pl.col('*').replace('n.a.', None))
+        .with_columns(
+            country_code=pl.col.country_code.cast(int),
+            date=pl.col.date.str.to_date('%Y-%m'),
+            for_treas_pos=pl.col.for_treas_pos.cast(float),
+            for_treas_net=pl.col.for_treas_net.cast(float),
+            for_lt_treas_pos=pl.col.for_lt_treas_pos.cast(float),
+            for_lt_treas_net=pl.col.for_lt_treas_net.cast(float),
+            for_lt_treas_valchg=pl.col.for_lt_treas_valchg.cast(float),
+            for_st_treas_pos=pl.col.for_st_treas_pos.cast(float),
+            for_st_treas_net=pl.col.for_st_treas_net.cast(float),
+        )
+        .select(
+            'date',
+            'country',
+            'for_treas_pos',
+        )
+        .sort('country', 'date')
+    )
+
+    return holders

@@ -97,6 +97,7 @@ absorb.upload('custom_dataset')
 - [mempool dumpster](https://mempool-dumpster.flashbots.net) Ethereum mempool archive
 - [snowflake](https://www.snowflake.com/) generalized data platform
 - [sourcify](https://sourcify.dev) verified contracts
+- [tic](https://ticdata.treasury.gov) usa treasury department data
 - [tix](https://github.com/paradigmxyz/tix) price feeds
 - [vera](https://verifieralliance.org) verified contract archives
 - [xatu](https://github.com/ethpandaops/xatu-data) many Ethereum datasets
