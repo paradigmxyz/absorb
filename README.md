@@ -89,6 +89,7 @@ absorb.upload('custom_dataset')
 - [cryo](https://github.com/paradigmxyz/cryo) EVM datasets
 - [defillama](https://defillama.com) DeFi data
 - [dune](https://dune.com) tables and queries
+- [fred](https://fred.stlouisfed.org) federal macroeonomic data
 - [flipside](https://flipsidecrypto.xyz) crypto data platform
 - [growthepie](https://www.growthepie.xyz) L2 metrics
 - [kalshi](https://kalshi.com) prediction market metrics
