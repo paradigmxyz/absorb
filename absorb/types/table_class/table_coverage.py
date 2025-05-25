@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 from . import table_paths
+import absorb
 
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T')
@@ -37,6 +38,18 @@ class TableCoverage(table_paths.TablePaths):
             return [start, end]
         else:
             raise Exception()
+
+    def get_missing_ranges(self) -> list[typing.Any]:
+        collected_range = self.get_collected_range()
+        available_range = self.get_available_range()
+        if collected_range is None:
+            return [available_range]
+        else:
+            return absorb.ops.ranges.get_range_diff(
+                subtract_this=collected_range,
+                from_this=available_range,
+                range_format=self.range_format,
+            )
 
     @classmethod
     def is_range_sortable(cls) -> bool:
