@@ -13,6 +13,10 @@ class Query(absorb.Table):
     source = 'bigquery'
     write_range = 'overwrite_all'
     parameters = {'sql': str, 'name': str}
+    required_packages = [
+        'google-cloud-bigquery >= 3.32.0',
+        'google-cloud-bigquery-storage >= 2.31.0',
+    ]
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()

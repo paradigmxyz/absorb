@@ -13,6 +13,7 @@ class Query(absorb.Table):
     write_range = 'overwrite_all'
     range_format = 'per_hour'
     parameters = {'name': str, 'sql': str}
+    required_packages = ['garlic >= 1.1']
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()

@@ -8,6 +8,7 @@ import absorb
 class BaseQuery(absorb.Table):
     source = 'dune'
     name_template = {'custom': '{name}'}
+    required_packages = ['spice >= 0.2.3']
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import spice
@@ -65,6 +66,7 @@ class AppendOnlyQuery(BaseQuery):
 class CexLabels(absorb.Table):
     source = 'dune'
     write_range = 'overwrite_all'
+    required_packages = ['cryo_manager']
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

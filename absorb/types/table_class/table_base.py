@@ -23,6 +23,7 @@ class TableBase:
     static_parameters: list[str] = []
     filename_template = '{source}__{table}__{data_range}.parquet'
     name_template: absorb.types.NameTemplate = {}
+    required_packages: list[str] = []
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
         # set parameters

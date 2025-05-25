@@ -13,6 +13,7 @@ class Commits(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'paths': list[str]}
     require_name = True
+    required_packages = ['nitwit >= 1.1']
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

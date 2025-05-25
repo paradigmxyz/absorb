@@ -30,6 +30,7 @@ classifiers = [
 dependencies = [
     "polars >= 1.0",
     "polars_evm >= 0.2.6",
+    "requests >= 2.0",
     "rich >= 13.9.4",
     "rich_argparse >= 1.5.2",
     "toolstr >= 0.9.11",
