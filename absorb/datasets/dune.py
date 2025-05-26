@@ -23,6 +23,7 @@ class FullQuery(BaseQuery):
     """collect the full output of a query"""
 
     write_range = 'overwrite_all'
+    chunk_format = 'all'
     parameter_types = {
         'name': str,
         'query': str,
@@ -43,7 +44,6 @@ class AppendOnlyQuery(BaseQuery):
     """collect the output of a query, time-partitioned"""
 
     write_range = 'append_only'
-    range_format = 'named_range'
     parameter_types = {
         'name': str,
         'query': str,
@@ -66,6 +66,7 @@ class AppendOnlyQuery(BaseQuery):
 class CexLabels(absorb.Table):
     source = 'dune'
     write_range = 'overwrite_all'
+    chunk_format = 'all'
     required_packages = ['cryo_manager']
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:

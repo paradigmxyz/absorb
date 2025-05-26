@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'flipside'
     write_range = 'overwrite_all'
-    range_format = 'per_hour'
+    chunk_format = 'all'
     parameters = {'name': str, 'sql': str}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:

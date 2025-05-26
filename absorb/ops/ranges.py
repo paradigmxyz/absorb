@@ -16,20 +16,14 @@ def chunk_coverage_to_list(
     if isinstance(coverage, list):
         return coverage
     elif isinstance(coverage, dict):
-        import itertools
-
         if not isinstance(chunk_format, dict):
             raise Exception()
-
-        keys = list(coverage.keys())
-        dims = [
-            chunk_coverage_to_list(
-                coverage=coverage[key],
-                chunk_format=chunk_format[key],
+        if chunk_format['type'] == 'multi':
+            return _multi_coverage_to_list(coverage, chunk_format)
+        else:
+            raise NotImplementedError(
+                'using number_range or timestamp_range with interval size'
             )
-            for key in keys
-        ]
-        return [dict(zip(keys, combo)) for combo in itertools.product(*dims)]
     elif isinstance(coverage, tuple):
         import tooltime
 
@@ -49,6 +43,25 @@ def chunk_coverage_to_list(
             raise Exception('cannot use this chunk_type as tuple range')
     else:
         raise Exception('invalid coverage format')
+
+
+def _multi_coverage_to_list(
+    coverage: absorb.Coverage,
+    chunk_format: absorb.MultiChunkFormat,
+) -> absorb.ChunkList:
+    import itertools
+
+    if not isinstance(coverage, dict):
+        raise Exception()
+    keys = list(coverage.keys())
+    dims = [
+        chunk_coverage_to_list(
+            coverage=coverage[key],
+            chunk_format=chunk_format['dims'][key],
+        )
+        for key in keys
+    ]
+    return [dict(zip(keys, combo)) for combo in itertools.product(*dims)]
 
 
 def get_range_diff(

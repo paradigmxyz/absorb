@@ -6,19 +6,16 @@ from . import common
 class BeaconAttestations(common.XatuTable):
     datatype = 'libp2p_gossipsub_beacon_attestation'
     source = 'libp2p'
-    range_format = 'hour'
-    per = 'hour'
+    chunk_format = 'hour'
 
 
 class BeaconBlocks(common.XatuTable):
     datatype = 'libp2p_gossipsub_beacon_block'
     source = 'libp2p'
-    range_format = 'hour'
-    per = 'day'
+    chunk_format = 'hour'
 
 
 class BlobSidecars(common.XatuTable):
     datatype = 'libp2p_gossipsub_blob_sidecar'
     source = 'libp2p'
-    range_format = 'hour'
-    per = 'day'
+    chunk_format = 'hour'

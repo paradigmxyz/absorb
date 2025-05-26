@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'snowflake'
     write_range = 'overwrite_all'
-    range_format = 'per_hour'
+    chunk_format = 'all'
     parameters = {'name': str, 'sql': str}
     required_packages = ['garlic >= 1.1']
 

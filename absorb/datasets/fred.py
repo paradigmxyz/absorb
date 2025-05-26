@@ -12,6 +12,7 @@ class Metric(absorb.Table):
     source = 'fred'
     write_range = 'overwrite_all'
     parameter_types = {'series_id': str}
+    chunk_format = 'all'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

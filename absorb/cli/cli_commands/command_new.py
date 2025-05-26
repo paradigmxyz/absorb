@@ -77,6 +77,7 @@ def get_table_class_template() -> str:
     template = """class {class_name}(absorb.Table):
     source = '{source_name}'
     write_range = 'overwrite_all'
+    chunk_format = None
     parameter_types = {}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:

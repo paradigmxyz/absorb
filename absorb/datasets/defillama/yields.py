@@ -15,7 +15,7 @@ class Yields(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'pools': typing.Union[list[str], None], 'top_n': int}
     default_parameters = {'pools': None, 'top_n': 5000}
-    range_format = 'date_range'
+    chunk_format = 'day'
     name_template = {
         'default': 'yields',
         'custom': {

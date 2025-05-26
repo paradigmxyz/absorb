@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'bigquery'
     write_range = 'overwrite_all'
+    chunk_format = 'all'
     parameters = {'sql': str, 'name': str}
     required_packages = [
         'google-cloud-bigquery >= 3.32.0',

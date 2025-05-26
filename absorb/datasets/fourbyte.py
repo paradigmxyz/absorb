@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 class FourbyteDatatype(absorb.Table):
     source = 'fourbyte'
     write_range = 'append_only'
-    range_format = 'id_range'
+    chunk_format = 'number_range'
 
     # custom
     endpoint: str

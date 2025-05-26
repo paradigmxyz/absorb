@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 class Chains(absorb.Table):
     source = 'chains'
     write_range = 'overwrite_all'
-    range_format = 'count'
+    chunk_format = 'number'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

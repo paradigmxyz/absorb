@@ -10,6 +10,7 @@ from . import table_class
 
 # chunk formats
 PrimitiveChunkFormat = typing.Literal[
+    'all',
     # temporal
     'hour',
     'day',
@@ -25,7 +26,6 @@ PrimitiveChunkFormat = typing.Literal[
     'number_list',
     # names
     'name',
-    'name_range',
     'name_list',
 ]
 
@@ -38,12 +38,22 @@ class CustomChunkFormat:
         raise NotImplementedError()
 
 
-class MultiChunkFormat:
+class MultiChunkFormat(typing.TypedDict):
     type: typing.Literal['multi']
     dims: dict[str, ScalarChunkFormat]
 
 
-ScalarChunkFormat = typing.Union[PrimitiveChunkFormat, CustomChunkFormat]
+class ExplicitChunkFormat(typing.TypedDict):
+    type: PrimitiveChunkFormat
+    number_interval: NotRequired[int | None]
+    timestamp_range: NotRequired[datetime.timedelta | None]
+
+
+ScalarChunkFormat = typing.Union[
+    PrimitiveChunkFormat,
+    ExplicitChunkFormat,
+    CustomChunkFormat,
+]
 
 ChunkFormat = typing.Union[ScalarChunkFormat, MultiChunkFormat]
 

@@ -15,7 +15,7 @@ url_template = (
 class Mempool(absorb.Table):
     source = 'blocknative'
     write_range = 'overwrite_all'
-    range_format = 'per_hour'
+    chunk_format = 'hour'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

@@ -16,8 +16,7 @@ path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}
 class Metrics(absorb.Table):
     source = 'kalshi'
     write_range = 'append_only'
-    cadence = 'daily'
-    range_format = 'date'
+    chunk_format = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -67,7 +66,7 @@ class Metadata(absorb.Table):
     source = 'kalshi'
     cadence = None
     write_range = 'overwrite_all'
-    range_format = 'date'
+    chunk_format = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

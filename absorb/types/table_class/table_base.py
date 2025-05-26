@@ -43,6 +43,11 @@ class TableBase:
             )
         self.parameters = parameters
 
+        required_parameters = ['chunk_format']
+        for parameter in required_parameters:
+            if not hasattr(self, parameter) or getattr(self, parameter) is None:
+                raise Exception('missing table parameter: ' + str(parameter))
+
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()
 

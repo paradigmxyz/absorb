@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 class Stablecoins(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    range_format = 'date_range'
+    chunk_format = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -29,7 +29,7 @@ class StablecoinsOfChains(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'chains': typing.Union[list[str], None]}
     default_parameters = {'chains': None}
-    range_format = 'date_range'
+    chunk_format = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -66,7 +66,7 @@ class StablecoinsOfTokens(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'tokens': typing.Union[list[str], None]}
     default_parameters = {'tokens': None}
-    range_format = 'date_range'
+    chunk_format = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -100,7 +100,7 @@ class StablecoinsOfTokens(absorb.Table):
 class StablecoinPrices(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    range_format = 'date_range'
+    chunk_format = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

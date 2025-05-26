@@ -12,6 +12,7 @@ class Commits(absorb.Table):
     source = 'git'
     write_range = 'overwrite_all'
     parameter_types = {'paths': list[str]}
+    chunk_format = 'all'
     require_name = True
     required_packages = ['nitwit >= 1.1']
 
@@ -51,6 +52,7 @@ class Authors(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'path': str}
     require_name = True
+    chunk_format = 'all'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -86,6 +88,7 @@ class FileDiffs(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'path': str}
     require_name = True
+    chunk_format = 'all'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -114,6 +117,7 @@ class FileDiffStats(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'path': str}
     require_name = True
+    chunk_format = 'all'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

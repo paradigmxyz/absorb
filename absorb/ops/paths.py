@@ -194,9 +194,6 @@ def _format_data_range(
         return (template % start) + '_to_' + (template % end)  # type: ignore
     elif chunk_format == 'name':
         return data_range  # type: ignore
-    elif chunk_format == 'name_range':
-        start, end = data_range
-        return start + '_to_' + end  # type: ignore
     elif chunk_format == 'name_list':
         return '_'.join(data_range)
     elif chunk_format is None:

@@ -3,20 +3,24 @@ import absorb
 import pytest
 
 
+required_attrs = [
+    'source',
+    'write_range',
+    'chunk_format',
+]
+
+
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
-def test_tables_have_attrs(table: type[absorb.Table]) -> None:
-    for attr in [
-        'source',
-        'write_range',
-    ]:
-        assert hasattr(table, attr), (
-            'missing attribute '
-            + attr
-            + ' for '
-            + str(table.source)
-            + '.'
-            + str(table.__name__)
-        )
+@pytest.mark.parametrize('attr', required_attrs)
+def test_tables_have_attrs(table: type[absorb.Table], attr: str) -> None:
+    assert hasattr(table, attr), (
+        'missing attribute '
+        + attr
+        + ' for '
+        + str(table.source)
+        + '.'
+        + str(table.__name__)
+    )
 
 
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
