@@ -22,7 +22,7 @@ class VeraChunkedDataset(absorb.Table):
     def get_schema(self) -> dict[str, pl.DataType | type[pl.Datatype]]:
         raise NotImplementedError()
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         return get_current_files(self.vera_filetype)
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:

@@ -24,5 +24,5 @@ class Query(absorb.Table):
         sql = self.parameters['sql']
         return garlic.query(sql)
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         raise NotImplementedError()

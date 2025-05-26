@@ -66,7 +66,7 @@ class Transactions(absorb.Table):
         'rawTx',
     ]
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         current = datetime.datetime.now()
@@ -82,7 +82,7 @@ class Transactions(absorb.Table):
             if absorb.ops.does_remote_file_exist(url):
                 break
             current -= datetime.timedelta(days=1)
-        return [initial, current]
+        return (initial, current)
 
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         url = url_template.format(

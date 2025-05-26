@@ -35,7 +35,7 @@ def _snake_to_camel(name: str) -> str:
 def get_table_name(
     *,
     base_name: str,
-    name_template: absorb.types.NameTemplate,
+    name_template: absorb.NameTemplate,
     parameter_types: dict[str, typing.Any],
     parameters: dict[str, typing.Any],
     default_parameters: dict[str, typing.Any],

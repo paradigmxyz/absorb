@@ -9,14 +9,56 @@ if typing.TYPE_CHECKING:
     _T = typing.TypeVar('_T', int, datetime.datetime)
 
 
+def chunk_coverage_to_list(
+    coverage: absorb.Coverage,
+    chunk_format: absorb.ChunkFormat,
+) -> absorb.ChunkList:
+    if isinstance(coverage, list):
+        return coverage
+    elif isinstance(coverage, dict):
+        import itertools
+
+        if not isinstance(chunk_format, dict):
+            raise Exception()
+
+        keys = list(coverage.keys())
+        dims = [
+            chunk_coverage_to_list(
+                coverage=coverage[key],
+                chunk_format=chunk_format[key],
+            )
+            for key in keys
+        ]
+        return [dict(zip(keys, combo)) for combo in itertools.product(*dims)]
+    elif isinstance(coverage, tuple):
+        import tooltime
+
+        start, end = coverage
+        if chunk_format in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
+            if not isinstance(chunk_format, str):  # for mypy
+                raise Exception()
+            return tooltime.get_intervals(
+                start,
+                end,
+                interval=chunk_format,
+                include_end=True,
+            )['start'].to_list()
+        elif chunk_format == 'number':
+            return list(range(start, end + 1))
+        else:
+            raise Exception('cannot use this chunk_type as tuple range')
+    else:
+        raise Exception('invalid coverage format')
+
+
 def get_range_diff(
-    subtract_this: typing.Any,
-    from_this: typing.Any,
-    range_format: absorb.RangeFormat,
-) -> list[typing.Any]:
+    subtract_this: absorb.Coverage,
+    from_this: absorb.Coverage,
+    chunk_format: absorb.ChunkFormat,
+) -> absorb.Coverage:
     """
     subtraction behaves differently depending on range format
-    - mainly, range_format is discrete-closed or continuous-semiopen or other
+    - mainly, chunk_format is discrete-closed or continuous-semiopen or other
     - some of these cases will have equivalent outcomes
         - handling them separately keeps maximum clarity + robustness
 
@@ -49,34 +91,79 @@ def get_range_diff(
                                 5.          |--|
                                 6.             |--|
     """
-    if range_format == 'date':
+    non_range_types = [
+        'number_list',
+        'timestamp',
+        'name',
+        'name_range',
+        'name_list',
+    ]
+
+    if (
+        isinstance(subtract_this, (list, dict))
+        or isinstance(from_this, (list, dict))
+        or chunk_format in non_range_types
+    ):
+        if not isinstance(subtract_this, list):
+            subtract_this = chunk_coverage_to_list(subtract_this, chunk_format)
+        if not isinstance(from_this, list):
+            from_this = chunk_coverage_to_list(from_this, chunk_format)
+        return [item for item in from_this if item not in subtract_this]
+
+    if not isinstance(subtract_this, tuple) or not isinstance(from_this, tuple):
+        raise Exception()
+    if chunk_format in [
+        'hour',
+        'day',
+        'week',
+        'month',
+        'quarter',
+        'year',
+    ]:
         import datetime
 
-        discrete_step = datetime.timedelta(days=1)
+        # get discrete chunk
+        if chunk_format == 'hour':
+            discrete_step = datetime.timedelta(hours=1)
+        elif chunk_format == 'day':
+            discrete_step = datetime.timedelta(days=1)
+        elif chunk_format == 'week':
+            discrete_step = datetime.timedelta(days=7)
+        elif chunk_format == 'month':
+            raise NotImplementedError()
+        elif chunk_format == 'quarter':
+            raise NotImplementedError()
+        elif chunk_format == 'year':
+            raise NotImplementedError()
+        else:
+            raise Exception('invalid chunk_format')
 
         return _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=discrete_step,
         )
-    elif range_format == 'date_range':
+    elif chunk_format == 'timestamp_range':
         return _get_continuous_closed_open_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
         )
-    elif range_format == 'named_range':
-        assert isinstance(subtract_this, list) and isinstance(from_this, list)
-        return [item for item in from_this if item not in set(subtract_this)]
-    elif range_format == 'block_range':
+    elif chunk_format == 'number':
         return _get_discrete_closed_range_diff(
-            subtract_this=subtract_this, from_this=from_this, discrete_step=1
+            subtract_this=subtract_this,
+            from_this=from_this,
+            discrete_step=1,
         )
-    elif range_format == 'id_range':
-        raise NotImplementedError()
-    elif range_format == 'count':
+    elif chunk_format == 'number_range':
+        return _get_discrete_closed_range_diff(
+            subtract_this=subtract_this,
+            from_this=from_this,
+            discrete_step=1,
+        )
+    elif isinstance(chunk_format, absorb.CustomChunkFormat):
         raise NotImplementedError()
     else:
-        raise NotImplementedError()
+        raise Exception('invalid chunk_format')
 
 
 def _get_discrete_closed_range_diff(
@@ -241,19 +328,6 @@ def _get_continuous_closed_open_range_diff(
 
 
 def partition_into_chunks(
-    data_ranges: list[typing.Any], range_format: absorb.RangeFormat
-) -> list[typing.Any]:
-    if range_format == 'date':
-        import datetime
-
-        dates = []
-        for data_range in data_ranges:
-            delta = datetime.timedelta(days=1)
-            start_date, end_date = data_range
-            current = start_date
-            while current <= end_date:
-                dates.append(current)
-                current = current + delta
-        return dates
-    else:
-        raise NotImplementedError()
+    coverage: absorb.Coverage, chunk_format: absorb.ChunkFormat
+) -> absorb.ChunkList:
+    return chunk_coverage_to_list(coverage=coverage, chunk_format=chunk_format)

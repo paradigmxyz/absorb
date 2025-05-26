@@ -6,6 +6,7 @@ from . import table_base
 
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T')
+    import polars as pl
 
 
 class TablePaths(table_base.TableBase):
@@ -22,15 +23,13 @@ class TablePaths(table_base.TableBase):
         data_range: typing.Any | None = None,
         glob: bool = False,
         warn: bool = True,
+        df: pl.DataFrame | None = None,
     ) -> str:
         if self.write_range == 'overwrite_all':
-            data_range = 'all'
-            range_format = None
-        else:
-            range_format = self.range_format
+            data_range = self._get_overwrite_range(df)
         return absorb.ops.paths.get_table_filepath(
             data_range=data_range,
-            range_format=range_format,
+            chunk_format=self.chunk_format,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -39,12 +38,18 @@ class TablePaths(table_base.TableBase):
             warn=warn,
         )
 
+    def _get_overwrite_range(self, df: pl.DataFrame | None) -> typing.Any:
+        if df is not None:
+            return df['timestamp'].max()
+        else:
+            raise Exception('must specify range')
+
     def get_file_paths(
         self, data_ranges: typing.Any, warn: bool = True
     ) -> list[str]:
         return absorb.ops.paths.get_table_filepaths(
             data_ranges=data_ranges,
-            range_format=self.range_format,
+            chunk_format=self.chunk_format,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -53,16 +58,17 @@ class TablePaths(table_base.TableBase):
         )
 
     def get_file_name(
-        self, data_range: typing.Any, *, glob: bool = False
+        self,
+        data_range: typing.Any,
+        *,
+        glob: bool = False,
+        df: pl.DataFrame | None = None,
     ) -> str:
         if self.write_range == 'overwrite_all':
-            data_range = 'all'
-            range_format = None
-        else:
-            range_format = self.range_format
+            data_range = self._get_overwrite_range(df)
         return absorb.ops.paths.get_table_filename(
             data_range=data_range,
-            range_format=range_format,
+            chunk_format=self.chunk_format,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -72,11 +78,11 @@ class TablePaths(table_base.TableBase):
 
     def parse_file_path(self, path: str) -> dict[str, typing.Any]:
         if self.write_range == 'overwrite_all':
-            range_format = None
+            chunk_format = None
         else:
-            range_format = self.range_format
+            chunk_format = self.chunk_format
         return absorb.ops.paths.parse_file_path(
             path=path,
             filename_template=self.filename_template,
-            range_format=range_format,
+            chunk_format=chunk_format,
         )

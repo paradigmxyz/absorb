@@ -40,24 +40,24 @@ class TableCollect(table_coverage.TableCoverage):
 
     def _get_chunks_to_collect(
         self, data_range: typing.Any | None = None, overwrite: bool = False
-    ) -> list[typing.Any]:
+    ) -> absorb.ChunkList:
         if self.write_range == 'overwrite_all':
             return [None]
         else:
             if data_range is None:
                 if overwrite:
-                    data_ranges = [self.get_available_range()]
+                    data_ranges: absorb.Coverage = [self.get_available_range()]
                 else:
                     data_ranges = self.get_missing_ranges()
             else:
                 data_ranges = [data_range]
             return absorb.ops.ranges.partition_into_chunks(
-                data_ranges, range_format=self.range_format
+                data_ranges, chunk_format=self.chunk_format
             )
 
     def _summarize_collection_plan(
         self,
-        chunks: list[typing.Any],
+        chunks: absorb.ChunkList,
         overwrite: bool,
         verbose: int,
     ) -> None:
@@ -75,10 +75,19 @@ class TableCollect(table_coverage.TableCoverage):
         if self.write_range == 'overwrite_all':
             absorb.ops.print_bullet('chunk', '\[entire dataset]')  # noqa
         elif len(chunks) == 1:
-            absorb.ops.print_bullet('single chunk', chunks[0])
+            absorb.ops.print_bullet(
+                'single chunk',
+                absorb.ops.format_chunk(chunks[0], self.chunk_format),
+            )
         elif len(chunks) > 1:
-            absorb.ops.print_bullet('min_chunk', chunks[0])
-            absorb.ops.print_bullet('max_chunk', chunks[-1])
+            absorb.ops.print_bullet(
+                'min_chunk',
+                absorb.ops.format_chunk(chunks[0], self.chunk_format),
+            )
+            absorb.ops.print_bullet(
+                'max_chunk',
+                absorb.ops.format_chunk(chunks[-1], self.chunk_format),
+            )
         absorb.ops.print_bullet('overwrite', str(overwrite))
         absorb.ops.print_bullet('output dir', self.get_dir_path())
         absorb.ops.print_bullet(
@@ -93,7 +102,7 @@ class TableCollect(table_coverage.TableCoverage):
             for c, chunk in enumerate(chunks):
                 absorb.ops.print_bullet(
                     key=None,
-                    value=absorb.ops.format_range(chunk),
+                    value=absorb.ops.format_chunk(chunk, self.chunk_format),
                     number=c + 1,
                     indent=4,
                 )

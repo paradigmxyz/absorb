@@ -55,12 +55,12 @@ class Metrics(absorb.Table):
 
         return df
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         first = datetime.datetime(year=2021, month=6, day=30)
         last = _find_last()
-        return [first, last]
+        return (first, last)
 
 
 class Metadata(absorb.Table):
@@ -124,13 +124,13 @@ class Metadata(absorb.Table):
             item for result in cursor_results for item in result['current_page']
         ).unique('series_ticker')
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         now = datetime.datetime.now(datetime.timezone.utc).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
-        return [None, now]
+        return (None, now)
 
 
 def get_date_url(date: datetime.datetime) -> str:

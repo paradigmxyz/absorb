@@ -74,7 +74,7 @@ def get_table_metadata_path(
 
 def get_table_filepath(
     data_range: typing.Any,
-    range_format: absorb.RangeFormat,
+    chunk_format: absorb.ChunkFormat,
     filename_template: str,
     table: str,
     *,
@@ -88,7 +88,7 @@ def get_table_filepath(
     dir_path = get_table_dir(source=source, table=table, warn=warn)
     filename = get_table_filename(
         data_range=data_range,
-        range_format=range_format,
+        chunk_format=chunk_format,
         filename_template=filename_template,
         table=table,
         source=source,
@@ -100,7 +100,7 @@ def get_table_filepath(
 
 def get_table_filename(
     data_range: typing.Any,
-    range_format: absorb.RangeFormat,
+    chunk_format: absorb.ChunkFormat,
     filename_template: str,
     table: str,
     *,
@@ -117,14 +117,14 @@ def get_table_filename(
             format_params['data_range'] = '*'
         else:
             format_params['data_range'] = _format_data_range(
-                data_range, range_format
+                data_range, chunk_format
             )
     return filename_template.format(**format_params)
 
 
 def get_table_filepaths(
     data_ranges: typing.Any,
-    range_format: absorb.RangeFormat,
+    chunk_format: absorb.ChunkFormat,
     filename_template: str,
     table: str,
     *,
@@ -139,7 +139,7 @@ def get_table_filepaths(
     for data_range in data_ranges:
         filename = get_table_filename(
             data_range=data_range,
-            range_format=range_format,
+            chunk_format=chunk_format,
             filename_template=filename_template,
             table=table,
             source=source,
@@ -151,38 +151,58 @@ def get_table_filepaths(
 
 
 def _format_data_range(
-    data_range: typing.Any, range_format: absorb.RangeFormat
+    data_range: typing.Any, chunk_format: absorb.ChunkFormat
 ) -> str:
-    if range_format == 'date':
+    if chunk_format == 'hour':
+        return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
+    elif chunk_format == 'day':
         return data_range.strftime('%Y-%m-%d')  # type: ignore
-    elif range_format == 'date_range':
+    elif chunk_format == 'week':
+        return data_range.strftime('%Y-%m-%d')  # type: ignore
+    elif chunk_format == 'month':
+        return data_range.strftime('%Y-%m')  # type: ignore
+    elif chunk_format == 'quarter':
+        if data_range.month == 1 and data_range.day == 1:
+            quarter = 1
+        elif data_range.month == 4 and data_range.day == 1:
+            quarter = 2
+        elif data_range.month == 7 and data_range.day == 1:
+            quarter = 4
+        elif data_range.month == 10 and data_range.day == 1:
+            quarter = 4
+        else:
+            raise Exception('invalid quarter timestamp')
+        return data_range.strftime('%Y-Q') + str(quarter)  # type: ignore
+    elif chunk_format == 'year':
+        return data_range.strftime('%Y')  # type: ignore
+    elif chunk_format == 'timestamp':
+        return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
+    elif chunk_format == 'timestamp_range':
         return (
             _format_value(data_range[0], 'date')
             + '_to_'
             + _format_value(data_range[1], 'date')
         )
-    elif range_format == 'named_range':
-        if len(data_range) == 2:
-            values = list(data_range.values())
-            values = sorted(values)
-            values_str = [_format_value(value) for value in values]
-            return values_str[0] + '_to_' + values_str[1]
-        else:
-            raise NotImplementedError('range with >2 keys')
-    elif range_format == 'block_range':
-        return (
-            _format_value(data_range[0], 'int')
-            + '_to_'
-            + _format_value(data_range[1], 'int')
-        )
-    elif range_format == 'id_range':
-        return (
-            _format_value(data_range[0]) + '_to_' + _format_value(data_range[1])
-        )
-    elif range_format is None:
+    elif chunk_format == 'number':
+        width = 10
+        template = '%0' + str(width) + 'd'
+        return template % data_range  # type: ignore
+    elif chunk_format == 'number_range':
+        width = 10
+        template = '%0' + str(width) + 'd'
+        start, end = data_range
+        return (template % start) + '_to_' + (template % end)  # type: ignore
+    elif chunk_format == 'name':
+        return data_range  # type: ignore
+    elif chunk_format == 'name_range':
+        start, end = data_range
+        return start + '_to_' + end  # type: ignore
+    elif chunk_format == 'name_list':
+        return '_'.join(data_range)
+    elif chunk_format is None:
         return str(data_range)
     else:
-        raise Exception('invalid range_format: ' + str(range_format))
+        raise Exception('invalid chunk range format: ' + str(chunk_format))
 
 
 def _format_value(
@@ -210,24 +230,24 @@ def parse_file_path(
     path: str,
     filename_template: str,
     *,
-    range_format: absorb.RangeFormat | None = None,
+    chunk_format: absorb.ChunkFormat | None = None,
 ) -> dict[str, typing.Any]:
     import os
 
     keys = os.path.splitext(filename_template)[0].split('__')
     values = os.path.splitext(os.path.basename(path))[0].split('__')
     items = {k[1:-1]: v for k, v in zip(keys, values)}
-    if range_format is not None and 'data_range' in items:
+    if chunk_format is not None and 'data_range' in items:
         items['data_range'] = parse_data_range(
-            items['data_range'], range_format
+            items['data_range'], chunk_format
         )
     return items
 
 
 def parse_data_range(
-    as_str: str, range_format: absorb.RangeFormat
+    as_str: str, chunk_format: absorb.ChunkFormat
 ) -> typing.Any:
-    if range_format == 'date':
+    if chunk_format == 'timestamp':
         import datetime
 
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')

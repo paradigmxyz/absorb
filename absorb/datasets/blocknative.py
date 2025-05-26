@@ -62,7 +62,7 @@ class Mempool(absorb.Table):
             url=url, polars_kwargs=polars_kwargs
         )
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         return (

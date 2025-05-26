@@ -41,7 +41,7 @@ class CoinMetrics(absorb.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return get_historical_coin_metrics(self.parameters['top_n'])
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         now = datetime.datetime.now()
@@ -70,7 +70,7 @@ class Categories(absorb.Table):
             categories=self.parameters['categories']
         )
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         now = datetime.datetime.now()
@@ -107,7 +107,7 @@ class CategoryMetrics(absorb.Table):
             coin_metrics=coin_metrics, coin_categories=coin_categories
         )
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         now = datetime.datetime.now()

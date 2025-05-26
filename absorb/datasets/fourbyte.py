@@ -27,7 +27,7 @@ class FourbyteDatatype(absorb.Table):
             'bytes_signature': pl.Binary,
         }
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import requests
 
         data = requests.get(self.endpoint).json()

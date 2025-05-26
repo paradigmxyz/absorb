@@ -24,7 +24,7 @@ class Query(absorb.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
         return query(self.parameters['sql'])
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         raise NotImplementedError()
 
 

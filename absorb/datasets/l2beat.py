@@ -47,7 +47,7 @@ class Metrics(absorb.Table):
     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
         return get_all_data()
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
         import requests
 
@@ -56,7 +56,7 @@ class Metrics(absorb.Table):
         data = response.json()
         last_timestamp = data['data']['chart']['data'][-1][0]
         last = datetime.datetime.fromtimestamp(last_timestamp)
-        return [first, last]
+        return (first, last)
 
 
 def get_projects() -> pl.DataFrame:

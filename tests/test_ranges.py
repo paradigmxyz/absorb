@@ -169,7 +169,7 @@ def test_range_diff_dates(test: RangeDiffTest) -> None:
     actual_output = absorb.ops.get_range_diff(
         subtract_this=subtract_this,
         from_this=from_this,
-        range_format='date',
+        chunk_format='day',
     )
     assert target_output == actual_output
 
@@ -284,6 +284,6 @@ def test_range_diff_date_ranges(test: RangeDiffTest) -> None:
     actual_output = absorb.ops.get_range_diff(
         subtract_this=subtract_this,
         from_this=from_this,
-        range_format='date_range',
+        chunk_format='timestamp_range',
     )
     assert target_output == actual_output

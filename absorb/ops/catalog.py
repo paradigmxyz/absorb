@@ -136,8 +136,12 @@ def get_tables_df(
                 pass
             else:
                 instance = absorb.ops.resolve_table(table)
-                if table_class.range_format == 'date':
+                if table_class.chunk_format == 'day':
                     start, end = instance.get_available_range()
+                    if not isinstance(
+                        start, datetime.datetime
+                    ) or not isinstance(end, datetime.datetime):
+                        raise Exception()
                     if start is not None:
                         start = start.replace(tzinfo=datetime.timezone.utc)
                     if end is not None:

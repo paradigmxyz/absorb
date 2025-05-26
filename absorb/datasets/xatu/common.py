@@ -35,7 +35,7 @@ class XatuTable(absorb.Table):
             per=self.per,
         )
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         return get_table_range(
             table=self.datatype, network=self.parameters['network']
         )
@@ -67,7 +67,9 @@ def get_manifest() -> dict[str, typing.Any]:
     return result
 
 
-def get_table_range(table: str, network: str) -> tuple[typing.Any, typing.Any]:
+def get_table_range(
+    table: str, network: str
+) -> tuple[int, int] | tuple[datetime.datetime, datetime.datetime]:
     manifest = get_manifest()
     for item in manifest['tables']:
         if item['name'] == table:

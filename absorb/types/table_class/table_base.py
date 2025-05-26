@@ -14,7 +14,7 @@ class TableBase:
     write_range: typing.Literal[
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]
-    range_format: absorb.types.RangeFormat
+    chunk_format: absorb.ChunkFormat
     index_by: typing.Literal['time', 'block', 'id']
     cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
     parameter_types: dict[str, typing.Any] = {}
@@ -22,7 +22,7 @@ class TableBase:
     parameters: dict[str, typing.Any] = {}
     static_parameters: list[str] = []
     filename_template = '{source}__{table}__{data_range}.parquet'
-    name_template: absorb.types.NameTemplate = {}
+    name_template: absorb.NameTemplate = {}
     required_packages: list[str] = []
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):

@@ -40,8 +40,8 @@ class Chains(absorb.Table):
         }
         return pl.DataFrame(data, schema=self.get_schema())
 
-    def get_available_range(self) -> typing.Any:
-        return len(get_network_data())
+    def get_available_range(self) -> absorb.Coverage:
+        return (0, len(get_network_data()))
 
 
 # specialcase the standard name for certain chains

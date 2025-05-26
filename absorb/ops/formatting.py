@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+import absorb
+
 
 bullet_styles = {
     'key_style': 'white bold',
@@ -18,15 +20,15 @@ def print_bullet(
     toolstr.print_bullet(key=key, value=value, **kwargs, **bullet_styles)
 
 
-def format_range(data_range: typing.Any) -> str:
+def format_chunk(chunk: typing.Any, chunk_format: absorb.ChunkFormat) -> str:
     import datetime
 
-    if isinstance(data_range, list):
+    if isinstance(chunk, list):
         date_strs = [
-            '-' if dt is None else dt.strftime('%Y-%m-%d') for dt in data_range
+            '-' if dt is None else dt.strftime('%Y-%m-%d') for dt in chunk
         ]
         return '\[' + ', '.join(date_strs) + ']'
-    elif isinstance(data_range, datetime.datetime):
-        return data_range.strftime('%Y-%m-%d')
+    elif isinstance(chunk, datetime.datetime):
+        return chunk.strftime('%Y-%m-%d')
     else:
-        return str(data_range)
+        return str(chunk)

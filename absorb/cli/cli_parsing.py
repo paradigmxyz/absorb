@@ -320,7 +320,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
 
 
 def _parse_ranges(
-    raw_ranges: list[str] | None, range_format: absorb.RangeFormat
+    raw_ranges: list[str] | None, chunk_format: absorb.ChunkFormat
 ) -> list[typing.Any] | None:
     """
     examples:
@@ -330,10 +330,10 @@ def _parse_ranges(
     """
     if raw_ranges is None:
         return None
-    if range_format == 'date' or range_format == 'date_range':
-        raise NotImplementedError('manual ranges for ' + str(range_format))
+    if chunk_format == 'day' or chunk_format == 'timestamp_range':
+        raise NotImplementedError('manual ranges for ' + str(chunk_format))
     else:
-        raise NotImplementedError('manual ranges for ' + str(range_format))
+        raise NotImplementedError('manual ranges for ' + str(chunk_format))
 
     # 'date',
     # 'date_range',

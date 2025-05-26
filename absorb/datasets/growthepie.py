@@ -37,7 +37,7 @@ class Metrics(absorb.Table):
             .sort('date', 'network')
         )
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
         import requests
         import polars as pl
@@ -50,4 +50,4 @@ class Metrics(absorb.Table):
         last_str: str = pl.DataFrame(data)['date'].max()  # type: ignore
         last = datetime.datetime.strptime(last_str, '%Y-%m-%d')
 
-        return [first, last]
+        return (first, last)

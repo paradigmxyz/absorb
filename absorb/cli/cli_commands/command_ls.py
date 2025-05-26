@@ -33,16 +33,20 @@ def ls_command(args: Namespace) -> dict[str, Any]:
             for dataset in tracked_datasets:
                 instance = absorb.Table.instantiate(dataset)
                 available_range = instance.get_available_range()
-                available_range = absorb.ops.format_range(available_range)
+                available_range_str = absorb.ops.format_chunk(
+                    available_range, instance.chunk_format
+                )
                 collected_range = instance.get_collected_range()
                 if collected_range is not None:
-                    collected_range = absorb.ops.format_range(collected_range)
+                    collected_range_str = absorb.ops.format_chunk(
+                        collected_range, instance.chunk_format
+                    )
                 else:
-                    collected_range = '-'
+                    collected_range_str = '-'
                 row = [
                     dataset['source_name'],
                     dataset['table_name'],
-                    available_range + '\n' + collected_range,
+                    available_range_str + '\n' + collected_range_str,
                 ]
                 rows.append(row)
             columns = ['source', 'table', 'available range\ncollected range']

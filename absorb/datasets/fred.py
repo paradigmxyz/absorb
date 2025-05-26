@@ -34,7 +34,7 @@ class Metric(absorb.Table):
             metric=pl.lit(series_id),
         )
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         import datetime
 
         metadata = get_series_metadata(self.parameters['series_id'])
