@@ -151,24 +151,24 @@ def get_range_diff(
         else:
             raise Exception('invalid chunk_format')
 
-        return _get_discrete_closed_range_diff(
+        range_list = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=discrete_step,
         )
     elif chunk_format == 'timestamp_range':
-        return _get_continuous_closed_open_range_diff(
+        range_list = _get_continuous_closed_open_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
         )
     elif chunk_format == 'number':
-        return _get_discrete_closed_range_diff(
+        range_list = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=1,
         )
     elif chunk_format == 'number_range':
-        return _get_discrete_closed_range_diff(
+        range_list = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=1,
@@ -177,6 +177,17 @@ def get_range_diff(
         raise NotImplementedError()
     else:
         raise Exception('invalid chunk_format')
+
+    if len(range_list) == 0:
+        return []
+    elif len(range_list) == 1:
+        return range_list[0]
+    else:
+        return [
+            item
+            for range in range_list
+            for item in chunk_coverage_to_list(range, chunk_format=chunk_format)
+        ]
 
 
 def _get_discrete_closed_range_diff(

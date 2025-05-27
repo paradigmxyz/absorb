@@ -39,7 +39,7 @@ class TableCoverage(table_paths.TablePaths):
             files = sorted(glob.glob(glob_str))
             start = self.parse_file_path(files[0])['data_range']
             end = self.parse_file_path(files[-1])['data_range']
-            return [start, end]
+            return (start, end)
         else:
             raise Exception()
 

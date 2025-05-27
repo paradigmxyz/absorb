@@ -28,7 +28,7 @@ class TableCollect(table_coverage.TableCoverage):
 
         # summarize collection plan
         if verbose >= 1:
-            self._summarize_collection_plan(chunks, overwrite, verbose)
+            self._summarize_collection_plan(chunks, overwrite, verbose, dry)
 
         # return early if dry
         if dry:
@@ -46,11 +46,14 @@ class TableCollect(table_coverage.TableCoverage):
         else:
             if data_range is None:
                 if overwrite:
-                    data_ranges: absorb.Coverage = [self.get_available_range()]
+                    coverage = self.get_available_range()
                 else:
-                    data_ranges = self.get_missing_ranges()
+                    coverage = self.get_missing_ranges()
             else:
-                data_ranges = [data_range]
+                coverage = [data_range]
+            data_ranges = absorb.ops.chunk_coverage_to_list(
+                coverage, chunk_format=self.chunk_format
+            )
             return absorb.ops.ranges.partition_into_chunks(
                 data_ranges, chunk_format=self.chunk_format
             )
@@ -60,6 +63,7 @@ class TableCollect(table_coverage.TableCoverage):
         chunks: absorb.ChunkList,
         overwrite: bool,
         verbose: int,
+        dry: bool,
     ) -> None:
         import datetime
         import rich
@@ -83,10 +87,12 @@ class TableCollect(table_coverage.TableCoverage):
             absorb.ops.print_bullet(
                 'min_chunk',
                 absorb.ops.format_chunk(chunks[0], self.chunk_format),
+                indent=4,
             )
             absorb.ops.print_bullet(
                 'max_chunk',
                 absorb.ops.format_chunk(chunks[-1], self.chunk_format),
+                indent=4,
             )
         absorb.ops.print_bullet('overwrite', str(overwrite))
         absorb.ops.print_bullet('output dir', self.get_dir_path())
@@ -95,9 +101,9 @@ class TableCollect(table_coverage.TableCoverage):
         )
         if len(chunks) == 0:
             print('[already collected]')
-        print()
 
         if verbose > 1:
+            print()
             absorb.ops.print_bullet(key='chunks', value='')
             for c, chunk in enumerate(chunks):
                 absorb.ops.print_bullet(
@@ -106,6 +112,11 @@ class TableCollect(table_coverage.TableCoverage):
                     number=c + 1,
                     indent=4,
                 )
+
+        if dry:
+            print('[dry run]')
+        if len(chunks) > 0:
+            print()
 
     def _execute_collect_chunk(
         self,
