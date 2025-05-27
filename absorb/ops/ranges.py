@@ -9,17 +9,17 @@ if typing.TYPE_CHECKING:
     _T = typing.TypeVar('_T', int, datetime.datetime)
 
 
-def chunk_coverage_to_list(
+def coverage_to_list(
     coverage: absorb.Coverage,
-    chunk_format: absorb.ChunkFormat,
+    index_type: absorb.IndexType,
 ) -> absorb.ChunkList:
     if isinstance(coverage, list):
         return coverage
     elif isinstance(coverage, dict):
-        if not isinstance(chunk_format, dict):
+        if not isinstance(index_type, dict):
             raise Exception()
-        if chunk_format['type'] == 'multi':
-            return _multi_coverage_to_list(coverage, chunk_format)
+        if index_type['type'] == 'multi':
+            return _multi_coverage_to_list(coverage, index_type)
         else:
             raise NotImplementedError(
                 'using number_range or timestamp_range with interval size'
@@ -28,16 +28,16 @@ def chunk_coverage_to_list(
         import tooltime
 
         start, end = coverage
-        if chunk_format in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
-            if not isinstance(chunk_format, str):  # for mypy
+        if index_type in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
+            if not isinstance(index_type, str):  # for mypy
                 raise Exception()
             return tooltime.get_intervals(
                 start,
                 end,
-                interval=chunk_format,
+                interval=index_type,
                 include_end=True,
             )['start'].to_list()
-        elif chunk_format == 'number':
+        elif index_type == 'number':
             return list(range(start, end + 1))
         else:
             raise Exception('cannot use this chunk_type as tuple range')
@@ -47,7 +47,7 @@ def chunk_coverage_to_list(
 
 def _multi_coverage_to_list(
     coverage: absorb.Coverage,
-    chunk_format: absorb.MultiChunkFormat,
+    index_type: absorb.MultiIndexType,
 ) -> absorb.ChunkList:
     import itertools
 
@@ -55,9 +55,9 @@ def _multi_coverage_to_list(
         raise Exception()
     keys = list(coverage.keys())
     dims = [
-        chunk_coverage_to_list(
+        coverage_to_list(
             coverage=coverage[key],
-            chunk_format=chunk_format['dims'][key],
+            index_type=index_type['dims'][key],
         )
         for key in keys
     ]
@@ -67,11 +67,11 @@ def _multi_coverage_to_list(
 def get_range_diff(
     subtract_this: absorb.Coverage,
     from_this: absorb.Coverage,
-    chunk_format: absorb.ChunkFormat,
+    index_type: absorb.IndexType,
 ) -> absorb.Coverage:
     """
     subtraction behaves differently depending on range format
-    - mainly, chunk_format is discrete-closed or continuous-semiopen or other
+    - mainly, index_type is discrete-closed or continuous-semiopen or other
     - some of these cases will have equivalent outcomes
         - handling them separately keeps maximum clarity + robustness
 
@@ -115,17 +115,17 @@ def get_range_diff(
     if (
         isinstance(subtract_this, (list, dict))
         or isinstance(from_this, (list, dict))
-        or chunk_format in non_range_types
+        or index_type in non_range_types
     ):
         if not isinstance(subtract_this, list):
-            subtract_this = chunk_coverage_to_list(subtract_this, chunk_format)
+            subtract_this = coverage_to_list(subtract_this, index_type)
         if not isinstance(from_this, list):
-            from_this = chunk_coverage_to_list(from_this, chunk_format)
+            from_this = coverage_to_list(from_this, index_type)
         return [item for item in from_this if item not in subtract_this]
 
     if not isinstance(subtract_this, tuple) or not isinstance(from_this, tuple):
         raise Exception()
-    if chunk_format in [
+    if index_type in [
         'hour',
         'day',
         'week',
@@ -136,47 +136,47 @@ def get_range_diff(
         import datetime
 
         # get discrete chunk
-        if chunk_format == 'hour':
+        if index_type == 'hour':
             discrete_step = datetime.timedelta(hours=1)
-        elif chunk_format == 'day':
+        elif index_type == 'day':
             discrete_step = datetime.timedelta(days=1)
-        elif chunk_format == 'week':
+        elif index_type == 'week':
             discrete_step = datetime.timedelta(days=7)
-        elif chunk_format == 'month':
+        elif index_type == 'month':
             raise NotImplementedError()
-        elif chunk_format == 'quarter':
+        elif index_type == 'quarter':
             raise NotImplementedError()
-        elif chunk_format == 'year':
+        elif index_type == 'year':
             raise NotImplementedError()
         else:
-            raise Exception('invalid chunk_format')
+            raise Exception('invalid index_type')
 
         range_list = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=discrete_step,
         )
-    elif chunk_format == 'timestamp_range':
+    elif index_type == 'timestamp_range':
         range_list = _get_continuous_closed_open_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
         )
-    elif chunk_format == 'number':
+    elif index_type == 'number':
         range_list = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=1,
         )
-    elif chunk_format == 'number_range':
+    elif index_type == 'number_range':
         range_list = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=1,
         )
-    elif isinstance(chunk_format, absorb.CustomChunkFormat):
+    elif isinstance(index_type, absorb.CustomIndexType):
         raise NotImplementedError()
     else:
-        raise Exception('invalid chunk_format')
+        raise Exception('invalid index_type')
 
     if len(range_list) == 0:
         return []
@@ -186,7 +186,7 @@ def get_range_diff(
         return [
             item
             for range in range_list
-            for item in chunk_coverage_to_list(range, chunk_format=chunk_format)
+            for item in coverage_to_list(range, index_type=index_type)
         ]
 
 
@@ -352,6 +352,6 @@ def _get_continuous_closed_open_range_diff(
 
 
 def partition_into_chunks(
-    coverage: absorb.Coverage, chunk_format: absorb.ChunkFormat
+    coverage: absorb.Coverage, index_type: absorb.IndexType
 ) -> absorb.ChunkList:
-    return chunk_coverage_to_list(coverage=coverage, chunk_format=chunk_format)
+    return coverage_to_list(coverage=coverage, index_type=index_type)

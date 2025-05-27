@@ -19,8 +19,7 @@ def help_command(args: argparse.Namespace) -> dict[str, typing.Any]:
     for attr in [
         'source',
         'write_range',
-        'index_by',
-        'cadence',
+        'index_type',
     ]:
         if hasattr(table, attr):
             value = getattr(table, attr)

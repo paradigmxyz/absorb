@@ -10,20 +10,25 @@ if typing.TYPE_CHECKING:
 
 
 class TableBase:
+    # structure
     source: str
     write_range: typing.Literal[
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]
-    chunk_format: absorb.ChunkFormat
-    index_by: typing.Literal['time', 'block', 'id']
-    cadence: typing.Literal['daily', 'weekly', 'monthly', 'yearly'] | None
+    index_type: absorb.IndexType
+
+    # dependencies
+    required_packages: list[str] = []
+
+    # parameters
     parameter_types: dict[str, typing.Any] = {}
     default_parameters: dict[str, typing.Any] = {}
     parameters: dict[str, typing.Any] = {}
     static_parameters: list[str] = []
-    filename_template = '{source}__{table}__{data_range}.parquet'
+
+    # naming
     name_template: absorb.NameTemplate = {}
-    required_packages: list[str] = []
+    filename_template = '{source}__{table}__{data_range}.parquet'
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
         # set parameters
@@ -43,10 +48,15 @@ class TableBase:
             )
         self.parameters = parameters
 
-        required_parameters = ['chunk_format']
+        required_parameters: list[str] = []
         for parameter in required_parameters:
             if not hasattr(self, parameter) or getattr(self, parameter) is None:
                 raise Exception('missing table parameter: ' + str(parameter))
+
+        if self.write_range == 'append_only' and (
+            not hasattr(self, 'index_type') or self.index_type is None
+        ):
+            raise Exception('index_type is required for append only tables')
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()

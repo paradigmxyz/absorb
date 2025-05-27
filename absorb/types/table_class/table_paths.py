@@ -26,10 +26,13 @@ class TablePaths(table_base.TableBase):
         df: pl.DataFrame | None = None,
     ) -> str:
         if self.write_range == 'overwrite_all':
-            data_range = self._get_overwrite_range(df)
+            if glob:
+                data_range = None
+            else:
+                data_range = self._get_overwrite_range(df)
         return absorb.ops.paths.get_table_filepath(
             data_range=data_range,
-            chunk_format=self.chunk_format,
+            index_type=self.index_type,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -39,6 +42,7 @@ class TablePaths(table_base.TableBase):
         )
 
     def _get_overwrite_range(self, df: pl.DataFrame | None) -> typing.Any:
+        raise Exception()
         if df is not None:
             return df['timestamp'].max()
         else:
@@ -49,7 +53,7 @@ class TablePaths(table_base.TableBase):
     ) -> list[str]:
         return absorb.ops.paths.get_table_filepaths(
             data_ranges=data_ranges,
-            chunk_format=self.chunk_format,
+            index_type=self.index_type,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -65,10 +69,13 @@ class TablePaths(table_base.TableBase):
         df: pl.DataFrame | None = None,
     ) -> str:
         if self.write_range == 'overwrite_all':
-            data_range = self._get_overwrite_range(df)
+            if glob:
+                data_range = None
+            else:
+                data_range = self._get_overwrite_range(df)
         return absorb.ops.paths.get_table_filename(
             data_range=data_range,
-            chunk_format=self.chunk_format,
+            index_type=self.index_type,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -78,11 +85,11 @@ class TablePaths(table_base.TableBase):
 
     def parse_file_path(self, path: str) -> dict[str, typing.Any]:
         if self.write_range == 'overwrite_all':
-            chunk_format = None
+            index_type = None
         else:
-            chunk_format = self.chunk_format
+            index_type = self.index_type
         return absorb.ops.paths.parse_file_path(
             path=path,
             filename_template=self.filename_template,
-            chunk_format=chunk_format,
+            index_type=index_type,
         )

@@ -74,7 +74,7 @@ def get_table_metadata_path(
 
 def get_table_filepath(
     data_range: typing.Any,
-    chunk_format: absorb.ChunkFormat,
+    index_type: absorb.IndexType,
     filename_template: str,
     table: str,
     *,
@@ -88,7 +88,7 @@ def get_table_filepath(
     dir_path = get_table_dir(source=source, table=table, warn=warn)
     filename = get_table_filename(
         data_range=data_range,
-        chunk_format=chunk_format,
+        index_type=index_type,
         filename_template=filename_template,
         table=table,
         source=source,
@@ -100,7 +100,7 @@ def get_table_filepath(
 
 def get_table_filename(
     data_range: typing.Any,
-    chunk_format: absorb.ChunkFormat,
+    index_type: absorb.IndexType,
     filename_template: str,
     table: str,
     *,
@@ -117,14 +117,14 @@ def get_table_filename(
             format_params['data_range'] = '*'
         else:
             format_params['data_range'] = absorb.ops.format_chunk(
-                data_range, chunk_format
+                data_range, index_type
             )
     return filename_template.format(**format_params)
 
 
 def get_table_filepaths(
     data_ranges: typing.Any,
-    chunk_format: absorb.ChunkFormat,
+    index_type: absorb.IndexType,
     filename_template: str,
     table: str,
     *,
@@ -139,7 +139,7 @@ def get_table_filepaths(
     for data_range in data_ranges:
         filename = get_table_filename(
             data_range=data_range,
-            chunk_format=chunk_format,
+            index_type=index_type,
             filename_template=filename_template,
             table=table,
             source=source,
@@ -154,40 +154,36 @@ def parse_file_path(
     path: str,
     filename_template: str,
     *,
-    chunk_format: absorb.ChunkFormat | None = None,
+    index_type: absorb.IndexType | None = None,
 ) -> dict[str, typing.Any]:
     import os
 
     keys = os.path.splitext(filename_template)[0].split('__')
     values = os.path.splitext(os.path.basename(path))[0].split('__')
     items = {k[1:-1]: v for k, v in zip(keys, values)}
-    if chunk_format is not None and 'data_range' in items:
-        items['data_range'] = parse_data_range(
-            items['data_range'], chunk_format
-        )
+    if index_type is not None and 'data_range' in items:
+        items['data_range'] = parse_data_range(items['data_range'], index_type)
     return items
 
 
-def parse_data_range(
-    as_str: str, chunk_format: absorb.ChunkFormat
-) -> typing.Any:
+def parse_data_range(as_str: str, index_type: absorb.IndexType) -> typing.Any:
     import datetime
 
-    if chunk_format == 'hour':
+    if index_type == 'hour':
         return datetime.datetime.strptime(as_str, '%Y-%m-%d--%H-%M-%S')
-    elif chunk_format == 'day':
+    elif index_type == 'day':
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')
-    elif chunk_format == 'week':
+    elif index_type == 'week':
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')
-    elif chunk_format == 'month':
+    elif index_type == 'month':
         return datetime.datetime.strptime(as_str, '%Y-%m')
-    elif chunk_format == 'quarter':
+    elif index_type == 'quarter':
         year = int(as_str[:4])
         month = int(as_str[as_str.index('Q') + 1 :])
         return datetime.datetime(year, month, 1)
-    elif chunk_format == 'year':
+    elif index_type == 'year':
         return datetime.datetime.strptime(as_str, '%Y')
-    elif chunk_format == 'timestamp':
+    elif index_type == 'timestamp':
         import datetime
 
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')

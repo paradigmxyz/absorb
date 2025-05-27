@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 class TreasuryHoldings(absorb.Table):
     source = 'tic'
     write_range = 'overwrite_all'
-    chunk_format = 'month'
+    index_type = 'month'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

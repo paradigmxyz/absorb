@@ -6,7 +6,6 @@ import pytest
 required_attrs = [
     'source',
     'write_range',
-    'chunk_format',
 ]
 
 

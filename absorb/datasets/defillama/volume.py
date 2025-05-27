@@ -28,7 +28,7 @@ from . import common
 #             'top_n_chains': 'dex_volumes_top_{top_n_chains}_chains',
 #         },
 #     }
-#     range_format = 'date_range'
+#     index_type = 'date_range'
 
 #     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
 #         return {
@@ -80,7 +80,7 @@ from . import common
 #         'chains': typing.Union[list[str], None],
 #     }
 #     default_parameters = {'protocols': None, 'chains': None}
-#     range_format = 'date_range'
+#     index_type = 'date_range'
 
 #     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
 #         return {
@@ -131,7 +131,7 @@ class ProtocolDexVolumes(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
     default_parameters = {'protocols': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -164,7 +164,7 @@ class ChainDexVolumes(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'chains': typing.Union[list[str], None]}
     default_parameters = {'chains': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -197,7 +197,7 @@ class ProtocolOptionsVolumes(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
     default_parameters = {'protocols': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -227,7 +227,7 @@ class ChainOptionsVolumes(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'chains': typing.Union[list[str], None]}
     default_parameters = {'chains': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {

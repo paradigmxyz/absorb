@@ -23,7 +23,7 @@ def collect_command(args: Namespace) -> dict[str, Any]:
         instance = absorb.Table.instantiate(dataset)
         if instance.write_range == 'append_only':
             data_ranges = cli_parsing._parse_ranges(
-                args.range, chunk_format=instance.chunk_format
+                args.range, index_type=instance.index_type
             )
         else:
             data_ranges = None

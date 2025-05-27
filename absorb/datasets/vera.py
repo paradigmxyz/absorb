@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:
 
 class VeraChunkedDataset(absorb.Table):
     vera_filetype: str
-    chunk_format = 'number_range'
+    index_type = 'number_range'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.Datatype]]:
         raise NotImplementedError()

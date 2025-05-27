@@ -64,7 +64,7 @@ def get_series_catalog() -> dict[str, tuple[str, str]]:
         # monetary
         'M1': ('M1SL', 'month'),
         'M1_raw': ('M1NS', 'month'),
-        'M2': ('M2SL', 'week'),
+        'M2': ('M2SL', 'month'),
         'M2_raw': ('M2NS', 'month'),
         # inflation
         'CPI': ('CPIAUCSL', 'month'),

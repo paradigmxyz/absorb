@@ -19,7 +19,7 @@ endpoints = {
 class CoinMetrics(absorb.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
-    chunk_format = 'day'
+    index_type = 'day'
     parameter_types = {'top_n': int}
     default_parameters = {'top_n': 1000}
     name_template = {
@@ -52,7 +52,6 @@ class CoinMetrics(absorb.Table):
 class Categories(absorb.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
-    chunk_format = 'all'
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
     name_template = {
@@ -81,7 +80,7 @@ class Categories(absorb.Table):
 class CategoryMetrics(absorb.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
-    chunk_format = 'day'
+    index_type = 'day'
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
     dependencies = [CoinMetrics, Categories]

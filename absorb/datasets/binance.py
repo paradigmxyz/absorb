@@ -31,7 +31,7 @@ CandlestickInterval = typing.Literal[
 class Candles(absorb.Table):
     source = 'binance'
     write_range = 'append_only'
-    chunk_format = 'day'
+    index_type = 'day'
     parameter_types = {'pair': str, 'interval': str, 'market': str}
     default_parameters = {'market': 'spot'}
     name_template = {'custom': 'candles_{market}_{pair}_{interval}'}
@@ -67,7 +67,7 @@ class Candles(absorb.Table):
 class Trades(absorb.Table):
     source = 'binance'
     write_range = 'append_only'
-    chunk_format = 'day'
+    index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
     name_template = {'custom': 'trades_{market}_{pair}'}
@@ -99,7 +99,7 @@ class Trades(absorb.Table):
 class AggregateTrades(absorb.Table):
     source = 'binance'
     write_range = 'append_only'
-    chunk_format = 'day'
+    index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
     name_template = {'custom': 'aggregate_trades_{market}_{pair}'}

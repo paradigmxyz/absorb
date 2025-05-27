@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 # class Fees(absorb.Table):
 #     source = 'defillama'
 #     write_range = 'overwrite_all'
-#     range_format = 'date_range'
+#     index_type = 'date_range'
 #     parameter_types = {
 #         'chains': typing.Union[list[str], None],
 #         'parameters': typing.Union[list[str], None],
@@ -71,7 +71,7 @@ if typing.TYPE_CHECKING:
 class Fees(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -88,7 +88,7 @@ class ChainFees(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'chains': typing.Union[list[str], None]}
     default_parameters = {'chains': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -127,7 +127,7 @@ class FeesOfProtocols(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
     default_parameters = {'protocols': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

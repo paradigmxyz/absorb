@@ -14,7 +14,7 @@ class ChainTvls(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'chains': typing.Union[list[str], None]}
     default_parameters = {'chains': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {
@@ -47,7 +47,7 @@ class ProtocolTvls(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
     default_parameters = {'protocols': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -83,7 +83,7 @@ class ProtocolTvlsPerToken(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'protocols': typing.Union[list[str], None]}
     default_parameters = {'protocols': None}
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         return {

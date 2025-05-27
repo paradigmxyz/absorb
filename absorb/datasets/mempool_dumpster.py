@@ -12,7 +12,7 @@ url_template = 'https://mempool-dumpster.flashbots.net/ethereum/mainnet/{year}-{
 class Transactions(absorb.Table):
     source = 'mempool_dumpster'
     write_range = 'append_only'
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

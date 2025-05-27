@@ -136,7 +136,7 @@ def get_tables_df(
                 pass
             else:
                 instance = absorb.ops.resolve_table(table)
-                if table_class.chunk_format == 'day':
+                if table_class.index_type == 'day':
                     start, end = instance.get_available_range()
                     if not isinstance(
                         start, datetime.datetime

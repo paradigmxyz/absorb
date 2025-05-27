@@ -24,7 +24,7 @@ endpoints = {
 class Metrics(absorb.Table):
     source = 'l2beat'
     write_range = 'overwrite_all'
-    chunk_format = 'day'
+    index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

@@ -52,12 +52,12 @@ class TableCoverage(table_paths.TablePaths):
             return absorb.ops.ranges.get_range_diff(
                 subtract_this=collected_range,
                 from_this=available_range,
-                chunk_format=self.chunk_format,
+                index_type=self.index_type,
             )
 
     @classmethod
     def is_range_sortable(cls) -> bool:
-        return cls.chunk_format is not None
+        return cls.index_type is not None
 
     def get_min_collected_timestamp(self) -> datetime.datetime:
         raise NotImplementedError()

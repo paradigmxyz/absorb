@@ -20,18 +20,16 @@ def print_bullet(
     toolstr.print_bullet(key=key, value=value, **kwargs, **bullet_styles)
 
 
-def format_chunk(
-    data_range: typing.Any, chunk_format: absorb.ChunkFormat
-) -> str:
-    if chunk_format == 'hour':
+def format_chunk(data_range: typing.Any, index_type: absorb.IndexType) -> str:
+    if index_type == 'hour':
         return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
-    elif chunk_format == 'day':
+    elif index_type == 'day':
         return data_range.strftime('%Y-%m-%d')  # type: ignore
-    elif chunk_format == 'week':
+    elif index_type == 'week':
         return data_range.strftime('%Y-%m-%d')  # type: ignore
-    elif chunk_format == 'month':
+    elif index_type == 'month':
         return data_range.strftime('%Y-%m')  # type: ignore
-    elif chunk_format == 'quarter':
+    elif index_type == 'quarter':
         if data_range.month == 1 and data_range.day == 1:
             quarter = 1
         elif data_range.month == 4 and data_range.day == 1:
@@ -43,11 +41,11 @@ def format_chunk(
         else:
             raise Exception('invalid quarter timestamp')
         return data_range.strftime('%Y-Q') + str(quarter)  # type: ignore
-    elif chunk_format == 'year':
+    elif index_type == 'year':
         return data_range.strftime('%Y')  # type: ignore
-    elif chunk_format == 'timestamp':
+    elif index_type == 'timestamp':
         return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
-    elif chunk_format == 'timestamp_range':
+    elif index_type == 'timestamp_range':
         import datetime
 
         t_start: datetime.datetime
@@ -58,22 +56,22 @@ def format_chunk(
             + '_to_'
             + t_end.strftime('%Y-%m-%d--%H-%M-%S')
         )
-    elif chunk_format == 'number':
+    elif index_type == 'number':
         width = 10
         template = '%0' + str(width) + 'd'
         return template % data_range  # type: ignore
-    elif chunk_format == 'number_range':
+    elif index_type == 'number_range':
         width = 10
         template = '%0' + str(width) + 'd'
         start, end = data_range
         return (template % start) + '_to_' + (template % end)  # type: ignore
-    elif chunk_format == 'name':
+    elif index_type == 'name':
         return data_range  # type: ignore
-    elif chunk_format == 'name_list':
+    elif index_type == 'name_list':
         return '_'.join(data_range)
-    elif chunk_format is None:
+    elif index_type is None:
         return str(data_range)
-    elif chunk_format == 'all':
+    elif index_type == 'all':
         return 'all'
     else:
-        raise Exception('invalid chunk range format: ' + str(chunk_format))
+        raise Exception('invalid chunk range format: ' + str(index_type))

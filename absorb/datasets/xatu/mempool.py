@@ -6,4 +6,4 @@ from . import common
 class Transactions(common.XatuTable):
     source = 'mempool'
     datatype = 'mempool_transaction'
-    chunk_format = 'hour'
+    index_type = 'hour'

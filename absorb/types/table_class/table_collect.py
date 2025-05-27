@@ -42,6 +42,10 @@ class TableCollect(table_coverage.TableCoverage):
         self, data_range: typing.Any | None = None, overwrite: bool = False
     ) -> absorb.ChunkList:
         if self.write_range == 'overwrite_all':
+            available = self.get_available_range()
+            collected = self.get_collected_range()
+            missing = self.get_missing_ranges()
+            raise Exception()
             return [None]
         else:
             if data_range is None:
@@ -51,11 +55,11 @@ class TableCollect(table_coverage.TableCoverage):
                     coverage = self.get_missing_ranges()
             else:
                 coverage = [data_range]
-            data_ranges = absorb.ops.chunk_coverage_to_list(
-                coverage, chunk_format=self.chunk_format
+            data_ranges = absorb.ops.coverage_to_list(
+                coverage, index_type=self.index_type
             )
             return absorb.ops.ranges.partition_into_chunks(
-                data_ranges, chunk_format=self.chunk_format
+                data_ranges, index_type=self.index_type
             )
 
     def _summarize_collection_plan(
@@ -81,17 +85,17 @@ class TableCollect(table_coverage.TableCoverage):
         elif len(chunks) == 1:
             absorb.ops.print_bullet(
                 'single chunk',
-                absorb.ops.format_chunk(chunks[0], self.chunk_format),
+                absorb.ops.format_chunk(chunks[0], self.index_type),
             )
         elif len(chunks) > 1:
             absorb.ops.print_bullet(
                 'min_chunk',
-                absorb.ops.format_chunk(chunks[0], self.chunk_format),
+                absorb.ops.format_chunk(chunks[0], self.index_type),
                 indent=4,
             )
             absorb.ops.print_bullet(
                 'max_chunk',
-                absorb.ops.format_chunk(chunks[-1], self.chunk_format),
+                absorb.ops.format_chunk(chunks[-1], self.index_type),
                 indent=4,
             )
         absorb.ops.print_bullet('overwrite', str(overwrite))
@@ -108,7 +112,7 @@ class TableCollect(table_coverage.TableCoverage):
             for c, chunk in enumerate(chunks):
                 absorb.ops.print_bullet(
                     key=None,
-                    value=absorb.ops.format_chunk(chunk, self.chunk_format),
+                    value=absorb.ops.format_chunk(chunk, self.index_type),
                     number=c + 1,
                     indent=4,
                 )
@@ -127,9 +131,7 @@ class TableCollect(table_coverage.TableCoverage):
         import os
 
         if verbose >= 1:
-            print(
-                'collecting', absorb.ops.format_chunk(chunk, self.chunk_format)
-            )
+            print('collecting', absorb.ops.format_chunk(chunk, self.index_type))
         df = self.collect_chunk(data_range=chunk)
         if df is not None:
             path = self.get_file_path(data_range=chunk, df=df)

@@ -34,12 +34,12 @@ def ls_command(args: Namespace) -> dict[str, Any]:
                 instance = absorb.Table.instantiate(dataset)
                 available_range = instance.get_available_range()
                 available_range_str = absorb.ops.format_chunk(
-                    available_range, instance.chunk_format
+                    available_range, instance.index_type
                 )
                 collected_range = instance.get_collected_range()
                 if collected_range is not None:
                     collected_range_str = absorb.ops.format_chunk(
-                        collected_range, instance.chunk_format
+                        collected_range, instance.index_type
                     )
                 else:
                     collected_range_str = '-'

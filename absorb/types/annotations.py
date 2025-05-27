@@ -9,7 +9,7 @@ from . import table_class
 
 
 # chunk formats
-PrimitiveChunkFormat = typing.Literal[
+PrimitiveIndexType = typing.Literal[
     'all',
     # temporal
     'hour',
@@ -30,7 +30,7 @@ PrimitiveChunkFormat = typing.Literal[
 ]
 
 
-class CustomChunkFormat:
+class CustomIndexType:
     def partition_into_chunks(self, coverage: Coverage) -> list[Chunk]:
         raise NotImplementedError()
 
@@ -38,24 +38,24 @@ class CustomChunkFormat:
         raise NotImplementedError()
 
 
-class MultiChunkFormat(typing.TypedDict):
+class MultiIndexType(typing.TypedDict):
     type: typing.Literal['multi']
-    dims: dict[str, ScalarChunkFormat]
+    dims: dict[str, ScalarIndexType]
 
 
-class ExplicitChunkFormat(typing.TypedDict):
-    type: PrimitiveChunkFormat
+class ExplicitIndexType(typing.TypedDict):
+    type: PrimitiveIndexType
     number_interval: NotRequired[int | None]
-    timestamp_range: NotRequired[datetime.timedelta | None]
+    timestamp_interval: NotRequired[datetime.timedelta | None]
 
 
-ScalarChunkFormat = typing.Union[
-    PrimitiveChunkFormat,
-    ExplicitChunkFormat,
-    CustomChunkFormat,
+ScalarIndexType = typing.Union[
+    PrimitiveIndexType,
+    ExplicitIndexType,
+    CustomIndexType,
 ]
 
-ChunkFormat = typing.Union[ScalarChunkFormat, MultiChunkFormat]
+IndexType = typing.Union[ScalarIndexType, MultiIndexType]
 
 # chunks
 PrimitiveChunk = typing.Union[
@@ -82,12 +82,12 @@ MultiChunkRange = typing.Mapping[
 Coverage = typing.Union[ChunkList, ScalarChunkRange, MultiChunkRange]
 
 
-def get_chunk_format_type(
-    chunk_format: ChunkFormat,
+def get_index_type_type(
+    index_type: PrimitiveIndexType,
 ) -> type | types.GenericAlias | None:
     import datetime
 
-    if isinstance(chunk_format, str):
+    if isinstance(index_type, str):
         return {
             'hour': datetime.datetime,
             'day': datetime.datetime,
@@ -102,8 +102,8 @@ def get_chunk_format_type(
             'name': str,
             'name_list': list[str],
             None: None,
-        }[chunk_format]
-    elif isinstance(chunk_format, dict):
+        }[index_type]
+    elif isinstance(index_type, dict):
         return dict[str, typing.Any]
     else:
         raise Exception()
