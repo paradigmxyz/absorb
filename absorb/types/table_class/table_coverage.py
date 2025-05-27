@@ -38,7 +38,7 @@ class TableCoverage(table_io.TableIO):
                     )
                     .collect()
                 )
-                return (df['min_timestamp'], df['max_timestamp'])
+                return (df['min_timestamp'][0], df['max_timestamp'][0])
                 # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
                 # if 'data_range' in parsed:
                 #     return [parsed['data_range']]

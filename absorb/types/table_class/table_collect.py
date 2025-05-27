@@ -42,7 +42,14 @@ class TableCollect(table_coverage.TableCoverage):
         self, data_range: typing.Any | None = None, overwrite: bool = False
     ) -> absorb.ChunkList:
         if self.write_range == 'overwrite_all':
-            return [None]
+            missing = self.get_missing_ranges()
+            if len(missing) >= 1:
+                available = self.get_available_range()
+                return absorb.ops.ranges.partition_into_chunks(
+                    available, index_type=self.index_type
+                )
+            else:
+                return []
         else:
             if data_range is None:
                 if overwrite:
