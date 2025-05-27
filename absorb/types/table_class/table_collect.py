@@ -127,7 +127,9 @@ class TableCollect(table_coverage.TableCoverage):
         import os
 
         if verbose >= 1:
-            print('collecting', chunk)
+            print(
+                'collecting', absorb.ops.format_chunk(chunk, self.chunk_format)
+            )
         df = self.collect_chunk(data_range=chunk)
         if df is not None:
             path = self.get_file_path(data_range=chunk, df=df)
