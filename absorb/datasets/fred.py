@@ -12,7 +12,6 @@ class Metric(absorb.Table):
     source = 'fred'
     write_range = 'overwrite_all'
     parameter_types = {'series_id': str}
-    chunk_format = 'all'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -60,27 +59,27 @@ def get_api_key() -> str:
     return api_key
 
 
-def get_series_catalog() -> dict[str, str]:
+def get_series_catalog() -> dict[str, tuple[str, str]]:
     return {
         # monetary
-        'M1': 'M1SL',
-        'M1_raw': 'M1NS',
-        'M2': 'M2SL',
-        'M2_raw': 'M2NS',
+        'M1': ('M1SL', 'month'),
+        'M1_raw': ('M1NS', 'month'),
+        'M2': ('M2SL', 'week'),
+        'M2_raw': ('M2NS', 'month'),
         # inflation
-        'CPI': 'CPIAUCSL',
-        'PCEPI': 'PCEPI',
-        'PPI': 'PPIACO',
+        'CPI': ('CPIAUCSL', 'month'),
+        'PCEPI': ('PCEPI', 'month'),
+        'PPI': ('PPIACO', 'month'),
         # interest rates
-        'interest_rates': 'FEDFUNDS',
-        'bond_yield_10y': 'DGS10',
+        'interest_rates': ('FEDFUNDS', 'month'),
+        'bond_yield_10y': ('DGS10', 'day'),
         # labor
-        'unemployment': 'UNRATE',
-        'nonfarm_employment': 'PAYEMS',
-        'labor_force_participation': 'CIVPART',
+        'unemployment': ('UNRATE', 'month'),
+        'nonfarm_employment': ('PAYEMS', 'month'),
+        'labor_force_participation': ('CIVPART', 'month'),
         # economic output
-        'nominal_gdp': 'GDP',
-        'adjusted_gdp': 'GDPC1',
+        'nominal_gdp': ('GDP', 'quarter'),
+        'adjusted_gdp': ('GDPC1', 'quarter'),
     }
 
 
@@ -113,7 +112,11 @@ def _fetch(url: str, params: dict[str, str]) -> dict[str, typing.Any]:
 
 def get_series_metadata(name: str) -> dict[str, typing.Any]:
     url = 'https://api.stlouisfed.org/fred/series'
-    series_id = get_series_catalog().get(name, name)
+    catalog = get_series_catalog()
+    if name in catalog:
+        series_id = catalog[name][0]
+    else:
+        series_id = name
     result = _fetch(url, {'series_id': series_id})
     if len(result['seriess']) == 0:
         raise Exception('series not found')
@@ -134,7 +137,11 @@ def get_series(
 
     url = 'https://api.stlouisfed.org/fred/series/observations'
 
-    series_id = get_series_catalog().get(name, name)
+    catalog = get_series_catalog()
+    if name in catalog:
+        series_id = catalog[name][0]
+    else:
+        series_id = name
     params = {'series_id': series_id}
     if parameters is not None:
         params.update(parameters)
@@ -178,8 +185,9 @@ def get_all_tags() -> pl.DataFrame:
 
 # create classes
 tables = []
-for name in get_series_catalog().keys():
+for name, (series_id, cadence) in get_series_catalog().items():
     namespace = {'default_parameters': {'series_id': name}}
     cls = type(name, (Metric,), namespace)
+    cls.index_type = cadence  # type: ignore
     tables.append(cls)
     globals()[name] = cls
