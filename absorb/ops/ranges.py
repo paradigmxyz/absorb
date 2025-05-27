@@ -134,8 +134,10 @@ def get_range_diff(
         'year',
     ]:
         import datetime
+        import tooltime
 
         # get discrete chunk
+        discrete_step: datetime.timedelta | tooltime.DateDelta
         if index_type == 'hour':
             discrete_step = datetime.timedelta(hours=1)
         elif index_type == 'day':
@@ -143,11 +145,11 @@ def get_range_diff(
         elif index_type == 'week':
             discrete_step = datetime.timedelta(days=7)
         elif index_type == 'month':
-            raise NotImplementedError()
+            discrete_step = tooltime.DateDelta(months=1)
         elif index_type == 'quarter':
-            raise NotImplementedError()
+            discrete_step = tooltime.DateDelta(quarters=1)
         elif index_type == 'year':
-            raise NotImplementedError()
+            discrete_step = tooltime.DateDelta(years=1)
         else:
             raise Exception('invalid index_type')
 

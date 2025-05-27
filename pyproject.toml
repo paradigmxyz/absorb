@@ -34,6 +34,7 @@ dependencies = [
     "rich >= 13.9.4",
     "rich_argparse >= 1.5.2",
     "toolstr >= 0.9.11",
+    "tooltime >= 0.3.4",
 ]
 
 [project.urls]
