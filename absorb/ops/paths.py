@@ -244,7 +244,23 @@ def parse_file_path(
 def parse_data_range(
     as_str: str, chunk_format: absorb.ChunkFormat
 ) -> typing.Any:
-    if chunk_format == 'timestamp':
+    import datetime
+
+    if chunk_format == 'hour':
+        return datetime.datetime.strptime(as_str, '%Y-%m-%d--%H-%M-%S')
+    elif chunk_format == 'day':
+        return datetime.datetime.strptime(as_str, '%Y-%m-%d')
+    elif chunk_format == 'week':
+        return datetime.datetime.strptime(as_str, '%Y-%m-%d')
+    elif chunk_format == 'month':
+        return datetime.datetime.strptime(as_str, '%Y-%m')
+    elif chunk_format == 'quarter':
+        year = int(as_str[:4])
+        month = int(as_str[as_str.index('Q') + 1 :])
+        return datetime.datetime(year, month, 1)
+    elif chunk_format == 'year':
+        return datetime.datetime.strptime(as_str, '%Y')
+    elif chunk_format == 'timestamp':
         import datetime
 
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')
