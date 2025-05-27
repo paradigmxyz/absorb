@@ -114,6 +114,7 @@ def get_project_tvs(project: str) -> pl.DataFrame:
 
 def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
     import polars as pl
+    import time
 
     if projects is None:
         projects = get_projects()
@@ -122,7 +123,9 @@ def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
     for project in projects.to_dicts():
         print('getting', project['slug'])
         try:
+            time.sleep(10)
             activity = get_project_activity(project['slug'])
+            time.sleep(10)
             tvs = get_project_tvs(project['slug'])
         except Exception as e:
             print('skipping ' + project['slug'] + ' because ' + str(e.args[0]))
