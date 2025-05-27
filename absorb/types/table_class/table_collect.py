@@ -42,10 +42,6 @@ class TableCollect(table_coverage.TableCoverage):
         self, data_range: typing.Any | None = None, overwrite: bool = False
     ) -> absorb.ChunkList:
         if self.write_range == 'overwrite_all':
-            available = self.get_available_range()
-            collected = self.get_collected_range()
-            missing = self.get_missing_ranges()
-            raise Exception()
             return [None]
         else:
             if data_range is None:
@@ -131,7 +127,11 @@ class TableCollect(table_coverage.TableCoverage):
         import os
 
         if verbose >= 1:
-            print('collecting', absorb.ops.format_chunk(chunk, self.index_type))
+            if self.write_range == 'overwrite_all':
+                as_str = 'all'
+            else:
+                as_str = absorb.ops.format_chunk(chunk, self.index_type)
+            print('collecting', as_str)
         df = self.collect_chunk(data_range=chunk)
         if df is not None:
             path = self.get_file_path(data_range=chunk, df=df)

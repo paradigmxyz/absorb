@@ -10,7 +10,6 @@ from . import table_class
 
 # chunk formats
 PrimitiveIndexType = typing.Literal[
-    'all',
     # temporal
     'hour',
     'day',

@@ -71,7 +71,5 @@ def format_chunk(data_range: typing.Any, index_type: absorb.IndexType) -> str:
         return '_'.join(data_range)
     elif index_type is None:
         return str(data_range)
-    elif index_type == 'all':
-        return 'all'
     else:
         raise Exception('invalid chunk range format: ' + str(index_type))

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing
-from . import table_paths
+from . import table_io
 import absorb
 
 if typing.TYPE_CHECKING:
@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
     import datetime
 
 
-class TableCoverage(table_paths.TablePaths):
+class TableCoverage(table_io.TableIO):
     def get_available_range(self) -> absorb.Coverage:
         raise NotImplementedError()
 
@@ -28,11 +28,22 @@ class TableCoverage(table_paths.TablePaths):
             if len(files) == 0:
                 return None
             elif len(files) == 1:
-                parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
-                if 'data_range' in parsed:
-                    return [parsed['data_range']]
-                else:
-                    raise Exception('data_range not in name template')
+                import polars as pl
+
+                df = (
+                    self.scan()
+                    .select(
+                        min_timestamp=pl.col.timestamp.min(),
+                        max_timestamp=pl.col.timestamp.max(),
+                    )
+                    .collect()
+                )
+                return (df['min_timestamp'], df['max_timestamp'])
+                # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
+                # if 'data_range' in parsed:
+                #     return [parsed['data_range']]
+                # else:
+                #     raise Exception('data_range not in name template')
             else:
                 raise Exception('too many files')
         elif self.is_range_sortable():

@@ -42,7 +42,6 @@ class TablePaths(table_base.TableBase):
         )
 
     def _get_overwrite_range(self, df: pl.DataFrame | None) -> typing.Any:
-        raise Exception()
         if df is not None:
             return df['timestamp'].max()
         else:
