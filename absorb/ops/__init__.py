@@ -1,5 +1,6 @@
 from .catalog import *
 from .config import *
+from .coverage import *
 from .formatting import *
 from .io import *
 from .names import *
