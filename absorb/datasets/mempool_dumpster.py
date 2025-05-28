@@ -84,11 +84,11 @@ class Transactions(absorb.Table):
             current -= datetime.timedelta(days=1)
         return (initial, current)
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         url = url_template.format(
-            year=data_range.year,
-            month=data_range.month,
-            day=data_range.day,
+            year=chunk.year,  # type: ignore
+            month=chunk.month,  # type: ignore
+            day=chunk.day,  # type: ignore
         )
         return absorb.ops.download_parquet_to_dataframe(url)
 

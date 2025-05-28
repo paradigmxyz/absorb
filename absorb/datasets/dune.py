@@ -29,7 +29,7 @@ class FullQuery(BaseQuery):
         'spice_kwargs': dict[str, typing.Any],
     }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import spice
 
         query = self.parameters['query']
@@ -50,13 +50,13 @@ class AppendOnlyQuery(BaseQuery):
         'range_parameters': list[str],
     }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
 
         query = self.parameters['query']
         spice_kwargs = self.parameters['spice_kwargs']
         spice_kwargs.setdefault('parameters', {})
-        self.parameters.update(data_range)
+        self.parameters.update(chunk)  # type: ignore
         return spice.query(
             query, poll=True, include_execution=False, **spice_kwargs
         )
@@ -79,7 +79,7 @@ class CexLabels(absorb.Table):
             'ecosystem': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
 
         evm_cex_query = 'https://dune.com/queries/3237025'

@@ -22,7 +22,7 @@ class Metrics(absorb.Table):
         else:
             raise Exception('data not found')
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import requests
         import polars as pl
 

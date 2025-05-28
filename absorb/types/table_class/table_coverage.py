@@ -40,16 +40,16 @@ class TableCoverage(table_io.TableIO):
                 )
                 return (df['min_timestamp'][0], df['max_timestamp'][0])
                 # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
-                # if 'data_range' in parsed:
-                #     return [parsed['data_range']]
+                # if 'chunk' in parsed:
+                #     return [parsed['chunk']]
                 # else:
-                #     raise Exception('data_range not in name template')
+                #     raise Exception('chunk not in name template')
             else:
                 raise Exception('too many files')
         elif self.is_range_sortable():
             files = sorted(glob.glob(glob_str))
-            start = self.parse_file_path(files[0])['data_range']
-            end = self.parse_file_path(files[-1])['data_range']
+            start = self.parse_file_path(files[0])['chunk']
+            end = self.parse_file_path(files[-1])['chunk']
             return (start, end)
         else:
             raise Exception()

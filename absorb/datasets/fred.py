@@ -23,7 +23,7 @@ class Metric(absorb.Table):
             'metric': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import polars as pl
 
         series_id = self.parameters['series_id']

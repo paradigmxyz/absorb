@@ -52,11 +52,11 @@ class Candles(absorb.Table):
             'taker_buy_quote_volume': pl.Float64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         if self.parameters['market'] == 'spot':
             return get_spot_candlesticks(
                 pair=self.parameters['pair'],
-                timestamp=data_range,
+                timestamp=chunk,  # type: ignore
                 interval=self.parameters['interval'],
                 duration='daily',
             )
@@ -85,11 +85,11 @@ class Trades(absorb.Table):
             'trade_id': pl.Int64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         if self.parameters['market'] == 'spot':
             return get_spot_trades(
                 pair=self.parameters['pair'],
-                timestamp=data_range,
+                timestamp=chunk,  # type: ignore
                 duration='daily',
             )
         else:
@@ -118,11 +118,11 @@ class AggregateTrades(absorb.Table):
             'last_trade_id': pl.Int64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         if self.parameters['market'] == 'spot':
             return get_spot_aggregate_trades(
                 pair=self.parameters['pair'],
-                timestamp=data_range,
+                timestamp=chunk,  # type: ignore
                 duration='daily',
             )
         else:

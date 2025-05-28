@@ -44,7 +44,7 @@ class Metrics(absorb.Table):
             'stack': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_all_data()
 
     def get_available_range(self) -> absorb.Coverage:

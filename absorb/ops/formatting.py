@@ -44,37 +44,37 @@ def format_coverage(
         raise Exception()
 
 
-def format_chunk(data_range: typing.Any, index_type: absorb.IndexType) -> str:
+def format_chunk(chunk: absorb.Chunk, index_type: absorb.IndexType) -> str:
     if index_type == 'hour':
-        return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
+        return chunk.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
     elif index_type == 'day':
-        return data_range.strftime('%Y-%m-%d')  # type: ignore
+        return chunk.strftime('%Y-%m-%d')  # type: ignore
     elif index_type == 'week':
-        return data_range.strftime('%Y-%m-%d')  # type: ignore
+        return chunk.strftime('%Y-%m-%d')  # type: ignore
     elif index_type == 'month':
-        return data_range.strftime('%Y-%m')  # type: ignore
+        return chunk.strftime('%Y-%m')  # type: ignore
     elif index_type == 'quarter':
-        if data_range.month == 1 and data_range.day == 1:
+        if chunk.month == 1 and chunk.day == 1:  # type: ignore
             quarter = 1
-        elif data_range.month == 4 and data_range.day == 1:
+        elif chunk.month == 4 and chunk.day == 1:  # type: ignore
             quarter = 2
-        elif data_range.month == 7 and data_range.day == 1:
+        elif chunk.month == 7 and chunk.day == 1:  # type: ignore
             quarter = 4
-        elif data_range.month == 10 and data_range.day == 1:
+        elif chunk.month == 10 and chunk.day == 1:  # type: ignore
             quarter = 4
         else:
             raise Exception('invalid quarter timestamp')
-        return data_range.strftime('%Y-Q') + str(quarter)  # type: ignore
+        return chunk.strftime('%Y-Q') + str(quarter)  # type: ignore
     elif index_type == 'year':
-        return data_range.strftime('%Y')  # type: ignore
+        return chunk.strftime('%Y')  # type: ignore
     elif index_type == 'timestamp':
-        return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
+        return chunk.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
     elif index_type == 'timestamp_range':
         import datetime
 
         t_start: datetime.datetime
         t_end: datetime.datetime
-        t_start, t_end = data_range
+        t_start, t_end = chunk  # type: ignore
         return (
             t_start.strftime('%Y-%m-%d--%H-%M-%S')
             + '_to_'
@@ -83,17 +83,17 @@ def format_chunk(data_range: typing.Any, index_type: absorb.IndexType) -> str:
     elif index_type == 'number':
         width = 10
         template = '%0' + str(width) + 'd'
-        return template % data_range  # type: ignore
+        return template % chunk
     elif index_type == 'number_range':
         width = 10
         template = '%0' + str(width) + 'd'
-        start, end = data_range
-        return (template % start) + '_to_' + (template % end)  # type: ignore
+        start, end = chunk  # type: ignore
+        return (template % start) + '_to_' + (template % end)
     elif index_type == 'name':
-        return data_range  # type: ignore
+        return chunk  # type: ignore
     elif index_type == 'name_list':
-        return '_'.join(data_range)
+        return '_'.join(chunk)  # type: ignore
     elif index_type is None:
-        return str(data_range)
+        return str(chunk)
     else:
         raise Exception('invalid chunk range format: ' + str(index_type))

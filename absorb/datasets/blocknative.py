@@ -50,12 +50,12 @@ class Mempool(absorb.Table):
             'detect_date': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         url = url_template.format(
-            year=data_range.year,
-            month=data_range.month,
-            day=data_range.day,
-            hour=data_range.hour,
+            year=chunk.year,  # type: ignore
+            month=chunk.month,  # type: ignore
+            day=chunk.day,  # type: ignore
+            hour=chunk.hour,  # type: ignore
         )
         polars_kwargs = {'separator': '\t', 'schema': self.get_schema()}
         return absorb.ops.download_csv_gz_to_dataframe(

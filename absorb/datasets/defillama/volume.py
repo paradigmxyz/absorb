@@ -38,7 +38,7 @@ from . import common
 #             'volume_usd': pl.Float64,
 #         }
 
-#     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
 #         import polars as pl
 
 #         chains = self.parameters['chains']
@@ -90,7 +90,7 @@ from . import common
 #             'volume_usd': pl.Float64,
 #         }
 
-#     def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
 #         import polars as pl
 
 #         chains = self.parameters['chains']
@@ -141,7 +141,7 @@ class ProtocolDexVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import polars as pl
 
         protocols = self.parameters['protocols']
@@ -174,7 +174,7 @@ class ChainDexVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -207,7 +207,7 @@ class ProtocolOptionsVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import polars as pl
 
         protocols = self.parameters['protocols']
@@ -237,7 +237,7 @@ class ChainOptionsVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import polars as pl
 
         chains = self.parameters['chains']

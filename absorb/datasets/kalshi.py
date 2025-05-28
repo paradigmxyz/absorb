@@ -35,11 +35,11 @@ class Metrics(absorb.Table):
             'status': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import requests
         import polars as pl
 
-        date: datetime.datetime = data_range
+        date: datetime.datetime = chunk  # type: ignore
         url = get_date_url(date)
         response = requests.get(url, stream=True)
         if response.status_code == 404:
@@ -90,7 +90,7 @@ class Metadata(absorb.Table):
             'search_score': pl.Int64,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import requests
         import time
         import polars as pl

@@ -20,18 +20,18 @@ class TablePaths(table_base.TableBase):
 
     def get_file_path(
         self,
-        data_range: typing.Any | None = None,
+        chunk: absorb.Chunk | None = None,
         glob: bool = False,
         warn: bool = True,
         df: pl.DataFrame | None = None,
     ) -> str:
         if self.write_range == 'overwrite_all':
             if glob:
-                data_range = None
+                chunk = None
             else:
-                data_range = self._get_overwrite_range(df)
+                chunk = self._get_overwrite_range(df)
         return absorb.ops.paths.get_table_filepath(
-            data_range=data_range,
+            chunk=chunk,
             index_type=self.index_type,
             filename_template=self.filename_template,
             table=self.name(),
@@ -48,10 +48,10 @@ class TablePaths(table_base.TableBase):
             raise Exception('must specify range')
 
     def get_file_paths(
-        self, data_ranges: typing.Any, warn: bool = True
+        self, chunks: absorb.Coverage, warn: bool = True
     ) -> list[str]:
         return absorb.ops.paths.get_table_filepaths(
-            data_ranges=data_ranges,
+            chunks=chunks,
             index_type=self.index_type,
             filename_template=self.filename_template,
             table=self.name(),
@@ -62,18 +62,18 @@ class TablePaths(table_base.TableBase):
 
     def get_file_name(
         self,
-        data_range: typing.Any,
+        chunk: absorb.Chunk,
         *,
         glob: bool = False,
         df: pl.DataFrame | None = None,
     ) -> str:
         if self.write_range == 'overwrite_all':
             if glob:
-                data_range = None
+                chunk = None
             else:
-                data_range = self._get_overwrite_range(df)
+                chunk = self._get_overwrite_range(df)
         return absorb.ops.paths.get_table_filename(
-            data_range=data_range,
+            chunk=chunk,
             index_type=self.index_type,
             filename_template=self.filename_template,
             table=self.name(),

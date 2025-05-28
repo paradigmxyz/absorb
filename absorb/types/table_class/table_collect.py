@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 class TableCollect(table_coverage.TableCoverage):
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         raise NotImplementedError()
 
     def collect(
@@ -127,7 +127,7 @@ class TableCollect(table_coverage.TableCoverage):
 
     def _execute_collect_chunk(
         self,
-        chunk: typing.Any,
+        chunk: absorb.Chunk,
         overwrite: bool,
         verbose: int,
     ) -> None:
@@ -139,9 +139,9 @@ class TableCollect(table_coverage.TableCoverage):
             else:
                 as_str = absorb.ops.format_chunk(chunk, self.index_type)
             print('collecting', as_str)
-        df = self.collect_chunk(data_range=chunk)
+        df = self.collect_chunk(chunk=chunk)
         if df is not None:
-            path = self.get_file_path(data_range=chunk, df=df)
+            path = self.get_file_path(chunk=chunk, df=df)
             absorb.ops.write_file(df=df, path=path)
         if verbose >= 1 and df is None:
             print('could not collect data for', os.path.basename(path))

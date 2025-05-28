@@ -25,8 +25,8 @@ class VeraChunkedDataset(absorb.Table):
     def get_available_range(self) -> absorb.Coverage:
         return get_current_files(self.vera_filetype)
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
-        url = 'https://export.verifieralliance.org/' + data_range
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+        url = 'https://export.verifieralliance.org/' + chunk  # type: ignore
         return absorb.ops.download_parquet_to_dataframe(url=url)
 
 

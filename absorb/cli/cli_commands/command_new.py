@@ -84,10 +84,10 @@ def get_table_class_template() -> str:
 
         return {}
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         raise NotImplementedError()
 
-    def get_available_range(self) -> typing.Any:
+    def get_available_range(self) -> absorb.Coverage:
         raise NotImplementedError()
 """
     return template

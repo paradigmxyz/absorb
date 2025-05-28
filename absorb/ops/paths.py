@@ -73,7 +73,7 @@ def get_table_metadata_path(
 
 
 def get_table_filepath(
-    data_range: typing.Any,
+    chunk: absorb.Chunk,
     index_type: absorb.IndexType,
     filename_template: str,
     table: str,
@@ -87,7 +87,7 @@ def get_table_filepath(
 
     dir_path = get_table_dir(source=source, table=table, warn=warn)
     filename = get_table_filename(
-        data_range=data_range,
+        chunk=chunk,
         index_type=index_type,
         filename_template=filename_template,
         table=table,
@@ -99,7 +99,7 @@ def get_table_filepath(
 
 
 def get_table_filename(
-    data_range: typing.Any,
+    chunk: absorb.Chunk,
     index_type: absorb.IndexType,
     filename_template: str,
     table: str,
@@ -112,18 +112,16 @@ def get_table_filename(
     if source is not None:
         format_params['source'] = source
     format_params['table'] = table
-    if '{data_range}' in filename_template:
+    if '{chunk}' in filename_template:
         if glob:
-            format_params['data_range'] = '*'
+            format_params['chunk'] = '*'
         else:
-            format_params['data_range'] = absorb.ops.format_chunk(
-                data_range, index_type
-            )
+            format_params['chunk'] = absorb.ops.format_chunk(chunk, index_type)
     return filename_template.format(**format_params)
 
 
 def get_table_filepaths(
-    data_ranges: typing.Any,
+    chunks: typing.Any,
     index_type: absorb.IndexType,
     filename_template: str,
     table: str,
@@ -136,9 +134,9 @@ def get_table_filepaths(
 
     dir_path = get_table_dir(source=source, table=table, warn=warn)
     paths = []
-    for data_range in data_ranges:
+    for chunk in chunks:
         filename = get_table_filename(
-            data_range=data_range,
+            chunk=chunk,
             index_type=index_type,
             filename_template=filename_template,
             table=table,
@@ -161,12 +159,12 @@ def parse_file_path(
     keys = os.path.splitext(filename_template)[0].split('__')
     values = os.path.splitext(os.path.basename(path))[0].split('__')
     items = {k[1:-1]: v for k, v in zip(keys, values)}
-    if index_type is not None and 'data_range' in items:
-        items['data_range'] = parse_data_range(items['data_range'], index_type)
+    if index_type is not None and 'chunk' in items:
+        items['chunk'] = parse_chunk(items['chunk'], index_type)
     return items
 
 
-def parse_data_range(as_str: str, index_type: absorb.IndexType) -> typing.Any:
+def parse_chunk(as_str: str, index_type: absorb.IndexType) -> typing.Any:
     import datetime
 
     if index_type == 'hour':

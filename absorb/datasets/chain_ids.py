@@ -25,7 +25,7 @@ class Chains(absorb.Table):
             'chain_id_hex': pl.String,
         }
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         import polars as pl
 
         network_names = get_network_names()

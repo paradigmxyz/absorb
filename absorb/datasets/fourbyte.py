@@ -34,8 +34,8 @@ class FourbyteDatatype(absorb.Table):
         max_id = max(result['id'] for result in data['results'])
         return (0, max_id)
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame | None:
-        return scrape_4byte(url=self.endpoint, data_range=data_range)
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+        return scrape_4byte(url=self.endpoint, chunk=chunk)  # type: ignore
 
 
 class Functions(FourbyteDatatype):
@@ -52,7 +52,7 @@ def get_tables() -> list[type[absorb.Table]]:
 
 def scrape_4byte(
     url: str,
-    data_range: tuple[int, int],
+    chunk: tuple[int, int],
     wait_time: float = 0.1,
     min_id: int | None = None,
 ) -> pl.DataFrame:

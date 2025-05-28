@@ -17,7 +17,7 @@ class Query(absorb.Table):
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError('implement schema for Query')
 
-    def collect_chunk(self, data_range: typing.Any) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         sql = self.parameters['sql']
         return query(sql)
 

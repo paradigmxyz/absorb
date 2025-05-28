@@ -28,7 +28,7 @@ class TableBase:
 
     # naming
     name_template: absorb.NameTemplate = {}
-    filename_template = '{source}__{table}__{data_range}.parquet'
+    filename_template = '{source}__{table}__{chunk}.parquet'
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
         # set parameters
@@ -94,9 +94,6 @@ class TableBase:
         )
 
     # defaults
-
-    def get_default_data_range(self) -> typing.Any:
-        raise NotImplementedError()
 
     @staticmethod
     def instantiate(dataset: absorb.TrackedTable) -> absorb.Table:
