@@ -108,12 +108,6 @@ def get_index_type_type(
         raise Exception()
 
 
-class Context(typing.TypedDict):
-    parameters: dict[str, typing.Any]
-    data_range: typing.Any
-    overwrite: bool
-
-
 class TrackedTable(typing.TypedDict):
     source_name: str
     table_name: str
