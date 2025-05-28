@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-class TreasuryHoldings(absorb.Table):
+class Treasuries(absorb.Table):
     source = 'tic'
     write_range = 'overwrite_all'
     index_type = 'month'
@@ -17,7 +17,7 @@ class TreasuryHoldings(absorb.Table):
         import polars as pl
 
         return {
-            'date': pl.Date,
+            'timestamp': pl.Date,
             'country': pl.String,
             'for_treas_pos': pl.Float64,
         }
@@ -26,7 +26,10 @@ class TreasuryHoldings(absorb.Table):
         return get_post_2019_holdings()
 
     def get_available_range(self) -> absorb.Coverage:
-        raise NotImplementedError()
+        import datetime
+
+        holdings = get_post_2019_holdings()
+        return (datetime.datetime(2011, 9, 1), holdings['timestamp'].max())
 
 
 def get_post_2019_holdings() -> pl.DataFrame:
@@ -44,7 +47,7 @@ def get_post_2019_holdings() -> pl.DataFrame:
     schema = {
         'country': pl.String,
         'country_code': pl.String,
-        'date': pl.String,
+        'timestamp': pl.String,
         'for_treas_pos': pl.String,
         'for_treas_net': pl.String,
         'for_lt_treas_pos': pl.String,
@@ -65,7 +68,7 @@ def get_post_2019_holdings() -> pl.DataFrame:
         .with_columns(pl.col('*').replace('n.a.', None))
         .with_columns(
             country_code=pl.col.country_code.cast(int),
-            date=pl.col.date.str.to_date('%Y-%m'),
+            timestamp=pl.col.timestamp.str.to_date('%Y-%m'),
             for_treas_pos=pl.col.for_treas_pos.cast(float),
             for_treas_net=pl.col.for_treas_net.cast(float),
             for_lt_treas_pos=pl.col.for_lt_treas_pos.cast(float),
@@ -75,11 +78,11 @@ def get_post_2019_holdings() -> pl.DataFrame:
             for_st_treas_net=pl.col.for_st_treas_net.cast(float),
         )
         .select(
-            'date',
+            'timestamp',
             'country',
             'for_treas_pos',
         )
-        .sort('country', 'date')
+        .sort('country', 'timestamp')
     )
 
     return holders
