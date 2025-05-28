@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-CandlestickInterval = typing.Literal[
+CandleInterval = typing.Literal[
     '1s',
     '1m',
     '3m',
@@ -28,13 +28,13 @@ CandlestickInterval = typing.Literal[
 ]
 
 
-class Candles(absorb.Table):
+class SpotCandles(absorb.Table):
     source = 'binance'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'interval': str, 'market': str}
     default_parameters = {'market': 'spot'}
-    name_template = {'custom': 'candles_{market}_{pair}_{interval}'}
+    name_template = {'custom': 'spot_candles_{market}_{pair}_{interval}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -54,23 +54,23 @@ class Candles(absorb.Table):
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
         if self.parameters['market'] == 'spot':
-            return get_spot_candlesticks(
+            return get_spot_candles(
                 pair=self.parameters['pair'],
                 timestamp=chunk,  # type: ignore
                 interval=self.parameters['interval'],
-                duration='daily',
+                window='daily',
             )
         else:
             raise Exception('invalid market')
 
 
-class Trades(absorb.Table):
+class SpotTrades(absorb.Table):
     source = 'binance'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
-    name_template = {'custom': 'trades_{market}_{pair}'}
+    name_template = {'custom': 'spot_trades_{market}_{pair}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -90,19 +90,19 @@ class Trades(absorb.Table):
             return get_spot_trades(
                 pair=self.parameters['pair'],
                 timestamp=chunk,  # type: ignore
-                duration='daily',
+                window='daily',
             )
         else:
             raise Exception('invalid market')
 
 
-class AggregateTrades(absorb.Table):
+class SpotAggregateTrades(absorb.Table):
     source = 'binance'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
-    name_template = {'custom': 'aggregate_trades_{market}_{pair}'}
+    name_template = {'custom': 'spot_aggregate_trades_{market}_{pair}'}
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -123,7 +123,7 @@ class AggregateTrades(absorb.Table):
             return get_spot_aggregate_trades(
                 pair=self.parameters['pair'],
                 timestamp=chunk,  # type: ignore
-                duration='daily',
+                window='daily',
             )
         else:
             raise Exception('invalid market')
@@ -134,19 +134,19 @@ def get_spot_url(
     pair: str,
     timestamp: datetime.datetime,
     datatype: typing.Literal['trades', 'aggTrades', 'klines'],
-    duration: typing.Literal['daily', 'monthly'],
-    interval: CandlestickInterval | None = None,
+    window: typing.Literal['daily', 'monthly'],
+    interval: CandleInterval | None = None,
 ) -> str:
     import datetime
     import os
 
-    if duration == 'daily':
+    if window == 'daily':
         if timestamp != datetime.datetime(
             timestamp.year, timestamp.month, timestamp.day
         ):
             raise Exception('timestamp must be a specific day')
         date_str = timestamp.strftime('%Y-%m-%d')
-    elif duration == 'monthly':
+    elif window == 'monthly':
         if timestamp != datetime.datetime(timestamp.year, timestamp.month, 1):
             raise Exception('timestamp must be a specific month')
         date_str = timestamp.strftime('%Y-%m')
@@ -156,21 +156,21 @@ def get_spot_url(
     if datatype == 'klines':
         if interval is None:
             raise Exception('must specify interval')
-        template = 'spot/{duration}/klines/{pair}/{interval}/{pair}-{interval}-{date_str}.zip'
+        template = 'spot/{window}/klines/{pair}/{interval}/{pair}-{interval}-{date_str}.zip'
     else:
         if interval is not None:
             raise Exception(
-                'cannot specify interval for dataset, only specify duration'
+                'cannot specify interval for dataset, only specify window'
             )
         template = (
-            'spot/{duration}/{datatype}/{pair}/{pair}-{datatype}-{date_str}.zip'
+            'spot/{window}/{datatype}/{pair}/{pair}-{datatype}-{date_str}.zip'
         )
 
     root = 'https://data.binance.vision/data'
     tail = template.format(
         datatype=datatype,
         pair=pair,
-        duration=duration,
+        window=window,
         interval=interval,
         date_str=date_str,
     )
@@ -180,7 +180,7 @@ def get_spot_url(
 def get_spot_trades(
     pair: str,
     timestamp: datetime.datetime,
-    duration: typing.Literal['daily', 'monthly'] = 'daily',
+    window: typing.Literal['daily', 'monthly'] = 'daily',
 ) -> pl.DataFrame:
     import polars as pl
 
@@ -188,7 +188,7 @@ def get_spot_trades(
         pair=pair,
         timestamp=timestamp,
         datatype='trades',
-        duration=duration,
+        window=window,
     )
 
     raw_schema: dict[str, pl.DataType | type[pl.DataType]] = {
@@ -217,7 +217,7 @@ def get_spot_trades(
 def get_spot_aggregate_trades(
     pair: str,
     timestamp: datetime.datetime,
-    duration: typing.Literal['daily', 'monthly'] = 'daily',
+    window: typing.Literal['daily', 'monthly'] = 'daily',
 ) -> pl.DataFrame:
     import polars as pl
 
@@ -225,7 +225,7 @@ def get_spot_aggregate_trades(
         pair=pair,
         timestamp=timestamp,
         datatype='aggTrades',
-        duration=duration,
+        window=window,
     )
 
     raw_schema: dict[str, pl.DataType | type[pl.DataType]] = {
@@ -253,11 +253,11 @@ def get_spot_aggregate_trades(
     return _process(url=url, raw_schema=raw_schema, columns=columns)
 
 
-def get_spot_candlesticks(
+def get_spot_candles(
     pair: str,
     timestamp: datetime.datetime,
-    interval: CandlestickInterval,
-    duration: typing.Literal['daily', 'monthly'] = 'daily',
+    interval: CandleInterval,
+    window: typing.Literal['daily', 'monthly'] = 'daily',
 ) -> pl.DataFrame:
     import polars as pl
 
@@ -266,7 +266,7 @@ def get_spot_candlesticks(
         timestamp=timestamp,
         datatype='klines',
         interval=interval,
-        duration=duration,
+        window=window,
     )
 
     raw_schema: dict[str, pl.DataType | type[pl.DataType]] = {
@@ -311,6 +311,6 @@ def _process(
         absorb.ops.download_csv_zip_to_dataframe(
             url, polars_kwargs={'schema': raw_schema, 'has_header': False}
         )
-        .with_columns(pl.col.timestamp.cast(pl.Datetime('us')))
+        .with_columns(pl.col.timestamp.cast(pl.Datetime('ms')))
         .select(columns)
     )
