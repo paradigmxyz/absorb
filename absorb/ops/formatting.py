@@ -20,6 +20,30 @@ def print_bullet(
     toolstr.print_bullet(key=key, value=value, **kwargs, **bullet_styles)
 
 
+def format_coverage(
+    coverage: absorb.Coverage, index_type: absorb.IndexType
+) -> str:
+    if isinstance(coverage, tuple):
+        start, end = coverage
+        return (
+            format_chunk(start, index_type)
+            + '_to_'
+            + format_chunk(end, index_type)
+        )
+    elif isinstance(coverage, list):
+        start = min(coverage)
+        end = max(coverage)
+        return (
+            format_chunk(start, index_type)
+            + '_to_'
+            + format_chunk(end, index_type)
+        )
+    elif isinstance(coverage, dict):
+        raise NotImplementedError()
+    else:
+        raise Exception()
+
+
 def format_chunk(data_range: typing.Any, index_type: absorb.IndexType) -> str:
     if index_type == 'hour':
         return data_range.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore

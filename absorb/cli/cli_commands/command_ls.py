@@ -33,12 +33,12 @@ def ls_command(args: Namespace) -> dict[str, Any]:
             for dataset in tracked_datasets:
                 instance = absorb.Table.instantiate(dataset)
                 available_range = instance.get_available_range()
-                available_range_str = absorb.ops.format_chunk(
+                available_range_str = absorb.ops.format_coverage(
                     available_range, instance.index_type
                 )
                 collected_range = instance.get_collected_range()
                 if collected_range is not None:
-                    collected_range_str = absorb.ops.format_chunk(
+                    collected_range_str = absorb.ops.format_coverage(
                         collected_range, instance.index_type
                     )
                 else:
