@@ -307,10 +307,19 @@ def _process(
 ) -> pl.DataFrame:
     import polars as pl
 
+    datetime_column = (
+        pl.when(pl.col.timestamp >= 1230796800 * 1_000_000)
+        .then(pl.col.timestamp.cast(pl.Datetime('us')))
+        .when(pl.col.timestamp >= 1230796800 * 1_000)
+        .then((1_000 * pl.col.timestamp).cast(pl.Datetime('us')))
+        .when(pl.col.timestamp >= 1230796800)
+        .then((1_000_000 * pl.col.timestamp).cast(pl.Datetime('us')))
+    )
+
     return (
         absorb.ops.download_csv_zip_to_dataframe(
             url, polars_kwargs={'schema': raw_schema, 'has_header': False}
         )
-        .with_columns(pl.col.timestamp.cast(pl.Datetime('ms')))
+        .with_columns(datetime_column)
         .select(columns)
     )
