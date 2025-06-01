@@ -41,6 +41,7 @@ class SpotCandles(absorb.Table):
 
         return {
             'timestamp': pl.Datetime('us'),
+            'pair': pl.String,
             'open': pl.Float64,
             'high': pl.Float64,
             'low': pl.Float64,
@@ -77,6 +78,7 @@ class SpotTrades(absorb.Table):
 
         return {
             'timestamp': pl.Datetime('us'),
+            'pair': pl.String,
             'price': pl.Float64,
             'quantity_base': pl.Float64,
             'quantity_quote': pl.Float64,
@@ -109,6 +111,7 @@ class SpotAggregateTrades(absorb.Table):
 
         return {
             'timestamp': pl.Datetime('us'),
+            'pair': pl.String,
             'price': pl.Float64,
             'quantity': pl.Float64,
             'buyer_is_maker': pl.Boolean,
@@ -203,6 +206,7 @@ def get_spot_trades(
 
     columns = [
         'timestamp',
+        pl.lit(pair).alias('pair'),
         'price',
         'quantity_base',
         'quantity_quote',
@@ -241,6 +245,7 @@ def get_spot_aggregate_trades(
 
     columns = [
         'timestamp',
+        pl.lit(pair).alias('pair'),
         'price',
         'quantity',
         'buyer_is_maker',
@@ -286,6 +291,7 @@ def get_spot_candles(
 
     columns = [
         'timestamp',
+        pl.lit(pair).alias('pair'),
         'open',
         'high',
         'low',
