@@ -29,7 +29,13 @@ class TablePaths(table_base.TableBase):
             if glob:
                 chunk = None
             else:
-                chunk = self._get_overwrite_range(df)
+                if df is not None:
+                    if 'timestamp' in df.columns:
+                        chunk = df['timestamp'].max()
+                    else:
+                        chunk = 'all'
+                else:
+                    raise Exception('must specify range')
         return absorb.ops.paths.get_table_filepath(
             chunk=chunk,
             index_type=self.index_type,
@@ -40,12 +46,6 @@ class TablePaths(table_base.TableBase):
             glob=glob,
             warn=warn,
         )
-
-    def _get_overwrite_range(self, df: pl.DataFrame | None) -> typing.Any:
-        if df is not None:
-            return df['timestamp'].max()
-        else:
-            raise Exception('must specify range')
 
     def get_file_paths(
         self, chunks: absorb.Coverage, warn: bool = True
@@ -58,28 +58,6 @@ class TablePaths(table_base.TableBase):
             source=self.source,
             parameters=self.parameters,
             warn=warn,
-        )
-
-    def get_file_name(
-        self,
-        chunk: absorb.Chunk,
-        *,
-        glob: bool = False,
-        df: pl.DataFrame | None = None,
-    ) -> str:
-        if self.write_range == 'overwrite_all':
-            if glob:
-                chunk = None
-            else:
-                chunk = self._get_overwrite_range(df)
-        return absorb.ops.paths.get_table_filename(
-            chunk=chunk,
-            index_type=self.index_type,
-            filename_template=self.filename_template,
-            table=self.name(),
-            source=self.source,
-            parameters=self.parameters,
-            glob=glob,
         )
 
     def parse_file_path(self, path: str) -> dict[str, typing.Any]:
