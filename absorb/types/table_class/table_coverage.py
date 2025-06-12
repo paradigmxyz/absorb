@@ -30,15 +30,22 @@ class TableCoverage(table_io.TableIO):
             elif len(files) == 1:
                 import polars as pl
 
-                df = (
-                    self.scan()
-                    .select(
-                        min_timestamp=pl.col.timestamp.min(),
-                        max_timestamp=pl.col.timestamp.max(),
+                # for now: only handle timestamp ranges if timestamp present
+                schema = self.scan().collect_schema()
+                if 'timestamp' in schema.names():
+                    df = (
+                        self.scan()
+                        .select(
+                            min_timestamp=pl.col.timestamp.min(),
+                            max_timestamp=pl.col.timestamp.max(),
+                        )
+                        .collect()
                     )
-                    .collect()
-                )
-                return (df['min_timestamp'][0], df['max_timestamp'][0])
+                    return (df['min_timestamp'][0], df['max_timestamp'][0])
+
+                else:
+                    return None
+
                 # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
                 # if 'chunk' in parsed:
                 #     return [parsed['chunk']]

@@ -116,7 +116,11 @@ def get_table_filename(
         if glob:
             format_params['chunk'] = '*'
         else:
-            format_params['chunk'] = absorb.ops.format_chunk(chunk, index_type)
+            if isinstance(chunk, str):
+                chunk_str = chunk
+            else:
+                chunk_str = absorb.ops.format_chunk(chunk, index_type)
+            format_params['chunk'] = chunk_str
     return filename_template.format(**format_params)
 
 
