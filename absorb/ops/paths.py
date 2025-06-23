@@ -33,10 +33,16 @@ def get_config_path(*, warn: bool = False) -> str:
     )
 
 
+def get_datasets_dir(*, warn: bool = False) -> str:
+    import os
+
+    return os.path.join(get_absorb_root(warn=warn), 'datasets')
+
+
 def get_source_dir(source: str, *, warn: bool = False) -> str:
     import os
 
-    return os.path.join(get_absorb_root(warn=warn), 'datasets', source)
+    return os.path.join(get_datasets_dir(warn=warn), source)
 
 
 def get_table_dir(

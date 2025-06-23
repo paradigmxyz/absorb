@@ -11,8 +11,6 @@ if typing.TYPE_CHECKING:
 
 
 def ls_command(args: Namespace) -> dict[str, Any]:
-    import toolstr
-
     tracked_datasets = absorb.ops.get_tracked_tables()
 
     # available datasets
@@ -24,39 +22,53 @@ def ls_command(args: Namespace) -> dict[str, Any]:
 
     # tracked datasets
     print()
-    if args.verbose:
-        cli_outputs._print_title('Tracked datasets')
-        if len(tracked_datasets) == 0:
-            print('[none]')
-        else:
-            rows = []
-            for dataset in tracked_datasets:
-                instance = absorb.Table.instantiate(dataset)
-                available_range = instance.get_available_range()
-                available_range_str = absorb.ops.format_coverage(
-                    available_range, instance.index_type
-                )
-                collected_range = instance.get_collected_range()
-                if collected_range is not None:
-                    collected_range_str = absorb.ops.format_coverage(
-                        collected_range, instance.index_type
-                    )
-                else:
-                    collected_range_str = '-'
-                row = [
-                    dataset['source_name'],
-                    dataset['table_name'],
-                    available_range_str + '\n' + collected_range_str,
-                ]
-                rows.append(row)
-            columns = ['source', 'table', 'available range\ncollected range']
-            toolstr.print_multiline_table(rows, labels=columns)
+    cli_outputs._print_title('Tracked datasets')
+    if len(tracked_datasets) == 0:
+        print('[none]')
     else:
-        cli_outputs._print_title('Tracked datasets')
-        if len(tracked_datasets) == 0:
-            print('[none]')
+        if args.verbose:
+            _print_datasets_verbose(tracked_datasets)
         else:
             for dataset in tracked_datasets:
                 cli_outputs._print_dataset_bullet(dataset)
 
+    # untracked collected datasets
+    collected_datasets = absorb.ops.get_collected_tables()
+    untracked_collected_datasets = collected_datasets
+    if len(untracked_collected_datasets) > 0:
+        print()
+        cli_outputs._print_title('Untracked collected datasets')
+        if args.verbose:
+            _print_datasets_verbose(untracked_collected_datasets)
+        else:
+            for dataset in untracked_collected_datasets:
+                cli_outputs._print_dataset_bullet(dataset)
+
     return {}
+
+
+def _print_datasets_verbose(datasets: list[absorb.TrackedDataset]) -> None:
+    import toolstr
+
+    rows = []
+    for dataset in datasets:
+        instance = absorb.Table.instantiate(dataset)
+        available_range = instance.get_available_range()
+        available_range_str = absorb.ops.format_coverage(
+            available_range, instance.index_type
+        )
+        collected_range = instance.get_collected_range()
+        if collected_range is not None:
+            collected_range_str = absorb.ops.format_coverage(
+                collected_range, instance.index_type
+            )
+        else:
+            collected_range_str = '-'
+        row = [
+            dataset['source_name'],
+            dataset['table_name'],
+            available_range_str + '\n' + collected_range_str,
+        ]
+        rows.append(row)
+    columns = ['source', 'table', 'available range\ncollected range']
+    toolstr.print_multiline_table(rows, labels=columns)

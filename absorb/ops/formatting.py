@@ -45,6 +45,9 @@ def format_coverage(
 
 
 def format_chunk(chunk: absorb.Chunk, index_type: absorb.IndexType) -> str:
+    if chunk is None:
+        return '-'
+
     if index_type == 'hour':
         return chunk.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
     elif index_type == 'day':
