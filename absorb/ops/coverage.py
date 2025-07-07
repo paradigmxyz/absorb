@@ -27,6 +27,9 @@ def get_collected_tables() -> absorb.TrackedTable:
     import os
 
     datasets_dir = absorb.ops.get_datasets_dir()
+    if not os.path.isdir(datasets_dir):
+        return []
+
     tables = []
     for source in os.listdir(datasets_dir):
         source_dir = os.path.join(datasets_dir, source)
