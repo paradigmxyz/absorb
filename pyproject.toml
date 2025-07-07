@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "paradigm_absorb"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dynamic = ["version", "description"]
 license = {text = "MIT OR Apache-2.0"}
 classifiers = [
