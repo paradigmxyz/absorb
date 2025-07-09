@@ -83,3 +83,8 @@ venvPath = "."
 venv = ".venv"
 reportUnusedCallResult = false
 reportUnknownMemberType = false
+
+[dependency-groups]
+dev = [
+    "mypy>=1.16.1",
+]
