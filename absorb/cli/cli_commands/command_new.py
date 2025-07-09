@@ -35,7 +35,7 @@ def new_command(args: Namespace) -> dict[str, Any]:
             path = os.path.join(source_path + '.py')
     else:
         raise NotImplementedError(
-            'creating table definitions in TRUCK_ROOT, use --native or --path'
+            'creating table definitions in ABSORB_ROOT, use --native or --path'
         )
     print('adding table to file: ' + path)
 

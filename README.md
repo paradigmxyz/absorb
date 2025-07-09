@@ -112,12 +112,12 @@ To display information about the schema and other metadata of a dataset, type `a
 
 `absorb` stores each dataset as a collection of parquet files.
 
-Datasets can be stored in any location on your disks, and absorb will use symlinks to organize those files in the `TRUCK_ROOT` tree.
+Datasets can be stored in any location on your disks, and absorb will use symlinks to organize those files in the `ABSORB_ROOT` tree.
 
-the `TRUCK_ROOT` filesystem directory is organized as:
+the `ABSORB_ROOT` filesystem directory is organized as:
 
 ```
-{TRUCK_ROOT}/
+{ABSORB_ROOT}/
     datasets/
         <source>/
             tables/
