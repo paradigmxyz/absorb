@@ -7,8 +7,14 @@ if typing.TYPE_CHECKING:
     import argparse
 
 
-def help_command(args: argparse.Namespace) -> dict[str, typing.Any]:
+def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
     import toolstr
+
+    if args.dataset is None:
+        import sys
+
+        print('specify dataset to print info')
+        sys.exit(0)
 
     table = absorb.ops.resolve_table(args.dataset)
     schema = table.get_schema()

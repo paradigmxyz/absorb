@@ -27,7 +27,7 @@ def get_subcommands() -> (
             ],
         ),
         (
-            'help',
+            'info',
             'show info about a specific dataset or data source',
             [
                 (
