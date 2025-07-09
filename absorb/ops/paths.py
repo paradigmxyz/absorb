@@ -17,7 +17,7 @@ def get_absorb_root(*, warn: bool = False) -> str:
             import rich
 
             rich.print(
-                '[#777777]using default value for TRUCK_ROOT: ~/absorb[/#777777]\n'
+                '[#777777]using default value for TRUCK_ROOT: ~/absorb\n(set a value for the TRUCK_ROOT env var to remove this message)[/#777777]'
             )
             _cache['root_dir_warning_shown'] = True
         path = '~/absorb'
