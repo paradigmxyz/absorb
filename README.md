@@ -23,7 +23,22 @@
 
 
 ## Installation
-`uv install paradigm_absorb`
+
+basic installation
+```bash
+uv tool install paradigm_absorb
+```
+
+install with all extras
+```bash
+uv tool install paradigm_absorb[test,datasources,interactive]
+```
+
+install from source
+```bash
+git clone git@github.com:paradigmxyz/absorb.git
+uv tool install --editable .[test,datasources,interactive]
+```
 
 
 ## Example Usage

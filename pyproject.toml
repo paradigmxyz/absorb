@@ -57,6 +57,7 @@ datasources = [
 ]
 interactive = [
     "ipython>=8.18.1",
+    "ipdb>=0.13.13",
 ]
 
 [dependency-groups]
