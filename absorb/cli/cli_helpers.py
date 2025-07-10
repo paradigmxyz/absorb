@@ -17,9 +17,9 @@ def open_interactive_session(*, variables: dict[str, typing.Any]) -> None:
             '\n- \033[1m\033[97m' + key + '\033[0m: ' + type(value).__name__
         )
     try:
-        from IPython.terminal.embed import InteractiveShellEmbed
+        from IPython.terminal.embed import InteractiveShellEmbed  # type: ignore
 
-        ipshell = InteractiveShellEmbed(colors='Linux')  # type: ignore
+        ipshell = InteractiveShellEmbed(colors='Linux')
         ipshell(header=header, local_ns=variables)
     except ImportError:
         import code

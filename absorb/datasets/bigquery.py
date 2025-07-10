@@ -6,7 +6,7 @@ import absorb
 
 if typing.TYPE_CHECKING:
     import polars as pl
-    from google.cloud import bigquery
+    from google.cloud import bigquery  # type: ignore
 
 
 class Query(absorb.Table):

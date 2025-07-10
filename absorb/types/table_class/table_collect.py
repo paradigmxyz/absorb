@@ -39,7 +39,7 @@ class TableCollect(table_coverage.TableCoverage):
             self._execute_collect_chunk(chunk, overwrite, verbose)
 
     def _get_chunks_to_collect(
-        self, data_range: typing.Any | None = None, overwrite: bool = False
+        self, data_range: absorb.Coverage | None = None, overwrite: bool = False
     ) -> absorb.ChunkList:
         if self.write_range == 'overwrite_all':
             return [self.get_available_range()]
@@ -51,6 +51,8 @@ class TableCollect(table_coverage.TableCoverage):
                     coverage = self.get_missing_ranges()
             else:
                 coverage = [data_range]
+            if coverage is None:
+                raise Exception()
             data_ranges = absorb.ops.coverage_to_list(
                 coverage, index_type=self.index_type
             )

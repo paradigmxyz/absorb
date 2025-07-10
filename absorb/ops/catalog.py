@@ -137,7 +137,10 @@ def get_tables_df(
             else:
                 instance = absorb.ops.resolve_table(table)
                 if table_class.index_type == 'day':
-                    start, end = instance.get_available_range()
+                    available_range = instance.get_available_range()
+                    if available_range is None:
+                        raise Exception()
+                    start, end = available_range
                     if not isinstance(
                         start, datetime.datetime
                     ) or not isinstance(end, datetime.datetime):

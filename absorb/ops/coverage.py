@@ -23,7 +23,7 @@ def get_collected_range(
     return table.get_collected_range()
 
 
-def get_collected_tables() -> absorb.TrackedTable:
+def get_collected_tables() -> list[absorb.TrackedTable]:
     import os
 
     datasets_dir = absorb.ops.get_datasets_dir()
@@ -38,7 +38,7 @@ def get_collected_tables() -> absorb.TrackedTable:
             # TODO: get true parameters of colleceted datasets
             # TODO: read this information from a metadata.json
             camel_table = absorb.ops.names._snake_to_camel(table)
-            table_data = {
+            table_data: absorb.TrackedTable = {
                 'source_name': source,
                 'table_name': table,
                 'table_class': 'absorb.datasets.' + source + '.' + camel_table,

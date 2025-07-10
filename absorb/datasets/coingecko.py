@@ -52,7 +52,7 @@ class CoinMetrics(absorb.Table):
 class Categories(absorb.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
-    index_type = None
+    index_type = 'name'
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
     name_template = {

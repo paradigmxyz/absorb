@@ -48,6 +48,6 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
     print()
     toolstr.print('[green bold]schema[/green bold]')
     for key, value in schema.items():
-        absorb.ops.print_bullet(key=key, value=value)
+        absorb.ops.print_bullet(key=key, value=str(value))
 
     return {}

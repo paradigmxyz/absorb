@@ -204,7 +204,7 @@ def get_spot_trades(
         'best_price_match': pl.Boolean,
     }
 
-    columns = [
+    columns: list[str | pl.Expr] = [
         'timestamp',
         pl.lit(pair).alias('pair'),
         'price',
@@ -243,7 +243,7 @@ def get_spot_aggregate_trades(
         'best_price_match': pl.Boolean,
     }
 
-    columns = [
+    columns: list[str | pl.Expr] = [
         'timestamp',
         pl.lit(pair).alias('pair'),
         'price',
@@ -289,7 +289,7 @@ def get_spot_candles(
         'ignore': pl.String,
     }
 
-    columns = [
+    columns: list[str | pl.Expr] = [
         'timestamp',
         pl.lit(pair).alias('pair'),
         'open',
@@ -309,7 +309,7 @@ def get_spot_candles(
 def _process(
     url: str,
     raw_schema: dict[str, pl.DataType | type[pl.DataType]],
-    columns: list[str],
+    columns: list[str | pl.Expr],
 ) -> pl.DataFrame:
     import polars as pl
 

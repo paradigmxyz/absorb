@@ -152,10 +152,10 @@ class Transactions(absorb.Table):
 def load_block_stats(
     *, start_block: int | None = None, end_block: int | None = None
 ) -> pl.DataFrame:
-    import cryo_manager
+    import cryo_manager  # type: ignore
     import polars as pl
 
-    return (
+    return (  # type: ignore
         cryo_manager.scan(
             'blocks',
             network='ethereum',

@@ -289,9 +289,9 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
                     + str(list(parameters.keys()))
                 )
             parameter_type = parameter_types[key]
-            if parameter_type == str:
+            if parameter_type == str:  # noqa: E721
                 pass
-            elif parameter_type == int:
+            elif parameter_type == int:  # noqa: E721
                 value = int(value)
             elif parameter_type == list[str]:
                 value = value.split(',')

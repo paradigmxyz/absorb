@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 
 
 class TableCoverage(table_io.TableIO):
-    def get_available_range(self) -> absorb.Coverage:
+    def get_available_range(self) -> absorb.Coverage | None:
         if self.write_range == 'overwrite_all':
             return None
         else:
@@ -64,9 +64,11 @@ class TableCoverage(table_io.TableIO):
         else:
             raise Exception()
 
-    def get_missing_ranges(self) -> absorb.Coverage:
+    def get_missing_ranges(self) -> absorb.Coverage | None:
         collected_range = self.get_collected_range()
         available_range = self.get_available_range()
+        if available_range is None:
+            return None
         if collected_range is None:
             return [available_range]
         else:

@@ -47,7 +47,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
     return {}
 
 
-def _print_datasets_verbose(datasets: list[absorb.TrackedDataset]) -> None:
+def _print_datasets_verbose(datasets: list[absorb.TrackedTable]) -> None:
     import toolstr
 
     rows = []
