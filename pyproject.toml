@@ -28,9 +28,10 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
+    "nitwit>=0.1.1",
     "polars >= 1.0",
     "polars_evm >= 0.2.6",
-    "requests >= 2.0",
+    "requests>=2.0",
     "rich>=13.9.4",
     "rich_argparse >= 1.5.2",
     "toolstr >= 0.9.11",
@@ -48,10 +49,24 @@ name = "absorb"
 test = [
     "typing-extensions >=4.9.0",
 ]
+datasources = [
+    "dune-spice>=0.2.6",
+    "google>=3.0.0",
+    "google-auth>=2.40.3",
+    "paradigm-garlic>=0.1.1",
+]
+interactive = [
+    "ipython>=8.18.1",
+]
 
-[project.dev-dependencies]
-pytest = "^7.0.0"
-pytest-asyncio = "^0.18.3"  # Add this line for pytest-asyncio
+[dependency-groups]
+dev = [
+    "mypy>=1.16.1",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "types-requests>=2.31.0.6",
+]
+
 
 [tool.mypy]
 python_version = "3.9"
@@ -74,6 +89,9 @@ line-length = 80
 [tool.ruff.format]
 quote-style = "single"
 
+[tool.ruff.lint]
+ignore = ["F401", "F403"]
+
 
 [tool.pyright]
 exclude = [
@@ -84,7 +102,3 @@ venv = ".venv"
 reportUnusedCallResult = false
 reportUnknownMemberType = false
 
-[dependency-groups]
-dev = [
-    "mypy>=1.16.1",
-]
