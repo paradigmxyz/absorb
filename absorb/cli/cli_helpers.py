@@ -17,9 +17,9 @@ def open_interactive_session(*, variables: dict[str, typing.Any]) -> None:
             '\n- \033[1m\033[97m' + key + '\033[0m: ' + type(value).__name__
         )
     try:
-        from IPython.terminal.embed import InteractiveShellEmbed  # type: ignore
+        from IPython.terminal.embed import InteractiveShellEmbed
 
-        ipshell = InteractiveShellEmbed(colors='Linux')
+        ipshell = InteractiveShellEmbed(colors='Linux')  # type: ignore
         ipshell(header=header, local_ns=variables)
     except ImportError:
         import code
@@ -53,9 +53,21 @@ def _enter_debugger() -> None:
     # print stacktrace
     extype, value, tb = sys.exc_info()
     print('[ENTERING DEBUGGER]')
-    traceback.print_exc()
+
+    # print traceback
+    try:
+        from IPython.core.ultratb import VerboseTB
+        vtb = VerboseTB(color_scheme='Linux')  # You can also try 'LightBG' or 'Neutral'
+        if extype and value and tb:
+            formatted_tb = vtb.text(extype, value, tb)
+            print(formatted_tb)
+        else:
+            traceback.print_exc()
+    except ImportError:
+        traceback.print_exc()
     print()
 
+    # enter debugger
     try:
         import ipdb  # type: ignore
         import types
