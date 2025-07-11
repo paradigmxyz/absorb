@@ -42,7 +42,7 @@ def get_collected_tables() -> list[absorb.TrackedTable]:
                 'source_name': source,
                 'table_name': table,
                 'table_class': 'absorb.datasets.' + source + '.' + camel_table,
-                'parameters': {}
+                'parameters': {},
             }
             tables.append(table_data)
     return tables

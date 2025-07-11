@@ -57,7 +57,10 @@ def _enter_debugger() -> None:
     # print traceback
     try:
         from IPython.core.ultratb import VerboseTB
-        vtb = VerboseTB(color_scheme='Linux')  # You can also try 'LightBG' or 'Neutral'
+
+        vtb = VerboseTB(
+            color_scheme='Linux'
+        )  # You can also try 'LightBG' or 'Neutral'
         if extype and value and tb:
             formatted_tb = vtb.text(extype, value, tb)
             print(formatted_tb)
