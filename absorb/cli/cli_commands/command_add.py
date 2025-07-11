@@ -32,19 +32,22 @@ def add_command(args: Namespace) -> dict[str, Any]:
             track_dataset['table_name']
         )
 
+    # add untracked collected
+    tracked_tables = absorb.ops.get_tracked_tables()
+    if args.collected:
+        track_datasets += absorb.ops.get_untracked_collected_tables()
+
     # filter already collected
-    tracked = [
-        json.dumps(table, sort_keys=True)
-        for table in absorb.ops.get_tracked_tables()
-    ]
-    already_tracked = []
-    not_tracked = []
+    tracked = [json.dumps(table, sort_keys=True) for table in tracked_tables]
+    already_tracked = {}
+    not_tracked = {}
     for ds in track_datasets:
-        if json.dumps(ds, sort_keys=True) in tracked:
-            already_tracked.append(ds)
+        ds_hash = json.dumps(ds, sort_keys=True)
+        if ds_hash in tracked:
+            already_tracked[ds_hash] = ds
         else:
-            not_tracked.append(ds)
-    track_datasets = not_tracked
+            not_tracked[ds_hash] = ds
+    track_datasets = list(not_tracked.values())
 
     # check for invalid datasets
     sources = set(td['source_name'] for td in track_datasets)
@@ -64,7 +67,7 @@ def add_command(args: Namespace) -> dict[str, Any]:
     # print dataset summary
     if len(already_tracked) > 0:
         cli_outputs._print_title('Already tracking')
-        for dataset in already_tracked:
+        for dataset in already_tracked.values():
             cli_outputs._print_dataset_bullet(dataset)
         print()
     cli_outputs._print_title('Now tracking')
@@ -77,6 +80,8 @@ def add_command(args: Namespace) -> dict[str, Any]:
         rich.print(
             'to proceed with data collection, use [white bold]absorb collect[/white bold]'
         )
+
+    # start tracking tables
     absorb.ops.start_tracking_tables(track_datasets)
 
     return {}

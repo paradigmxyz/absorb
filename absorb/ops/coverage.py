@@ -46,3 +46,20 @@ def get_collected_tables() -> list[absorb.TrackedTable]:
             }
             tables.append(table_data)
     return tables
+
+
+def get_untracked_collected_tables(
+    *, tracked_datasets: list[absorb.TrackedTable] | None = None
+) -> list[absorb.TrackedTable]:
+    import json
+
+    if tracked_datasets is None:
+        tracked_datasets = absorb.ops.get_tracked_tables()
+    hashed_tracked_datasets = {
+        json.dumps(dataset, sort_keys=True) for dataset in tracked_datasets
+    }
+    return [
+        dataset
+        for dataset in get_collected_tables()
+        if json.dumps(dataset, sort_keys=True) not in hashed_tracked_datasets
+    ]

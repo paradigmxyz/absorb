@@ -33,8 +33,9 @@ def ls_command(args: Namespace) -> dict[str, Any]:
                 cli_outputs._print_dataset_bullet(dataset)
 
     # untracked collected datasets
-    collected_datasets = absorb.ops.get_collected_tables()
-    untracked_collected_datasets = collected_datasets
+    untracked_collected_datasets = absorb.ops.get_untracked_collected_tables(
+        tracked_datasets=tracked_datasets
+    )
     if len(untracked_collected_datasets) > 0:
         print()
         cli_outputs._print_title('Untracked collected datasets')

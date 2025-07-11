@@ -111,6 +111,13 @@ def get_subcommands() -> list[
                     ['--path'],
                     {'help': 'directory location to store the dataset'},
                 ),
+                (
+                    ['--collected'],
+                    {
+                        'action': 'store_true',
+                        'help': 'add datasets that are already collected',
+                    },
+                ),
             ],
         ),
         (
