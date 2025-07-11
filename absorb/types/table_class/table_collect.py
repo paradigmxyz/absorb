@@ -139,4 +139,4 @@ class TableCollect(table_coverage.TableCoverage):
             path = self.get_file_path(chunk=chunk, df=df)
             absorb.ops.write_file(df=df, path=path)
         if verbose >= 1 and df is None:
-            print('could not collect data for', os.path.basename(path))
+            print('could not collect data for', str(chunk))
