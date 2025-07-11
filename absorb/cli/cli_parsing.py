@@ -18,6 +18,13 @@ def get_subcommands() -> list[
             'list tracked datasets',
             [
                 (
+                    ['source'],
+                    {
+                        'nargs': '?',
+                        'help': 'data source',
+                    },
+                ),
+                (
                     ['--verbose', '-v'],
                     {
                         'action': 'store_true',

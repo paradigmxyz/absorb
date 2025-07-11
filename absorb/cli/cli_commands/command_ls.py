@@ -11,11 +11,13 @@ if typing.TYPE_CHECKING:
 
 
 def ls_command(args: Namespace) -> dict[str, Any]:
-    tracked_datasets = absorb.ops.get_tracked_tables()
-
     # available datasets
     cli_outputs._print_title('Available datasets')
-    for source in sorted(absorb.ops.get_sources()):
+    if args.source is not None:
+        sources = [args.source]
+    else:
+        sources = absorb.ops.get_sources()
+    for source in sorted(sources):
         source_tables = absorb.ops.get_source_tables(source)
         if len(source_tables) > 0:
             cli_outputs._print_source_datasets_bullet(source, source_tables)
@@ -23,6 +25,13 @@ def ls_command(args: Namespace) -> dict[str, Any]:
     # tracked datasets
     print()
     cli_outputs._print_title('Tracked datasets')
+    tracked_datasets = absorb.ops.get_tracked_tables()
+    if args.source is not None:
+        tracked_datasets = [
+            dataset
+            for dataset in tracked_datasets
+            if dataset['source_name'] == args.source
+        ]
     if len(tracked_datasets) == 0:
         print('[none]')
     else:
@@ -36,6 +45,12 @@ def ls_command(args: Namespace) -> dict[str, Any]:
     untracked_collected_datasets = absorb.ops.get_untracked_collected_tables(
         tracked_datasets=tracked_datasets
     )
+    if args.source is not None:
+        untracked_collected_datasets = [
+            dataset
+            for dataset in untracked_collected_datasets
+            if dataset['source_name'] == args.source
+        ]
     if len(untracked_collected_datasets) > 0:
         print()
         cli_outputs._print_title('Untracked collected datasets')
