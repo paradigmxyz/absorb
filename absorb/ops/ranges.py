@@ -14,7 +14,21 @@ def coverage_to_list(
     index_type: absorb.IndexType,
 ) -> absorb.ChunkList:
     if isinstance(coverage, list):
-        return coverage
+        if all(isinstance(item, tuple) for item in coverage) and index_type in [
+            'hour',
+            'day',
+            'week',
+            'month',
+            'quarter',
+            'year',
+        ]:
+            return [
+                subitem
+                for item in coverage
+                for subitem in coverage_to_list(item, index_type)
+            ]
+        else:
+            return coverage
     elif isinstance(coverage, dict):
         if not isinstance(index_type, dict):
             raise Exception()
