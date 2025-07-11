@@ -9,9 +9,9 @@ if typing.TYPE_CHECKING:
     import argparse
 
 
-def get_subcommands() -> (
-    list[tuple[str, str, list[tuple[list[str], dict[str, typing.Any]]]]]
-):
+def get_subcommands() -> list[
+    tuple[str, str, list[tuple[list[str], dict[str, typing.Any]]]]
+]:
     return [
         (
             'ls',
@@ -159,6 +159,27 @@ def get_subcommands() -> (
             ],
         ),
         (
+            'cd',
+            'change directory to an absorb path',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '?',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+                (
+                    ['--glob'],
+                    {'action': 'store_true'},
+                ),
+            ],
+        ),
+        (
             'new',
             'create new dataset',
             [
@@ -217,6 +238,9 @@ def parse_args() -> argparse.Namespace:
             '--interactive',
             help='open data in interactive python session',
             action='store_true',
+        )
+        subparser.add_argument(
+            '--cd-destination-tempfile',
         )
         parsers[name] = subparser
 

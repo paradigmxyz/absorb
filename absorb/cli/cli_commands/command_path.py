@@ -11,15 +11,20 @@ if typing.TYPE_CHECKING:
 
 
 def path_command(args: Namespace) -> dict[str, Any]:
+    path = _get_path(args)
+    print(path)
+    return {}
+
+
+def _get_path(args: Namespace) -> str:
     if args.dataset is None:
-        print(absorb.ops.get_absorb_root(warn=False))
+        return absorb.ops.get_absorb_root(warn=False)
     elif args.glob:
         tracked_dataset = cli_parsing._parse_datasets(args)[0]
         instance = absorb.Table.instantiate(tracked_dataset)
-        print(instance.get_glob(warn=False))
+        return instance.get_glob(warn=False)
     elif '.' in args.dataset:
         source, table = args.dataset.split('.')
-        print(absorb.ops.get_table_dir(source=source, table=table, warn=False))
+        return absorb.ops.get_table_dir(source=source, table=table, warn=False)
     else:
-        print(absorb.ops.get_source_dir(args.dataset, warn=False))
-    return {}
+        return absorb.ops.get_source_dir(args.dataset, warn=False)
