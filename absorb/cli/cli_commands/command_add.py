@@ -22,18 +22,9 @@ def add_command(args: Namespace) -> dict[str, Any]:
         )
     else:
         track_datasets = cli_parsing._parse_datasets(args)
-
-    # use snake case throughout
-    for track_dataset in track_datasets:
-        track_dataset['source_name'] = absorb.ops.names._camel_to_snake(
-            track_dataset['source_name']
-        )
-        track_dataset['table_name'] = absorb.ops.names._camel_to_snake(
-            track_dataset['table_name']
-        )
+    tracked_tables = absorb.ops.get_tracked_tables()
 
     # add untracked collected
-    tracked_tables = absorb.ops.get_tracked_tables()
     if args.collected:
         track_datasets += absorb.ops.get_untracked_collected_tables()
 

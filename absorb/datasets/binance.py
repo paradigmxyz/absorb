@@ -34,7 +34,7 @@ class SpotCandles(absorb.Table):
     index_type = 'day'
     parameter_types = {'pair': str, 'interval': str, 'market': str}
     default_parameters = {'market': 'spot'}
-    name_template = {'custom': 'spot_candles_{market}_{pair}_{interval}'}
+    name_template = 'spot_candles_{market}_{pair}_{interval}'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -71,7 +71,7 @@ class SpotTrades(absorb.Table):
     index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
-    name_template = {'custom': 'spot_trades_{market}_{pair}'}
+    name_template = 'spot_trades_{market}_{pair}'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -104,7 +104,7 @@ class SpotAggregateTrades(absorb.Table):
     index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
     default_parameters = {'market': 'spot'}
-    name_template = {'custom': 'spot_aggregate_trades_{market}_{pair}'}
+    name_template = 'spot_aggregate_trades_{market}_{pair}'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

@@ -27,7 +27,7 @@ class TableBase:
     static_parameters: list[str] = []
 
     # naming
-    name_template: absorb.NameTemplate = {}
+    name_template: str | list[str] = '{class_name}'
     filename_template = '{source}__{table}__{chunk}.parquet'
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
@@ -62,6 +62,10 @@ class TableBase:
         raise NotImplementedError()
 
     @classmethod
+    def full_class_name(cls) -> str:
+        return cls.__module__ + '.' + cls.__qualname__
+
+    @classmethod
     def class_name(
         cls,
         allow_generic: bool = False,
@@ -74,23 +78,17 @@ class TableBase:
         else:
             parameters = dict(cls.default_parameters, **cls.parameters)
         return absorb.ops.get_table_name(
-            base_name=cls.__name__,
-            name_template=cls.name_template,
-            parameter_types=cls.parameter_types,
+            class_name=cls.__name__,
+            template=cls.name_template,
             parameters=parameters,
-            default_parameters=cls.default_parameters,
-            static_parameters=cls.static_parameters,
             allow_generic=allow_generic,
         )
 
     def name(self) -> str:
         return absorb.ops.get_table_name(
-            base_name=type(self).__name__,
-            name_template=self.name_template,
-            parameter_types=self.parameter_types,
+            class_name=type(self).__name__,
+            template=self.name_template,
             parameters=self.parameters,
-            default_parameters=self.default_parameters,
-            static_parameters=self.static_parameters,
         )
 
     # defaults

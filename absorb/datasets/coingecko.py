@@ -22,10 +22,7 @@ class CoinMetrics(absorb.Table):
     index_type = 'day'
     parameter_types = {'top_n': int}
     default_parameters = {'top_n': 1000}
-    name_template = {
-        'default': 'coin_metrics',
-        'custom': 'coin_metrics_top_{top_n}',
-    }
+    name_template = 'coin_metrics_top_{top_n}'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -55,10 +52,7 @@ class Categories(absorb.Table):
     index_type = 'name'
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
-    name_template = {
-        'default': 'categories',
-        'custom': 'coin_metrics_{categories}',
-    }
+    name_template = 'coin_metrics_{categories}'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl
@@ -85,10 +79,10 @@ class CategoryMetrics(absorb.Table):
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
     dependencies = [CoinMetrics, Categories]
-    name_template = {
-        'default': 'category_metrics',
-        'custom': 'category_metrics_{categories}',
-    }
+    name_template = [
+        'category_metrics_{categories}',
+        'category_metrics',
+    ]
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         import polars as pl

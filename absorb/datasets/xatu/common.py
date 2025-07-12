@@ -24,7 +24,7 @@ class XatuTable(absorb.Table):
     datatype: str
     per: typing.Literal['day', 'hour']
     parameter_types = {'network': str}
-    name_template = {'custom': '{base_name}_{network}'}
+    name_template = '{class_name}_{network}'
     required_packages = ['yaml >= 5.4.1']
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:

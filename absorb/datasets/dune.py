@@ -7,7 +7,10 @@ import absorb
 
 class BaseQuery(absorb.Table):
     source = 'dune'
-    name_template = {'custom': '{name}'}
+    name_template = [
+        '{name}',
+        'query_{query_id}',
+    ]
     required_packages = ['spice >= 0.2.3']
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
@@ -25,7 +28,7 @@ class FullQuery(BaseQuery):
     write_range = 'overwrite_all'
     parameter_types = {
         'name': str,
-        'query': str,
+        'query_id': str,
         'spice_kwargs': dict[str, typing.Any],
     }
 
@@ -45,7 +48,7 @@ class AppendOnlyQuery(BaseQuery):
     write_range = 'append_only'
     parameter_types = {
         'name': str,
-        'query': str,
+        'query_id': str,
         'spice_kwargs': dict[str, typing.Any],
         'range_parameters': list[str],
     }

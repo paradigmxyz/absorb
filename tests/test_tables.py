@@ -54,7 +54,7 @@ def test_tables_implement_collect_chunk(table: type[absorb.Table]) -> None:
 def test_table_parameter_names_valid(table: type[absorb.Table]) -> None:
     for name in table.parameter_types.keys():
         assert name not in [
-            'base_name',
+            'class_name',
         ]
         assert '__' not in name
         assert not name.startswith('_')

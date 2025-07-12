@@ -59,27 +59,32 @@ def get_api_key() -> str:
     return api_key
 
 
-def get_series_catalog() -> dict[str, tuple[str, str]]:
+def get_series_catalog() -> dict[str, tuple[str, str, str]]:
+    # (series_id, cadence, name)
     return {
         # monetary
-        'M1': ('M1SL', 'month'),
-        'M1Raw': ('M1NS', 'month'),
-        'M2': ('M2SL', 'month'),
-        'M2Raw': ('M2NS', 'month'),
+        'M1': ('M1SL', 'month', 'm1'),
+        'M1Raw': ('M1NS', 'month', 'm1_raw'),
+        'M2': ('M2SL', 'month', 'm2'),
+        'M2Raw': ('M2NS', 'month', 'm2_raw'),
         # inflation
-        'CPI': ('CPIAUCSL', 'month'),
-        'PCEPI': ('PCEPI', 'month'),
-        'PPI': ('PPIACO', 'month'),
+        'CPI': ('CPIAUCSL', 'month', 'cpi'),
+        'PCEPI': ('PCEPI', 'month', 'pcepi'),
+        'PPI': ('PPIACO', 'month', 'ppi'),
         # interest rates
-        'InterestRates': ('FEDFUNDS', 'month'),
-        'BondYield10y': ('DGS10', 'day'),
+        'InterestRates': ('FEDFUNDS', 'month', 'interest_rates'),
+        'BondYield10y': ('DGS10', 'day', 'bond_yield_10y'),
         # labor
-        'Unemployment': ('UNRATE', 'month'),
-        'NonfarmEmployment': ('PAYEMS', 'month'),
-        'LaborForceParticipation': ('CIVPART', 'month'),
+        'Unemployment': ('UNRATE', 'month', 'unemployment'),
+        'NonfarmEmployment': ('PAYEMS', 'month', 'nonfarm_employment'),
+        'LaborForceParticipation': (
+            'CIVPART',
+            'month',
+            'labor_force_participation',
+        ),
         # economic output
-        'NominalGdp': ('GDP', 'quarter'),
-        'AdjustedGdp': ('GDPC1', 'quarter'),
+        'NominalGdp': ('GDP', 'quarter', 'nominal_gdp'),
+        'AdjustedGdp': ('GDPC1', 'quarter', 'adjusted_gdp'),
     }
 
 
@@ -184,10 +189,11 @@ def get_all_tags() -> pl.DataFrame:
 
 
 # create classes
-tables = []
-for name, (series_id, cadence) in get_series_catalog().items():
+tables: list[type[absorb.Table]] = []
+for name, (series_id, cadence, lower_name) in get_series_catalog().items():
     namespace = {'default_parameters': {'series_id': name}}
-    cls = type(name, (Metric,), namespace)
+    cls: Metric = type(name, (Metric,), namespace)  # type: ignore
     cls.index_type = cadence  # type: ignore
-    tables.append(cls)
+    cls.name_template = lower_name
+    tables.append(cls)  # type: ignore
     globals()[name] = cls

@@ -34,75 +34,64 @@ def _snake_to_camel(name: str) -> str:
 
 def get_table_name(
     *,
-    base_name: str,
-    name_template: absorb.NameTemplate,
-    parameter_types: dict[str, typing.Any],
-    parameters: dict[str, typing.Any],
-    default_parameters: dict[str, typing.Any],
-    static_parameters: list[str],
+    class_name: str,
+    template: str | list[str],
+    parameters: dict[str, typing.Any] | None = None,
     allow_generic: bool = False,
 ) -> str:
-    """
-    keys
-    - base_name: the name of the table datatype
-    - {parameter_name}: the name of any of the dataset parameters
-    """
-    if name_template.get('default') is None:
-        pass
-
-    if base_name.isupper():
-        base_name = base_name.lower()
-    else:
-        base_name = absorb.ops.names._camel_to_snake(base_name)
-
-    if len(parameter_types) == 0:
-        if len(name_template) == 0:
-            return base_name
-        elif name_template.get('default') is not None:
-            template = name_template['default']
-        elif name_template.get('custom') is not None:
-            if isinstance(name_template['custom'], str):
-                template = name_template['custom']
-            else:
-                raise Exception()
+    # get template str
+    if isinstance(template, list):
+        if len(template) == 1:
+            template = template[0]
         else:
-            raise Exception()
-    else:
-        parameters_are_default = all(
-            parameters.get(key) == default_parameters.get(key)
-            for key in parameter_types
-        )
-        if name_template.get('default') is not None and parameters_are_default:
-            template = name_template['default']
-        elif name_template.get('custom') is not None:
-            custom_template = name_template['custom']
-            if isinstance(custom_template, str):
-                template = custom_template
-            elif isinstance(custom_template, dict):
-                for key, value in custom_template.items():
-                    if isinstance(key, str):
-                        variables: str | tuple[str] = (key,)
-                    elif isinstance(key, tuple):
-                        variables = key
-                    else:
-                        raise Exception()
-                    if all(variable is not None for variable in variables):
-                        template = value
-                        break
-                else:
-                    raise Exception()
+            for subtemplate in template:
+                # get variable names from template (in curly braces)
+                variables = _get_template_variables(subtemplate)
+                if all(var in subtemplate for var in variables):
+                    template = subtemplate
+                    break
             else:
-                raise Exception()
-        elif len(name_template) == 0 and parameters_are_default:
-            return base_name
-        else:
-            raise Exception('need parameters specified')
+                raise ValueError(
+                    'could not determine template string from list'
+                )
 
+    # assemble the template variables
+    if class_name.isupper():
+        class_name = class_name.lower()
+    else:
+        class_name = absorb.ops.names._camel_to_snake(class_name)
+    template_vars = {'class_name': class_name}
+    if parameters:
+        template_vars.update(parameters)
+
+    # whether to allow generic template variables in the output
     if allow_generic:
-        template_items = dict(base_name=base_name, **parameters)
         result = template
-        for key, value in template_items.items():
-            result = result.replace('{' + key + '}', str(value))
+        for key, value in template_vars.items():
+            result = result.replace(f'{{{key}}}', str(value))
         return result
     else:
-        return template.format(base_name=base_name, **parameters)
+        return template.format(**template_vars)
+
+
+def _get_template_variables(template: str) -> list[str]:
+    """
+    Extracts variable names from a template string.
+    Variables are expected to be in curly braces, e.g., {variable_name}.
+    """
+    variables = []
+    in_variable = False
+    current_var: list[str] = []
+
+    for char in template:
+        if char == '{':
+            in_variable = True
+            current_var = []
+        elif char == '}':
+            if in_variable:
+                variables.append(''.join(current_var))
+                in_variable = False
+        elif in_variable:
+            current_var.append(char)
+
+    return variables

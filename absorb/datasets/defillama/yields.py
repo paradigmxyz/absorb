@@ -16,13 +16,10 @@ class Yields(absorb.Table):
     parameter_types = {'pools': typing.Union[list[str], None], 'top_n': int}
     default_parameters = {'pools': None, 'top_n': 5000}
     index_type = 'day'
-    name_template = {
-        'default': 'yields',
-        'custom': {
-            'top_n': 'pool_yields_top_{top_n}',
-            'pools': 'pool_yields_{pools}',
-        },
-    }
+    name_template = [
+        'pool_yields_top_{top_n}',
+        'pool_yields_{pools}',
+    ]
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

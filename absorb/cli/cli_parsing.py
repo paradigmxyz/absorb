@@ -298,14 +298,13 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
         table_class = absorb.ops.get_table_class(
             source=source, table_name=table
         )
-        camel_table = absorb.ops.names._snake_to_camel(table)
         parameters = _parse_parameters(
             table_class, args.parameters, use_all=len(tables) == 1
         )
         tracked_table: absorb.TrackedTable = {
             'source_name': source,
-            'table_name': table,
-            'table_class': 'absorb.datasets.' + source + '.' + camel_table,
+            'table_name': table_class.class_name(parameters=parameters),
+            'table_class': table_class.full_class_name(),
             'parameters': parameters,
         }
         parsed.append(tracked_table)
