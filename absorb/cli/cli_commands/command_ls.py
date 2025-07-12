@@ -22,9 +22,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
         if len(source_tables) > 0:
             cli_outputs._print_source_datasets_bullet(source, source_tables)
 
-    # tracked datasets
-    print()
-    cli_outputs._print_title('Tracked datasets')
+    # get tracked datasets
     tracked_datasets = absorb.ops.get_tracked_tables()
     if args.source is not None:
         tracked_datasets = [
@@ -32,6 +30,13 @@ def ls_command(args: Namespace) -> dict[str, Any]:
             for dataset in tracked_datasets
             if dataset['source_name'] == args.source
         ]
+    tracked_datasets = sorted(
+        tracked_datasets, key=lambda x: (x['source_name'], x['table_name'])
+    )
+
+    # print tracked datasets
+    print()
+    cli_outputs._print_title('Tracked datasets')
     if len(tracked_datasets) == 0:
         print('[none]')
     else:
@@ -41,7 +46,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
             for dataset in tracked_datasets:
                 cli_outputs._print_dataset_bullet(dataset)
 
-    # untracked collected datasets
+    # get untracked collected datasets
     untracked_collected_datasets = absorb.ops.get_untracked_collected_tables(
         tracked_datasets=tracked_datasets
     )
@@ -51,6 +56,12 @@ def ls_command(args: Namespace) -> dict[str, Any]:
             for dataset in untracked_collected_datasets
             if dataset['source_name'] == args.source
         ]
+    untracked_collected_datasets = sorted(
+        untracked_collected_datasets,
+        key=lambda x: (x['source_name'], x['table_name']),
+    )
+
+    # print untracked collected datasets
     if len(untracked_collected_datasets) > 0:
         print()
         cli_outputs._print_title('Untracked collected datasets')
