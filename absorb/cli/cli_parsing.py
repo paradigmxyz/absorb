@@ -299,34 +299,48 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
         )
         classes.append(table_class)
 
-    # parse parameter types
-    parameter_types = {}
-    for table_class in classes:
-        for parameter, parameter_type in table_class.parameter_types.items():
-            if parameter not in parameter_types:
-                parameter_types[parameter] = parameter_type
-            else:
-                if parameter_type != parameter_types[parameter]:
-                    raise Exception(
-                        'inconsistent parameter types across datasets'
-                    )
+    # create TrackedTable dicts
+    parsed = []
+    for source, table in zip(sources, tables):
+        camel_table = absorb.ops.names._snake_to_camel(table)
+        parameters = _parse_parameters(
+            classes, args.parameters, use_all=len(sources) == 1
+        )
+        tracked_table: absorb.TrackedTable = {
+            'source_name': source,
+            'table_name': table,
+            'table_class': 'absorb.datasets.' + source + '.' + camel_table,
+            'parameters': parameters,
+        }
+        parsed.append(tracked_table)
 
+    return parsed
+
+
+def _parse_parameters(
+    table_class: list[absorb.Table],
+    raw_parameters: list[str] | None,
+    use_all: bool = True,
+) -> dict[str, typing.Any]:
     # parse parameters
     parameters: dict[str, typing.Any] = {}
     value: typing.Any
-    if args.parameters is not None:
-        for parameter in args.parameters:
+    if raw_parameters is not None:
+        for parameter in raw_parameters:
             key, value = parameter.split('=')
 
             # set parameter type
-            if key not in parameter_types:
-                raise Exception(
-                    'unknown parameter: '
-                    + str(key)
-                    + ' not in '
-                    + str(list(parameters.keys()))
-                )
-            parameter_type = parameter_types[key]
+            if key not in table_class.parameter_types:
+                if use_all:
+                    raise Exception(
+                        'unknown parameter: '
+                        + str(key)
+                        + ' not in '
+                        + str(list(parameters.keys()))
+                    )
+                else:
+                    continue
+            parameter_type = table_class.parameter_types[key]
             if parameter_type == str:  # noqa: E721
                 pass
             elif parameter_type == int:  # noqa: E721
@@ -342,19 +356,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
 
             parameters[key] = value
 
-    # create TrackedTable dicts
-    parsed = []
-    for source, table in zip(sources, tables):
-        camel_table = absorb.ops.names._snake_to_camel(table)
-        tracked_table: absorb.TrackedTable = {
-            'source_name': source,
-            'table_name': table,
-            'table_class': 'absorb.datasets.' + source + '.' + camel_table,
-            'parameters': parameters,
-        }
-        parsed.append(tracked_table)
-
-    return parsed
+    return parameters
 
 
 def _parse_ranges(
