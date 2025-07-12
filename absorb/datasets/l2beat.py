@@ -65,7 +65,7 @@ def get_projects() -> pl.DataFrame:
 
     response = requests.get(endpoints['summary'])
     data = response.json()
-    return pl.DataFrame(list(data['data']['projects'].values()), orient='row')
+    return pl.DataFrame(list(data['projects'].values()), orient='row')
 
 
 def get_project_activity(project: str) -> pl.DataFrame:
@@ -123,13 +123,17 @@ def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
     for project in projects.to_dicts():
         print('getting', project['slug'])
         try:
-            time.sleep(10)
+            time.sleep(20)
             activity = get_project_activity(project['slug'])
-            time.sleep(10)
+            time.sleep(20)
             tvs = get_project_tvs(project['slug'])
         except Exception as e:
             print('skipping ' + project['slug'] + ' because ' + str(e.args[0]))
             continue
+        providers = project.get('providers')
+        if providers is None:
+            providers = []
+        provider = ', '.join(providers)
         df = (
             activity.join(tvs, on='timestamp', how='full', coalesce=True)
             .with_columns(
@@ -137,7 +141,7 @@ def get_all_data(*, projects: pl.DataFrame | None = None) -> pl.DataFrame:
                 layer=pl.lit(project['type']),
                 category=pl.lit(project['category']),
                 da=pl.lit(project['hostChain']),
-                stack=pl.lit(project['provider']),
+                stack=pl.lit(provider),
             )
             .sort('timestamp')
         )
