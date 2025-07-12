@@ -171,6 +171,8 @@ def test_range_diff_dates(test: RangeDiffTest) -> None:
         from_this=from_this,
         index_type='day',
     )
+    if isinstance(actual_output, tuple):
+        actual_output = [actual_output]
     assert target_output == actual_output
 
 
@@ -286,4 +288,6 @@ def test_range_diff_date_ranges(test: RangeDiffTest) -> None:
         from_this=from_this,
         index_type='timestamp_range',
     )
+    if isinstance(actual_output, tuple):
+        actual_output = [actual_output]
     assert target_output == actual_output

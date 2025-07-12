@@ -8,6 +8,7 @@ required_attrs = [
     'write_range',
 ]
 
+
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
 def test_case_switching(table: type[absorb.Table]) -> None:
     name = table.__name__

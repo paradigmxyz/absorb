@@ -199,11 +199,12 @@ def get_range_diff(
     elif len(range_list) == 1:
         return range_list[0]
     else:
-        return [
-            item
-            for range in range_list
-            for item in coverage_to_list(range, index_type=index_type)
-        ]
+        return range_list
+        # return [
+        #     item
+        #     for range in range_list
+        #     for item in coverage_to_list(range, index_type=index_type)
+        # ]
 
 
 def _get_discrete_closed_range_diff(
