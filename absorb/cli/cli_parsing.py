@@ -275,7 +275,6 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
     # parse datasets
     sources = []
     tables = []
-    classes = []
     if isinstance(args.dataset, list):
         datasets = args.dataset
     elif isinstance(args.dataset, str):
@@ -293,18 +292,15 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
                 sources.append(dataset)
                 tables.append(source_dataset.__name__)
 
-        # get table class
-        table_class = absorb.ops.get_table_class(
-            source=sources[-1], table_name=tables[-1]
-        )
-        classes.append(table_class)
-
     # create TrackedTable dicts
     parsed = []
-    for source, table, table_class in zip(sources, tables, classes):
+    for source, table in zip(sources, tables):
+        table_class = absorb.ops.get_table_class(
+            source=source, table_name=table
+        )
         camel_table = absorb.ops.names._snake_to_camel(table)
         parameters = _parse_parameters(
-            table_class, args.parameters, use_all=len(sources) == 1
+            table_class, args.parameters, use_all=len(tables) == 1
         )
         tracked_table: absorb.TrackedTable = {
             'source_name': source,
