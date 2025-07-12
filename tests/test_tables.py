@@ -8,6 +8,13 @@ required_attrs = [
     'write_range',
 ]
 
+@pytest.mark.parametrize('table', absorb.ops.get_table_classes())
+def test_case_switching(table: type[absorb.Table]) -> None:
+    name = table.__name__
+    as_snake = absorb.ops.names._camel_to_snake(name)
+    as_camel = absorb.ops.names._snake_to_camel(as_snake)
+    assert name == as_camel
+
 
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
 @pytest.mark.parametrize('attr', required_attrs)

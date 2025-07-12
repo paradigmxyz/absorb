@@ -63,23 +63,23 @@ def get_series_catalog() -> dict[str, tuple[str, str]]:
     return {
         # monetary
         'M1': ('M1SL', 'month'),
-        'M1_raw': ('M1NS', 'month'),
+        'M1Raw': ('M1NS', 'month'),
         'M2': ('M2SL', 'month'),
-        'M2_raw': ('M2NS', 'month'),
+        'M2Raw': ('M2NS', 'month'),
         # inflation
         'CPI': ('CPIAUCSL', 'month'),
         'PCEPI': ('PCEPI', 'month'),
         'PPI': ('PPIACO', 'month'),
         # interest rates
-        'interest_rates': ('FEDFUNDS', 'month'),
-        'bond_yield_10y': ('DGS10', 'day'),
+        'InterestRates': ('FEDFUNDS', 'month'),
+        'BondYield10y': ('DGS10', 'day'),
         # labor
-        'unemployment': ('UNRATE', 'month'),
-        'nonfarm_employment': ('PAYEMS', 'month'),
-        'labor_force_participation': ('CIVPART', 'month'),
+        'Unemployment': ('UNRATE', 'month'),
+        'NonfarmEmployment': ('PAYEMS', 'month'),
+        'LaborForceParticipation': ('CIVPART', 'month'),
         # economic output
-        'nominal_gdp': ('GDP', 'quarter'),
-        'adjusted_gdp': ('GDPC1', 'quarter'),
+        'NominalGdp': ('GDP', 'quarter'),
+        'AdjustedGdp': ('GDPC1', 'quarter'),
     }
 
 
