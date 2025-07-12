@@ -301,10 +301,10 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
 
     # create TrackedTable dicts
     parsed = []
-    for source, table in zip(sources, tables):
+    for source, table, table_class in zip(sources, tables, classes):
         camel_table = absorb.ops.names._snake_to_camel(table)
         parameters = _parse_parameters(
-            classes, args.parameters, use_all=len(sources) == 1
+            table_class, args.parameters, use_all=len(sources) == 1
         )
         tracked_table: absorb.TrackedTable = {
             'source_name': source,
@@ -318,7 +318,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
 
 
 def _parse_parameters(
-    table_class: list[absorb.Table],
+    table_class: type[absorb.Table],
     raw_parameters: list[str] | None,
     use_all: bool = True,
 ) -> dict[str, typing.Any]:
