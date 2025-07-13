@@ -74,6 +74,8 @@ class Fees(absorb.Table):
     index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
         return {
             'timestamp': pl.Datetime('ms'),
             'revenue_usd': pl.Int64,
