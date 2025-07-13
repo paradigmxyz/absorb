@@ -20,7 +20,7 @@ class VeraChunkedDataset(absorb.Table):
     index_type = 'number_range'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
-        raise NotImplementedError()
+        return {}
 
     def get_available_range(self) -> absorb.Coverage:
         return get_current_files(self.vera_filetype)

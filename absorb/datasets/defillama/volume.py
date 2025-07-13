@@ -134,6 +134,8 @@ class ProtocolDexVolumes(absorb.Table):
     index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
         return {
             'timestamp': pl.Datetime('ms'),
             'chain': pl.String,
@@ -167,6 +169,8 @@ class ChainDexVolumes(absorb.Table):
     index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
         return {
             'timestamp': pl.Datetime('ms'),
             'chain': pl.String,
@@ -200,6 +204,8 @@ class ProtocolOptionsVolumes(absorb.Table):
     index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
         return {
             'timestamp': pl.Datetime('ms'),
             'chain': pl.String,
@@ -230,6 +236,8 @@ class ChainOptionsVolumes(absorb.Table):
     index_type = 'day'
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+        import polars as pl
+
         return {
             'timestamp': pl.Datetime('ms'),
             'chain': pl.String,

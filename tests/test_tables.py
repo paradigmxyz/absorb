@@ -39,6 +39,15 @@ def test_tables_implement_get_schema(table: type[absorb.Table]) -> None:
         + str(table.__name__)
     )
 
+    # attempt to call get_schema()
+    table_instance = None
+    try:
+        table_instance = table()
+    except Exception:
+        pass
+    if table_instance is not None:
+        table_instance.get_schema()
+
 
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
 def test_tables_implement_collect_chunk(table: type[absorb.Table]) -> None:
