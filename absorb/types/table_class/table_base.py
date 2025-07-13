@@ -101,3 +101,13 @@ class TableBase:
         module = importlib.import_module(module_name)
         cls = getattr(module, class_name)
         return cls(parameters=dataset['parameters'])  # type: ignore
+
+    # validity
+
+    @classmethod
+    def get_missing_packages(cls) -> list[str]:
+        return [
+            package
+            for package in cls.required_packages
+            if not absorb.ops.is_package_installed(package)
+        ]

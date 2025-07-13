@@ -23,6 +23,8 @@ class TableCollect(table_coverage.TableCoverage):
         verbose: int = 1,
         dry: bool = False,
     ) -> None:
+        self._check_ready_to_collect()
+
         # get collection plan
         chunks = self._get_chunks_to_collect(data_range, overwrite)
 
@@ -37,6 +39,14 @@ class TableCollect(table_coverage.TableCoverage):
         # collect each chunk
         for chunk in chunks:
             self._execute_collect_chunk(chunk, overwrite, verbose)
+
+    def _check_ready_to_collect(self) -> None:
+        missing_packages = self.get_missing_packages()
+        if len(missing_packages) > 0:
+            raise Exception(
+                'required packages not installed: '
+                + ', '.join(missing_packages)
+            )
 
     def _get_chunks_to_collect(
         self, data_range: absorb.Coverage | None = None, overwrite: bool = False
@@ -79,7 +89,7 @@ class TableCollect(table_coverage.TableCoverage):
         )
         absorb.ops.print_bullet('n_chunks', str(len(chunks)))
         if self.write_range == 'overwrite_all':
-            absorb.ops.print_bullet('chunk', '\[entire dataset]')  # noqa
+            absorb.ops.print_bullet('chunk', '\\' + '[entire dataset]')  # noqa
         elif len(chunks) == 1:
             absorb.ops.print_bullet(
                 'single chunk',
