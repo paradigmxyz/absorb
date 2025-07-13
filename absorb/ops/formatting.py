@@ -23,7 +23,7 @@ def print_bullet(
 def format_coverage(
     coverage: absorb.Coverage | None, index_type: absorb.IndexType
 ) -> str:
-    if coverage is not None:
+    if coverage is None:
         return 'None'
     if isinstance(coverage, tuple):
         start, end = coverage

@@ -197,3 +197,38 @@ def parse_chunk(as_str: str, index_type: absorb.IndexType) -> typing.Any:
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')
     else:
         raise NotImplementedError()
+
+
+def get_dir_size(path: str) -> int:
+    import platform
+    import subprocess
+
+    system = platform.system()
+
+    if system == 'Linux':
+        # Linux has -b flag for bytes
+        result = subprocess.run(
+            ['du', '-sb', path], capture_output=True, text=True, check=True
+        )
+        return int(result.stdout.strip().split('\t')[0])
+
+    elif system == 'Darwin':  # macOS
+        # macOS outputs in 512-byte blocks
+        result = subprocess.run(
+            ['du', '-s', path], capture_output=True, text=True, check=True
+        )
+        blocks = int(result.stdout.strip().split('\t')[0])
+        return blocks * 512
+
+    else:
+        raise NotImplementedError(
+            'Unsupported operating system for get_dir_size'
+        )
+
+
+def format_bytes(bytes_size: int | float) -> str:
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if bytes_size < 1024.0:
+            return f'{bytes_size:.2f} {unit}'
+        bytes_size /= 1024.0
+    return f'{bytes_size:.2f} PB'
