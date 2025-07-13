@@ -53,6 +53,8 @@ datasources = [
     "dune-spice>=0.2.6",
     "google>=3.0.0",
     "google-auth>=2.40.3",
+    "google-cloud>=0.34.0",
+    "google-cloud-bigquery>=3.34.0",
     "paradigm-garlic>=0.1.1",
 ]
 interactive = [

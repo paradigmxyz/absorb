@@ -130,15 +130,19 @@ def _fetch(
     url = endpoints[datatype].format(**url_params)
     # response = session.get(url, headers=headers, params=params)
 
-    for i in range(5):
+    n_attempts = 5
+    for i in range(n_attempts):
         response = requests.get(url, headers=headers, params=params)
         if response.status_code == 429:
             time.sleep(60 * (i + 1))
             continue
         response.raise_for_status()
         return response.json()
-    else:
-        response.raise_for_status()
+    raise Exception(
+        'Failed to fetch data from CoinGecko API after '
+        + str(n_attempts)
+        + ' attempts.'
+    )
 
 
 def get_coinbase_api_key() -> str | None:

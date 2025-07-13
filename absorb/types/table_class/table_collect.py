@@ -56,7 +56,7 @@ class TableCollect(table_coverage.TableCoverage):
             data_ranges = absorb.ops.coverage_to_list(
                 coverage, index_type=self.index_type
             )
-            return absorb.ops.ranges.partition_into_chunks(
+            return absorb.ops.partition_into_chunks(
                 data_ranges, index_type=self.index_type
             )
 

@@ -54,6 +54,8 @@ def get_table_name(
                 raise ValueError(
                     'could not determine template string from list'
                 )
+    if not isinstance(template, str):
+        raise TypeError('template must be a string or a list of strings')
 
     # assemble the template variables
     if class_name.isupper():
@@ -66,7 +68,7 @@ def get_table_name(
 
     # whether to allow generic template variables in the output
     if allow_generic:
-        result = template
+        result: str = template
         for key, value in template_vars.items():
             result = result.replace(f'{{{key}}}', str(value))
         return result

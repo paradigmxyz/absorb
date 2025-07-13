@@ -5,8 +5,17 @@ import absorb
 
 if typing.TYPE_CHECKING:
     import datetime
+    from typing import TypeVar, Protocol
 
-    _T = typing.TypeVar('_T', int, datetime.datetime)
+    class SupportsComparison(Protocol):
+        def __lt__(self, other: object) -> bool: ...
+        def __le__(self, other: object) -> bool: ...
+        def __gt__(self, other: object) -> bool: ...
+        def __ge__(self, other: object) -> bool: ...
+        def __eq__(self, other: object) -> bool: ...
+
+    # _T = TypeVar('_T', int, datetime.datetime, bound=SupportsComparison)
+    _T = TypeVar('_T', bound=SupportsComparison)
 
 
 def coverage_to_list(
@@ -167,7 +176,7 @@ def get_range_diff(
         else:
             raise Exception('invalid index_type')
 
-        range_list = _get_discrete_closed_range_diff(
+        range_list: absorb.Coverage = _get_discrete_closed_range_diff(
             subtract_this=subtract_this,
             from_this=from_this,
             discrete_step=discrete_step,
@@ -197,7 +206,7 @@ def get_range_diff(
     if len(range_list) == 0:
         return []
     elif len(range_list) == 1:
-        return range_list[0]
+        return range_list[0]  # type: ignore
     else:
         return range_list
         # return [

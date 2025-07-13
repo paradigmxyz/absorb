@@ -72,7 +72,7 @@ class TableCoverage(table_io.TableIO):
         if collected_range is None:
             return [available_range]
         else:
-            return absorb.ops.ranges.get_range_diff(
+            return absorb.ops.get_range_diff(
                 subtract_this=collected_range,
                 from_this=available_range,
                 index_type=self.index_type,

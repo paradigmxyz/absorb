@@ -116,13 +116,3 @@ class HelpFormatter(rich_argparse.RichHelpFormatter):
             if not line.startswith('  \x1b[1;37m{')
         ]
         return '\n'.join(lines)
-
-
-class SpecJsonEncoder(json.JSONEncoder):
-    def default(self, obj: typing.Any) -> str:
-        import polars as pl
-
-        if isinstance(obj, (pl.DataTypeClass, pl.DataType)):
-            return str(obj)
-        else:
-            return super().default(obj)

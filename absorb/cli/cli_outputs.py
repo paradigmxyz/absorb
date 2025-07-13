@@ -18,7 +18,7 @@ def _print_dataset_bullet(dataset: absorb.TrackedTable) -> None:
 
     toolstr.print_bullet(
         '[white bold]' + _dataset_to_str(dataset) + '[/white bold]',
-        **absorb.ops.formatting.bullet_styles,
+        **absorb.ops.bullet_styles,
     )
 
 
@@ -31,5 +31,5 @@ def _print_source_datasets_bullet(
     toolstr.print_bullet(
         key=source,
         value='[green],[/green] '.join(names),
-        **absorb.ops.formatting.bullet_styles,
+        **absorb.ops.bullet_styles,
     )

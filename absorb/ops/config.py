@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 
 def get_default_config() -> absorb.Config:
     return {
-        'version': absorb.__version__,
+        'version': '0.1.0',
         'tracked_tables': [],
     }
 

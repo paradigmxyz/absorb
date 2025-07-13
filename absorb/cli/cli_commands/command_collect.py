@@ -14,7 +14,7 @@ def collect_command(args: Namespace) -> dict[str, Any]:
     if len(args.dataset) > 0:
         datasets = cli_parsing._parse_datasets(args)
     else:
-        datasets = absorb.ops.config.get_tracked_tables()
+        datasets = absorb.ops.get_tracked_tables()
 
     first = True
     for dataset in datasets:

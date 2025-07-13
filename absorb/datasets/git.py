@@ -41,8 +41,7 @@ class Commits(absorb.Table):
         import polars as pl
 
         dfs = [
-            nitwit.tables.collect_commits(path)
-            for path in self.parameters['paths']
+            nitwit.collect_commits(path) for path in self.parameters['paths']
         ]
         return pl.concat(dfs)
 
@@ -76,8 +75,8 @@ class Authors(absorb.Table):
 
         dfs = []
         for path in self.parameters['paths']:
-            commits = nitwit.tables.collect_commits(self.parameters['path'])
-            df = nitwit.tables.collect_authors(commits)
+            commits = nitwit.collect_commits(self.parameters['path'])
+            df = nitwit.collect_authors(commits)
             df = df.with_columns(repo_source=pl.lit(path))
             dfs.append(df)
         return pl.concat(dfs)
