@@ -11,10 +11,31 @@ if typing.TYPE_CHECKING:
 
 
 def collect_command(args: Namespace) -> dict[str, Any]:
+    import toolstr
+
     if len(args.dataset) > 0:
         datasets = cli_parsing._parse_datasets(args)
     else:
         datasets = absorb.ops.get_tracked_tables()
+
+    if len(datasets) == 0:
+        import sys
+
+        print('specify one or more datasets to collect')
+        sys.exit(0)
+    elif len(datasets) > 1:
+        toolstr.print_text_box(
+            'Collecting multiple datasets',
+            style='green',
+            text_style='bold white',
+        )
+        for d, dataset in enumerate(datasets):
+            absorb.ops.print_bullet(
+                key=dataset['source_name'] + '.' + dataset['table_name'],
+                value=None,
+                number=d + 1,
+            )
+        print()
 
     first = True
     for dataset in datasets:
