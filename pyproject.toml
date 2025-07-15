@@ -28,9 +28,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "nitwit>=0.1.1",
     "polars >= 1.0",
-    "polars_evm >= 0.2.6",
     "requests>=2.0",
     "rich>=13.9.4",
     "rich_argparse >= 1.5.2",
@@ -51,10 +49,11 @@ test = [
 ]
 datasources = [
     "dune-spice>=0.2.6",
-    "google>=3.0.0",
     "google-auth>=2.40.3",
-    "google-cloud>=0.34.0",
     "google-cloud-bigquery>=3.34.0",
+    "google-cloud>=0.34.0",
+    "google>=3.0.0",
+    "nitwit>=0.1.1",
     "paradigm-garlic>=0.1.1",
 ]
 interactive = [
