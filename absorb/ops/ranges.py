@@ -18,6 +18,18 @@ if typing.TYPE_CHECKING:
     _T = TypeVar('_T', bound=SupportsComparison)
 
 
+def index_is_temporal(index_type: absorb.IndexType) -> bool:
+    return index_type in [
+        'hour',
+        'day',
+        'week',
+        'month',
+        'quarter',
+        'year',
+        'timestamp_range',
+    ]
+
+
 def coverage_to_list(
     coverage: absorb.Coverage,
     index_type: absorb.IndexType,

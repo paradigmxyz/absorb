@@ -52,7 +52,23 @@ class TableCollect(table_coverage.TableCoverage):
         self, data_range: absorb.Coverage | None = None, overwrite: bool = False
     ) -> absorb.ChunkList:
         if self.write_range == 'overwrite_all':
-            return [self.get_available_range()]
+            available_range = self.get_available_range()
+            collected_range = self.get_collected_range()
+            if available_range is not None:
+                if available_range == collected_range:
+                    return []
+                else:
+                    return [available_range]
+            elif collected_range is not None and absorb.ops.index_is_temporal(
+                self.index_type
+            ):
+                if self.ready_for_update():
+                    return [None]
+                else:
+                    return []
+            else:
+                return [available_range]
+
         else:
             if data_range is None:
                 if overwrite:

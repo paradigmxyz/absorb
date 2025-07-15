@@ -47,6 +47,7 @@ class TableCoverage(table_io.TableIO):
                     return (df['min_timestamp'][0], df['max_timestamp'][0])
 
                 else:
+                    raise Exception()
                     return None
 
                 # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
@@ -82,14 +83,66 @@ class TableCoverage(table_io.TableIO):
     def is_range_sortable(cls) -> bool:
         return cls.index_type is not None
 
-    def get_min_collected_timestamp(self) -> datetime.datetime:
-        raise NotImplementedError()
+    def ready_for_update(self) -> bool:
+        """used for periodically updating datasets that have no get_available_range()"""
+        import datetime
+        import tooltime
 
-    def get_max_collected_timestamp(self) -> datetime.datetime:
-        raise NotImplementedError()
+        # ensure valid for dataset
+        if not absorb.ops.index_is_temporal(self.index_type):
+            raise Exception(
+                'ready_for_update() can only be called if index is temporal'
+            )
+        if not isinstance(self.index_type, str):
+            raise Exception(
+                'ready_for_update() can only be called if index_type is a string'
+            )
 
-    def get_min_available_timestamp(self) -> datetime.datetime:
-        raise NotImplementedError()
+        # get last update time
+        last_update_time = self.get_max_collected_timestamp()
+        if last_update_time is None:
+            return True
 
-    def get_max_available_timestamp(self) -> datetime.datetime:
-        raise NotImplementedError()
+        # get min latency
+        min_latency_seconds: float | int
+        if self.update_latency is None:
+            min_latency_seconds = tooltime.timelength_to_seconds(
+                '1 ' + self.index_type
+            )
+        elif isinstance(self.update_latency, str):
+            min_latency_seconds = tooltime.timelength_to_seconds(
+                self.update_latency
+            )
+        elif isinstance(self.update_latency, float):
+            min_latency_seconds = (
+                self.update_latency
+                * tooltime.timelength_to_seconds('1 ' + self.index_type)
+            )
+        else:
+            raise Exception('invalid format for update_latency')
+        min_latency = datetime.timedelta(seconds=min_latency_seconds)
+
+        # return whether now is past the last update time + min latency
+        return datetime.datetime.now() > last_update_time + min_latency
+
+    def get_min_collected_timestamp(self) -> datetime.datetime | None:
+        import polars as pl
+
+        return self.scan().select(pl.col.timestamp.min()).collect().item()  # type: ignore
+
+    def get_max_collected_timestamp(self) -> datetime.datetime | None:
+        import polars as pl
+
+        return self.scan().select(pl.col.timestamp.max()).collect().item()  # type: ignore
+
+    def get_collected_timestamp_range(
+        self,
+    ) -> tuple[datetime.datetime | None, datetime.datetime | None]:
+        import polars as pl
+
+        return (
+            self.scan()
+            .select(pl.col.timestamp.min(), pl.col.timestamp.max())
+            .collect()
+            .row(0)
+        )
