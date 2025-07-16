@@ -25,6 +25,34 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--available'],
+                    {
+                        'action': 'store_true',
+                        'help': 'list available datasets',
+                    },
+                ),
+                (
+                    ['--tracked'],
+                    {
+                        'action': 'store_true',
+                        'help': 'list tracked datasets',
+                    },
+                ),
+                (
+                    ['--untracked-collected'],
+                    {
+                        'action': 'store_true',
+                        'help': 'list untracked collected datasets',
+                    },
+                ),
+                (
+                    ['--one-per-line', '-1'],
+                    {
+                        'action': 'store_true',
+                        'help': 'list one dataset per line',
+                    },
+                ),
+                (
                     ['--verbose', '-v'],
                     {
                         'action': 'store_true',
