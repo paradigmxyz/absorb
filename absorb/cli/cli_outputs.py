@@ -9,11 +9,11 @@ def _print_title(title: str) -> None:
     rich.print('[bold green]' + title + '[/bold green]')
 
 
-def _dataset_to_str(dataset: absorb.TrackedTable) -> str:
+def _dataset_to_str(dataset: absorb.TableDict) -> str:
     return dataset['source_name'] + '.' + dataset['table_name']
 
 
-def _print_dataset_bullet(dataset: absorb.TrackedTable) -> None:
+def _print_dataset_bullet(dataset: absorb.TableDict) -> None:
     import toolstr
 
     toolstr.print_bullet(

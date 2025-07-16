@@ -299,7 +299,7 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
+def _parse_datasets(args: argparse.Namespace) -> list[absorb.TableDict]:
     # parse datasets
     sources = []
     tables = []
@@ -320,7 +320,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
                 sources.append(dataset)
                 tables.append(source_dataset.__name__)
 
-    # create TrackedTable dicts
+    # create TableDict dicts
     parsed = []
     for source, table in zip(sources, tables):
         table_class = absorb.ops.get_table_class(
@@ -329,7 +329,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TrackedTable]:
         parameters = _parse_parameters(
             table_class, args.parameters, use_all=len(tables) == 1
         )
-        tracked_table: absorb.TrackedTable = {
+        tracked_table: absorb.TableDict = {
             'source_name': source,
             'table_name': table_class.class_name(parameters=parameters),
             'table_class': table_class.full_class_name(),

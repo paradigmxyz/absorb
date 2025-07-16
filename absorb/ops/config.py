@@ -67,11 +67,11 @@ def validate_config(
 #
 
 
-def get_tracked_tables() -> list[absorb.TrackedTable]:
+def get_tracked_tables() -> list[absorb.TableDict]:
     return get_config()['tracked_tables']
 
 
-def start_tracking_tables(tables: list[absorb.TrackedTable]) -> None:
+def start_tracking_tables(tables: list[absorb.TableDict]) -> None:
     import json
 
     config = get_config()
@@ -86,7 +86,7 @@ def start_tracking_tables(tables: list[absorb.TrackedTable]) -> None:
     write_config(config)
 
 
-def stop_tracking_tables(tables: list[absorb.TrackedTable]) -> None:
+def stop_tracking_tables(tables: list[absorb.TableDict]) -> None:
     import json
 
     tables_str = [json.dumps(table, sort_keys=True) for table in tables]

@@ -108,7 +108,7 @@ class TableBase:
     # defaults
 
     @staticmethod
-    def instantiate(dataset: absorb.TrackedTable) -> absorb.Table:
+    def instantiate(dataset: absorb.TableDict) -> absorb.Table:
         import importlib
 
         module_name, class_name = dataset['table_class'].rsplit('.', maxsplit=1)

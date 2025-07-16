@@ -108,21 +108,16 @@ def get_index_type_type(
         raise Exception()
 
 
-class TrackedTable(typing.TypedDict):
+class TableDict(typing.TypedDict):
     source_name: str
     table_name: str
     table_class: str
     parameters: dict[str, typing.Any]
 
 
-TableReference = typing.Union[str, TrackedTable, table_class.Table]
+TableReference = typing.Union[str, TableDict, table_class.Table]
 
 
 class Config(typing.TypedDict):
     version: str
-    tracked_tables: list[TrackedTable]
-
-
-class NameTemplate(typing.TypedDict):
-    default: NotRequired[str]
-    custom: NotRequired[str | dict[str | tuple[str], str]]
+    tracked_tables: list[TableDict]

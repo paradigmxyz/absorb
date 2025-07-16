@@ -46,7 +46,7 @@ def get_source_dir(source: str, *, warn: bool = False) -> str:
 
 
 def get_table_dir(
-    dataset: absorb.TrackedTable | str | None = None,
+    dataset: absorb.TableDict | str | None = None,
     *,
     source: str | None = None,
     table: str | None = None,
@@ -69,7 +69,7 @@ def get_table_dir(
 
 
 def get_table_metadata_path(
-    dataset: absorb.TrackedTable | str, *, warn: bool = False
+    dataset: absorb.TableDict | str, *, warn: bool = False
 ) -> str:
     import os
 

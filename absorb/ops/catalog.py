@@ -75,7 +75,7 @@ def resolve_table(
         snake_table = names._camel_to_snake(table)
         if parameters is None:
             parameters = {}
-        tracked_table: absorb.TrackedTable = {
+        tracked_table: absorb.TableDict = {
             'source_name': source,
             'table_name': snake_table,
             'table_class': 'absorb.datasets.' + source + '.' + camel_table,
@@ -89,14 +89,14 @@ def resolve_table(
 
 def get_available_tables(
     *, exclude_parameters: bool = False
-) -> list[absorb.TrackedTable]:
+) -> list[absorb.TableDict]:
     tables = []
     for source in get_sources():
         for table in get_source_tables(source):
             if exclude_parameters and len(table.parameter_types) > 0:
                 continue
             snake_table = absorb.ops.names._camel_to_snake(table.__name__)
-            tracked_table: absorb.TrackedTable = {
+            tracked_table: absorb.TableDict = {
                 'source_name': source,
                 'table_name': snake_table,
                 'table_class': 'absorb.datasets.'

@@ -151,7 +151,7 @@ Schema of `absorb_config.json`:
 
 ```python
 {
-    'tracked_tables': list[TrackedTable]
+    'tracked_tables': list[TableDict]
 }
 ```
 
