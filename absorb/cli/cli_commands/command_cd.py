@@ -38,6 +38,8 @@ def cd_command(args: Namespace) -> dict[str, Any]:
         print(
             'add the following snippet to your shell config (e.g. ~/.profile):'
         )
+        print()
+        print(cd_snippet_template)
         sys.exit(0)
 
     # change pwd to path
