@@ -16,7 +16,7 @@ class Commits(absorb.Table):
     require_name = True
     required_packages = ['nitwit >= 1.1']
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -36,7 +36,7 @@ class Commits(absorb.Table):
             'repo_source': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import nitwit
         import polars as pl
 
@@ -53,7 +53,7 @@ class Authors(absorb.Table):
     require_name = True
     index_type = 'name'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -70,7 +70,7 @@ class Authors(absorb.Table):
             'repo_source': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import nitwit
 
         dfs = []
@@ -89,7 +89,7 @@ class FileDiffs(absorb.Table):
     require_name = True
     index_type = 'name'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -102,7 +102,7 @@ class FileDiffs(absorb.Table):
             'repo_source': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import nitwit
 
         dfs = [
@@ -118,7 +118,7 @@ class FileDiffStats(absorb.Table):
     require_name = True
     index_type = 'name'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -128,7 +128,7 @@ class FileDiffStats(absorb.Table):
             'deletions': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import nitwit
 
         dfs = [

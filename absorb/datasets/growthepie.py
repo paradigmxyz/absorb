@@ -15,7 +15,7 @@ class Metrics(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         df = self.collect_chunk(None)
         if df is not None:
             return dict(df.schema)

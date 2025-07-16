@@ -17,7 +17,7 @@ class Mempool(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'hour'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -50,7 +50,7 @@ class Mempool(absorb.Table):
             'detect_date': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         url = url_template.format(
             year=chunk.year,  # type: ignore
             month=chunk.month,  # type: ignore

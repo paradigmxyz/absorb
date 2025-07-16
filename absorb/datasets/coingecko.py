@@ -24,7 +24,7 @@ class CoinMetrics(absorb.Table):
     default_parameters = {'top_n': 1000}
     name_template = 'coin_metrics_top_{top_n}'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -35,7 +35,7 @@ class CoinMetrics(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_historical_coin_metrics(self.parameters['top_n'])
 
     def get_available_range(self) -> absorb.Coverage:
@@ -54,12 +54,12 @@ class Categories(absorb.Table):
     default_parameters = {'categories': None}
     name_template = 'coin_metrics_{categories}'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {'coin': pl.String, 'category': pl.String}
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_current_coin_categories(
             categories=self.parameters['categories']
         )
@@ -84,7 +84,7 @@ class CategoryMetrics(absorb.Table):
         'category_metrics',
     ]
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -94,7 +94,7 @@ class CategoryMetrics(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         coin_metrics = absorb.load('coingecko.coin_metrics')
         coin_categories = absorb.load('coingecko.categories')
         return get_historical_category_metrics(

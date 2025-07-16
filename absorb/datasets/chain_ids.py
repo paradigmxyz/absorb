@@ -16,7 +16,7 @@ class Chains(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'number'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -25,7 +25,7 @@ class Chains(absorb.Table):
             'chain_id_hex': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         network_names = get_network_names()

@@ -14,10 +14,10 @@ class Query(absorb.Table):
     parameters = {'name': str, 'sql': str}
     required_packages = ['garlic >= 1.1']
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         raise NotImplementedError()
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import garlic
 
         sql = self.parameters['sql']

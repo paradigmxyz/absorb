@@ -18,10 +18,10 @@ class Query(absorb.Table):
         'google-cloud-bigquery-storage >= 2.31.0',
     ]
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         raise NotImplementedError()
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return query(self.parameters['sql'])
 
     def get_available_range(self) -> absorb.Coverage:

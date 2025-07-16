@@ -36,7 +36,7 @@ class SpotCandles(absorb.Table):
     default_parameters = {'market': 'spot'}
     name_template = 'spot_candles_{market}_{pair}_{interval}'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -53,7 +53,7 @@ class SpotCandles(absorb.Table):
             'taker_buy_quote_volume': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         if self.parameters['market'] == 'spot':
             return get_spot_candles(
                 pair=self.parameters['pair'],
@@ -73,7 +73,7 @@ class SpotTrades(absorb.Table):
     default_parameters = {'market': 'spot'}
     name_template = 'spot_trades_{market}_{pair}'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -87,7 +87,7 @@ class SpotTrades(absorb.Table):
             'trade_id': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         if self.parameters['market'] == 'spot':
             return get_spot_trades(
                 pair=self.parameters['pair'],
@@ -106,7 +106,7 @@ class SpotAggregateTrades(absorb.Table):
     default_parameters = {'market': 'spot'}
     name_template = 'spot_aggregate_trades_{market}_{pair}'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -121,7 +121,7 @@ class SpotAggregateTrades(absorb.Table):
             'last_trade_id': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         if self.parameters['market'] == 'spot':
             return get_spot_aggregate_trades(
                 pair=self.parameters['pair'],

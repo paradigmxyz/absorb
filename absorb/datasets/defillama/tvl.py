@@ -16,7 +16,7 @@ class ChainTvls(absorb.Table):
     default_parameters = {'chains': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -25,7 +25,7 @@ class ChainTvls(absorb.Table):
             'tvl_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -51,7 +51,7 @@ class ProtocolTvls(absorb.Table):
     default_parameters = {'protocols': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -61,7 +61,7 @@ class ProtocolTvls(absorb.Table):
             'tvl_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         protocols = self.parameters['protocols']
@@ -87,7 +87,7 @@ class ProtocolTvlsPerToken(absorb.Table):
     default_parameters = {'protocols': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -98,7 +98,7 @@ class ProtocolTvlsPerToken(absorb.Table):
             'tvl_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         protocols = self.parameters['protocols']

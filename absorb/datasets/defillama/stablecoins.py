@@ -15,12 +15,12 @@ class Stablecoins(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {'timestamp': pl.Float64, 'circulating_usd': pl.Float64}
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_historical_total_stablecoins()
 
 
@@ -31,7 +31,7 @@ class StablecoinsOfChains(absorb.Table):
     default_parameters = {'chains': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -42,7 +42,7 @@ class StablecoinsOfChains(absorb.Table):
             'bridged_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -68,7 +68,7 @@ class StablecoinsOfTokens(absorb.Table):
     default_parameters = {'tokens': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -81,7 +81,7 @@ class StablecoinsOfTokens(absorb.Table):
             'bridged_to': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         tokens = self.parameters['tokens']
@@ -102,7 +102,7 @@ class StablecoinPrices(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -111,7 +111,7 @@ class StablecoinPrices(absorb.Table):
             'price': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_historical_stablecoin_prices()
 
 

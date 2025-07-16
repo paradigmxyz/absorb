@@ -13,7 +13,7 @@ class Metric(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'series_id': str}
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -23,7 +23,7 @@ class Metric(absorb.Table):
             'metric': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         series_id = self.parameters['series_id']

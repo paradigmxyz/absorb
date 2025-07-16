@@ -79,12 +79,12 @@ def get_table_class_template() -> str:
     write_range = 'overwrite_all'
     parameter_types = {}
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {}
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         raise NotImplementedError()
 
     def get_available_range(self) -> absorb.Coverage:

@@ -30,7 +30,7 @@ from . import common
 #     }
 #     index_type = 'date_range'
 
-#     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+#     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType] ]:
 #         return {
 #             'timestamp': pl.Datetime('ms'),
 #             'chain': pl.String,
@@ -38,7 +38,7 @@ from . import common
 #             'volume_usd': pl.Float64,
 #         }
 
-#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
 #         import polars as pl
 
 #         chains = self.parameters['chains']
@@ -82,7 +82,7 @@ from . import common
 #     default_parameters = {'protocols': None, 'chains': None}
 #     index_type = 'date_range'
 
-#     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+#     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
 #         return {
 #             'timestamp': pl.Datetime('ms'),
 #             'chain': pl.String,
@@ -90,7 +90,7 @@ from . import common
 #             'volume_usd': pl.Float64,
 #         }
 
-#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
 #         import polars as pl
 
 #         chains = self.parameters['chains']
@@ -133,7 +133,7 @@ class ProtocolDexVolumes(absorb.Table):
     default_parameters = {'protocols': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -143,7 +143,7 @@ class ProtocolDexVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         protocols = self.parameters['protocols']
@@ -168,7 +168,7 @@ class ChainDexVolumes(absorb.Table):
     default_parameters = {'chains': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -178,7 +178,7 @@ class ChainDexVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -203,7 +203,7 @@ class ProtocolOptionsVolumes(absorb.Table):
     default_parameters = {'protocols': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -213,7 +213,7 @@ class ProtocolOptionsVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         protocols = self.parameters['protocols']
@@ -235,7 +235,7 @@ class ChainOptionsVolumes(absorb.Table):
     default_parameters = {'chains': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -245,7 +245,7 @@ class ChainOptionsVolumes(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         chains = self.parameters['chains']

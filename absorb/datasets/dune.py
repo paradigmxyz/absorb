@@ -13,7 +13,7 @@ class BaseQuery(absorb.Table):
     ]
     required_packages = ['spice >= 0.2.3']
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import spice
 
         query = self.parameters['query']
@@ -32,7 +32,7 @@ class FullQuery(BaseQuery):
         'spice_kwargs': dict[str, typing.Any],
     }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
 
         query = self.parameters['query']
@@ -70,7 +70,7 @@ class CexLabels(absorb.Table):
     write_range = 'overwrite_all'
     required_packages = ['cryo_manager']
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {

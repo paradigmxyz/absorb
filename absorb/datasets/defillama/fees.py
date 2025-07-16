@@ -27,7 +27,7 @@ if typing.TYPE_CHECKING:
 #         },
 #     }
 
-#     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+#     def get_schema(self) -> dict[str, pl.DataType | pl.DataType | typ ]:
 #         import polars as pl
 
 #         return {
@@ -37,7 +37,7 @@ if typing.TYPE_CHECKING:
 #             'revenue_usd': pl.Int64,
 #         }
 
-#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
 #         import polars as pl
 
 #         if self.parameters['protocols'] is not None:
@@ -73,7 +73,7 @@ class Fees(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -81,7 +81,7 @@ class Fees(absorb.Table):
             'revenue_usd': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_historical_fees()
 
 
@@ -92,7 +92,7 @@ class ChainFees(absorb.Table):
     default_parameters = {'chains': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -102,7 +102,7 @@ class ChainFees(absorb.Table):
             'revenue_usd': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -131,7 +131,7 @@ class FeesOfProtocols(absorb.Table):
     default_parameters = {'protocols': None}
     index_type = 'day'
 
-    def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
+    def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
@@ -141,7 +141,7 @@ class FeesOfProtocols(absorb.Table):
             'revenue_usd': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame:
+    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import polars as pl
 
         protocols = self.parameters['protocols']
