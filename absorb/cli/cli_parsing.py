@@ -247,6 +247,39 @@ def get_subcommands() -> list[
                 ),
             ],
         ),
+        (
+            'preview',
+            'preview rows of a dataset',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '?',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+                (
+                    ['--count'],
+                    {
+                        'type': int,
+                        'default': 10,
+                        'help': 'number of rows to preview',
+                    },
+                ),
+                (
+                    ['--offset'],
+                    {
+                        'type': int,
+                        'default': 0,
+                        'help': 'number of rows to preview',
+                    },
+                ),
+            ],
+        ),
     ]
 
 
