@@ -36,17 +36,23 @@ class TableCollect(table_coverage.TableCoverage):
         if dry:
             return None
 
+        # create table directory
+        self.setup_table_dir()
+
         # collect each chunk
         for chunk in chunks:
             self._execute_collect_chunk(chunk, overwrite, verbose)
 
     def _check_ready_to_collect(self) -> None:
+        # check package dependencies
         missing_packages = self.get_missing_packages()
         if len(missing_packages) > 0:
             raise Exception(
                 'required packages not installed: '
                 + ', '.join(missing_packages)
             )
+
+        # TODO: check credentials
 
     def _get_chunks_to_collect(
         self, data_range: absorb.Coverage | None = None, overwrite: bool = False
@@ -154,15 +160,22 @@ class TableCollect(table_coverage.TableCoverage):
     ) -> None:
         import os
 
+        # print summary
         if verbose >= 1:
             if self.write_range == 'overwrite_all':
                 as_str = 'all'
             else:
                 as_str = absorb.ops.format_chunk(chunk, self.index_type)
             print('collecting', as_str)
+
+        # collect chunk
         df = self.collect_chunk(chunk=chunk)
+
+        # write file
         if df is not None:
             path = self.get_file_path(chunk=chunk, df=df)
             absorb.ops.write_file(df=df, path=path)
+
+        # print post-summary
         if verbose >= 1 and df is None:
             print('could not collect data for', str(chunk))

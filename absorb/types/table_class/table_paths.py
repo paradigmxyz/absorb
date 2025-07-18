@@ -70,3 +70,39 @@ class TablePaths(table_base.TableBase):
             filename_template=self.filename_template,
             index_type=index_type,
         )
+
+    def setup_table_dir(self) -> None:
+        import json
+        import os
+
+        # create directory
+        table_dir = self.get_dir_path()
+        os.makedirs(table_dir, exist_ok=True)
+
+        # set up metadata
+        metadata = self.create_table_metadata()
+        metadata_path = os.path.join(table_dir, 'table_metadata.json')
+        if os.path.isfile(metadata_path):
+            with open(metadata_path, 'r') as f:
+                existing_metadata = json.load(f)
+            if json.dumps(existing_metadata, sort_keys=True) != json.dumps(
+                metadata, sort_keys=True
+            ):
+                raise ValueError(
+                    'metadata for table does not match existing metadata in directory'
+                )
+        else:
+            with open(metadata_path, 'w') as f:
+                json.dump(metadata, f)
+
+    def create_table_metadata(self) -> absorb.TableDict:
+        """
+        Create metadata for the table file.
+        """
+        return {
+            'source_name': self.source,
+            'table_version': self.version,
+            'table_name': self.name(),
+            'table_class': type(self).__module__ + '.' + type(self).__name__,
+            'parameters': self.parameters,
+        }

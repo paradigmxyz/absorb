@@ -13,11 +13,13 @@ if typing.TYPE_CHECKING:
 def collect_command(args: Namespace) -> dict[str, Any]:
     import toolstr
 
+    # parse which datasets to collect
     if len(args.dataset) > 0:
         datasets = cli_parsing._parse_datasets(args)
     else:
         datasets = absorb.ops.get_tracked_tables()
 
+    # print datasets to collect
     if len(datasets) == 0:
         import sys
 
@@ -30,17 +32,17 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             text_style='bold white',
         )
         for d, dataset in enumerate(datasets):
-            absorb.ops.print_bullet(
-                key=dataset['source_name'] + '.' + dataset['table_name'],
-                value=None,
-                number=d + 1,
-            )
+            name = dataset['source_name'] + '.' + dataset['table_name']
+            absorb.ops.print_bullet(key=name, value=None, number=d + 1)
         print()
 
+    # collect each dataset
     first = True
     for dataset in datasets:
         if not first:
             print()
+
+        # instantiate dataset
         instance = absorb.Table.instantiate(dataset)
         if instance.write_range == 'append_only':
             data_ranges = cli_parsing._parse_ranges(
@@ -48,12 +50,17 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             )
         else:
             data_ranges = None
-        instance.collect(
-            data_range=data_ranges,
-            dry=args.dry,
-            overwrite=args.overwrite,
-            verbose=args.verbose,
-        )
+
+        # collect dataset
+        if args.setup_only:
+            instance.setup_table_dir()
+        else:
+            instance.collect(
+                data_range=data_ranges,
+                dry=args.dry,
+                overwrite=args.overwrite,
+                verbose=args.verbose,
+            )
         first = False
 
     return {}

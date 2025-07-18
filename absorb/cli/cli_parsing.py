@@ -109,6 +109,13 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--setup-only'],
+                    {
+                        'action': 'store_true',
+                        'help': 'only setup the table directory, do not collect data',
+                    },
+                ),
+                (
                     ['-v', '--verbose'],
                     {
                         'help': 'display extra information',

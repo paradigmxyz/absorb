@@ -36,7 +36,7 @@ def get_collected_tables() -> list[absorb.TableDict]:
         tables_dir = os.path.join(source_dir, 'tables')
         for table in os.listdir(tables_dir):
             # TODO: get true parameters of colleceted datasets
-            # TODO: read this information from a metadata.json
+            # TODO: read this information from a table_metadata.json
             camel_table = absorb.ops.names._snake_to_camel(table)
             table_data: absorb.TableDict = {
                 'source_name': source,
