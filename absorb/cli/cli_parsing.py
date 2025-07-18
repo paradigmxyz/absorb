@@ -290,6 +290,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         formatter_class=cli_helpers.HelpFormatter, allow_abbrev=False
     )
+    parser.add_argument(
+        '--cd-destination-tempfile',
+        help=argparse.SUPPRESS,
+    )
     subparsers = parser.add_subparsers(dest='command')
 
     parsers = {}
@@ -316,6 +320,7 @@ def parse_args() -> argparse.Namespace:
         )
         subparser.add_argument(
             '--cd-destination-tempfile',
+            help=argparse.SUPPRESS,
         )
         parsers[name] = subparser
 
