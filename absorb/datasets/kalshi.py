@@ -81,8 +81,8 @@ class Metadata(absorb.Table):
             'event_title': pl.String,
             'category': pl.String,
             'total_market_count': pl.Int64,
-            'product_metadata': pl.Struct,
-            'markets': pl.List,
+            # 'product_metadata': pl.Struct,
+            # 'markets': pl.List,
             'is_trending': pl.Boolean,
             'is_new': pl.Boolean,
             'is_closing': pl.Boolean,
@@ -119,9 +119,15 @@ class Metadata(absorb.Table):
                 print('status code', response.status_code)
                 break
 
-        return pl.DataFrame(
-            item for result in cursor_results for item in result['current_page']
-        ).unique('series_ticker')
+        return (
+            pl.DataFrame(
+                item
+                for result in cursor_results
+                for item in result['current_page']
+            )
+            .select(self.get_schema().keys())
+            .unique('series_ticker')
+        )
 
     def get_available_range(self) -> absorb.Coverage:
         import datetime
