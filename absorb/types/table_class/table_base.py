@@ -11,6 +11,8 @@ if typing.TYPE_CHECKING:
 
 
 class TableBase:
+    version: str = '0.1.0'
+
     #
     # # structure
     #

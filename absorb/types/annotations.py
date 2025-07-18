@@ -113,6 +113,7 @@ class TableDict(typing.TypedDict):
     table_name: str
     table_class: str
     parameters: dict[str, typing.Any]
+    table_version: NotRequired[str]
 
 
 TableReference = typing.Union[str, TableDict, table_class.Table]
