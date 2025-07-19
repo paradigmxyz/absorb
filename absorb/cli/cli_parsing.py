@@ -63,7 +63,7 @@ def get_subcommands() -> list[
         ),
         (
             'info',
-            'show info about a specific dataset or data source',
+            'show info about a specific dataset or source',
             [
                 (
                     ['dataset'],
@@ -303,6 +303,13 @@ def get_subcommands() -> list[
                     {
                         'action': 'store_true',
                         'help': 'regenerate metadata for dataset(s)',
+                    },
+                ),
+                (
+                    ['--regenerate-config'],
+                    {
+                        'action': 'store_true',
+                        'help': 'regenerate configuration, preserving as many settings as possible',
                     },
                 ),
             ],

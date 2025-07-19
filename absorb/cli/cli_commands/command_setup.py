@@ -27,4 +27,13 @@ def setup_command(args: Namespace) -> dict[str, Any]:
             instance = absorb.Table.instantiate(dataset)
             instance.setup_table_dir()
 
+    if args.regenerate_config:
+        old_config = absorb.ops.get_config()
+        new_config = absorb.ops.get_default_config()
+        for tracked_table in old_config['tracked_tables']:
+            table = absorb.Table.instantiate(tracked_table)
+            metadata = table.create_table_metadata()
+            new_config['tracked_tables'].append(metadata)
+        absorb.ops.write_config(new_config)
+
     return {}
