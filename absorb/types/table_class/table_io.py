@@ -17,11 +17,10 @@ class TableIO(table_paths.TablePaths):
     ) -> pl.LazyFrame:
         import polars as pl
 
-        glob = self.get_glob()
         if scan_kwargs is None:
             scan_kwargs = {}
         try:
-            return pl.scan_parquet(glob, **scan_kwargs)
+            return pl.scan_parquet(self.get_glob(), **scan_kwargs)
         except Exception as e:
             if e.args[0].startswith('expected at least 1 source'):
                 raise Exception('no data to load for ' + str(self.name()))

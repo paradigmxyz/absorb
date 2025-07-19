@@ -52,23 +52,31 @@ class TableBase:
             parameters = {}
         else:
             parameters = parameters.copy()
+
+        # make sure that static parameters are not changed
         for parameter in parameters.keys():
             if parameter in self.static_parameters:
                 raise Exception('cannot change parameter: ' + parameter)
         parameters = dict(self.parameters, **parameters)
+
+        # set default parameters
         for key, value in self.default_parameters.items():
             parameters.setdefault(key, value)
+
+        # make sure that parameters match the parameter types
         if set(parameters.keys()) != set(self.parameter_types.keys()):
             raise Exception(
                 self.name() + ': parameters must match parameter_types spec'
             )
         self.parameters = parameters
 
+        # make sure that all required parameters are set
         required_parameters: list[str] = []
         for parameter in required_parameters:
             if not hasattr(self, parameter) or getattr(self, parameter) is None:
                 raise Exception('missing table parameter: ' + str(parameter))
 
+        # make sure that append only tables have an index type
         if self.write_range == 'append_only' and (
             not hasattr(self, 'index_type') or self.index_type is None
         ):

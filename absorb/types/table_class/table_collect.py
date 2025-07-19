@@ -61,6 +61,7 @@ class TableCollect(table_coverage.TableCoverage):
             available_range = self.get_available_range()
             collected_range = self.get_collected_range()
             if available_range is not None:
+                # if available range is not None, use it to check for updates
                 if available_range == collected_range:
                     return []
                 else:
@@ -68,14 +69,17 @@ class TableCollect(table_coverage.TableCoverage):
             elif collected_range is not None and absorb.ops.index_is_temporal(
                 self.index_type
             ):
+                # if available range is None, check if ready for update
                 if self.ready_for_update():
                     return [None]
                 else:
                     return []
             else:
+                # if a non-temporal index, collect entire dataset
                 return [available_range]
 
         else:
+            # get coverage range for collection
             if data_range is None:
                 if overwrite:
                     coverage = self.get_available_range()
@@ -85,6 +89,8 @@ class TableCollect(table_coverage.TableCoverage):
                 coverage = [data_range]
             if coverage is None:
                 raise Exception()
+
+            # partition coverage into chunks
             data_ranges = absorb.ops.coverage_to_list(
                 coverage, index_type=self.index_type
             )

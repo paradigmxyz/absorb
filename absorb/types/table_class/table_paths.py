@@ -25,6 +25,7 @@ class TablePaths(table_base.TableBase):
         warn: bool = True,
         df: pl.DataFrame | None = None,
     ) -> str:
+        # special case the chunk if write_range=overwrite_all
         if self.write_range == 'overwrite_all':
             if glob:
                 chunk = None
@@ -36,6 +37,8 @@ class TablePaths(table_base.TableBase):
                         chunk = 'all'
                 else:
                     raise Exception('must specify range')
+
+        # get file path
         return absorb.ops.paths.get_table_filepath(
             chunk=chunk,
             index_type=self.index_type,
