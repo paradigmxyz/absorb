@@ -19,6 +19,7 @@ class Yields(absorb.Table):
     name_template = [
         'pool_yields_top_{top_n}',
         'pool_yields_{pools}',
+        'pool_yields',
     ]
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
@@ -42,15 +43,17 @@ class Yields(absorb.Table):
         import time
         import polars as pl
 
+        # get current yield pools
         current_yields = get_current_yields()
 
+        # select which pools to collect
         pools = self.parameters['pools']
         if pools is None:
-            pools = current_yields.sort('tvl_usd', descending=True)['pool'][
-                : self.parameters['top_n']
-            ]
+            pools = current_yields.sort('tvl_usd', descending=True)['pool']
+            if self.parameters['top_n'] is not None:
+                pools = pools[:self.parameters['top_n']]
 
-        # get yields
+        # collect yields for each pool
         next_time = time.time()
         dfs = []
         print('collecting', len(pools), 'pools')

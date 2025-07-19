@@ -33,7 +33,7 @@ class SpotCandles(absorb.Table):
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'interval': str, 'market': str}
-    default_parameters = {'market': 'spot'}
+    default_parameters = {}
     name_template = 'spot_candles_{market}_{pair}_{interval}'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
@@ -70,7 +70,7 @@ class SpotTrades(absorb.Table):
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
-    default_parameters = {'market': 'spot'}
+    default_parameters = {}
     name_template = 'spot_trades_{market}_{pair}'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
@@ -103,7 +103,7 @@ class SpotAggregateTrades(absorb.Table):
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'market': str}
-    default_parameters = {'market': 'spot'}
+    default_parameters = {}
     name_template = 'spot_aggregate_trades_{market}_{pair}'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:

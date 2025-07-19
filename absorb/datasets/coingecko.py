@@ -21,8 +21,11 @@ class CoinMetrics(absorb.Table):
     write_range = 'overwrite_all'
     index_type = 'day'
     parameter_types = {'top_n': int}
-    default_parameters = {'top_n': 1000}
-    name_template = 'coin_metrics_top_{top_n}'
+    default_parameters = {'top_n': None}
+    name_template = [
+        'coin_metrics_top_{top_n}',
+        'coin_metrics',
+    ]
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -36,7 +39,10 @@ class CoinMetrics(absorb.Table):
         }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
-        return get_historical_coin_metrics(self.parameters['top_n'])
+        top_n = self.parameters['top_n']
+        if top_n is None:
+            top_n = 1000
+        return get_historical_coin_metrics(top_n)
 
     def get_available_range(self) -> absorb.Coverage:
         import datetime
@@ -52,7 +58,10 @@ class Categories(absorb.Table):
     index_type = 'name'
     parameter_types = {'categories': typing.Union[list[str], None]}
     default_parameters = {'categories': None}
-    name_template = 'coin_metrics_{categories}'
+    name_template = [
+        'coin_metrics_{categories}',
+        'coin_metrics',
+    ]
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

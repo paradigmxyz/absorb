@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'bigquery'
     write_range = 'overwrite_all'
-    parameters = {'sql': str, 'name': str}
+    parameter_types = {'sql': str, 'name': str}
     required_packages = [
         'google-cloud-bigquery >= 3.32.0',
         'google-cloud-bigquery-storage >= 2.31.0',

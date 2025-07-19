@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'snowflake'
     write_range = 'overwrite_all'
-    parameters = {'name': str, 'sql': str}
+    parameter_types = {'name': str, 'sql': str}
     required_packages = ['garlic >= 1.1']
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:

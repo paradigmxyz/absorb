@@ -48,6 +48,8 @@ class TableBase:
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
         # set parameters
+        if self.parameters is not None:
+            raise Exception('parameters should not be set at the class level, use cls.default_parameters')
         if parameters is None:
             parameters = {}
         else:
@@ -96,11 +98,9 @@ class TableBase:
         parameters: dict[str, typing.Any] | None = None,
     ) -> str:
         if parameters is not None:
-            parameters = dict(
-                cls.default_parameters, **cls.parameters, **parameters
-            )
+            parameters = dict(cls.default_parameters, **parameter)
         else:
-            parameters = dict(cls.default_parameters, **cls.parameters)
+            parameters = cls.default_parameters
         return absorb.ops.get_table_name(
             class_name=cls.__name__,
             template=cls.name_template,
