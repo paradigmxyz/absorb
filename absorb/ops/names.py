@@ -46,8 +46,11 @@ def get_table_name(
         else:
             for subtemplate in template:
                 # get variable names from template (in curly braces)
-                variables = _get_template_variables(subtemplate)
-                if all(var in subtemplate for var in variables):
+                template_parameters = _get_template_variables(subtemplate)
+                if all(
+                    parameters is not None and parameters.get(var) is not None
+                    for var in template_parameters
+                ):
                     template = subtemplate
                     break
             else:
