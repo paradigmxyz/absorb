@@ -51,7 +51,7 @@ class Yields(absorb.Table):
         if pools is None:
             pools = current_yields.sort('tvl_usd', descending=True)['pool']
             if self.parameters['top_n'] is not None:
-                pools = pools[:self.parameters['top_n']]
+                pools = pools[: self.parameters['top_n']]
 
         # collect yields for each pool
         next_time = time.time()

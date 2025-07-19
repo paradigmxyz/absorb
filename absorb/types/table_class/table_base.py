@@ -35,8 +35,7 @@ class TableBase:
 
     parameter_types: dict[str, typing.Any] = {}
     default_parameters: dict[str, typing.Any] = {}
-    parameters: dict[str, typing.Any] = {}
-    static_parameters: list[str] = []
+    parameters: dict[str, typing.Any]
 
     #
     # # naming
@@ -48,18 +47,14 @@ class TableBase:
 
     def __init__(self, parameters: dict[str, typing.Any] | None = None):
         # set parameters
-        if self.parameters is not None:
-            raise Exception('parameters should not be set at the class level, use cls.default_parameters')
+        if hasattr(type(self), 'parameters'):
+            raise Exception(
+                'parameters should not be set at the class level, use cls.default_parameters'
+            )
         if parameters is None:
             parameters = {}
         else:
             parameters = parameters.copy()
-
-        # make sure that static parameters are not changed
-        for parameter in parameters.keys():
-            if parameter in self.static_parameters:
-                raise Exception('cannot change parameter: ' + parameter)
-        parameters = dict(self.parameters, **parameters)
 
         # set default parameters
         for key, value in self.default_parameters.items():
@@ -97,8 +92,9 @@ class TableBase:
         allow_generic: bool = False,
         parameters: dict[str, typing.Any] | None = None,
     ) -> str:
+        # build class parameters
         if parameters is not None:
-            parameters = dict(cls.default_parameters, **parameter)
+            parameters = dict(cls.default_parameters, **parameters)
         else:
             parameters = cls.default_parameters
         return absorb.ops.get_table_name(
