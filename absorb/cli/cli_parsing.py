@@ -287,6 +287,50 @@ def get_subcommands() -> list[
                 ),
             ],
         ),
+        (
+            'setup',
+            'setup environment',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--regenerate-metadata'],
+                    {
+                        'action': 'store_true',
+                        'help': 'regenerate metadata for dataset(s)',
+                    },
+                ),
+            ],
+        ),
+        (
+            'validate',
+            'validate datasets',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '?',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {'nargs': '*', 'help': 'dataset parameters'},
+                ),
+                (
+                    ['--verbose', '-v'],
+                    {
+                        'action': 'store_true',
+                        'help': 'display extra information',
+                    },
+                ),
+            ],
+        ),
     ]
 
 
