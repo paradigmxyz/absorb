@@ -108,11 +108,22 @@ def get_index_type_type(
         raise Exception()
 
 
+JSONValue = typing.Union[
+    str,
+    int,
+    float,
+    bool,
+    None,
+    dict[str, 'JSONValue'],
+    list['JSONValue'],
+]
+
+
 class TableDict(typing.TypedDict):
     source_name: str
     table_name: str
     table_class: str
-    parameters: dict[str, typing.Any]
+    parameters: dict[str, JSONValue]
     table_version: NotRequired[str]
 
 

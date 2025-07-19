@@ -5,6 +5,7 @@ import typing
 if typing.TYPE_CHECKING:
     import polars as pl
 
+import absorb
 from . import table_paths
 
 
@@ -12,7 +13,7 @@ class TableIO(table_paths.TablePaths):
     def scan(
         self,
         *,
-        parameters: dict[str, typing.Any] | None = None,
+        parameters: dict[str, absorb.JSONValue] | None = None,
         scan_kwargs: dict[str, typing.Any] | None = None,
     ) -> pl.LazyFrame:
         import polars as pl

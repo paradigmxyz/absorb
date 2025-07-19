@@ -33,8 +33,8 @@ class TableBase:
     # # parameters
     #
 
-    parameter_types: dict[str, typing.Any] = {}
-    default_parameters: dict[str, typing.Any] = {}
+    parameter_types: dict[str, type | tuple[type, ...]] = {}
+    default_parameters: dict[str, absorb.JSONValue] = {}
     parameters: dict[str, typing.Any]
 
     #
@@ -45,7 +45,7 @@ class TableBase:
     name_template: str | list[str] = '{class_name}'
     filename_template = '{source}__{table}__{chunk}.parquet'
 
-    def __init__(self, parameters: dict[str, typing.Any] | None = None):
+    def __init__(self, parameters: dict[str, absorb.JSONValue] | None = None):
         # set parameters
         if hasattr(type(self), 'parameters'):
             raise Exception(
@@ -90,7 +90,7 @@ class TableBase:
     def class_name(
         cls,
         allow_generic: bool = False,
-        parameters: dict[str, typing.Any] | None = None,
+        parameters: dict[str, absorb.JSONValue] | None = None,
     ) -> str:
         # build class parameters
         if parameters is not None:
