@@ -88,7 +88,7 @@ class Fees(absorb.Table):
 class ChainFees(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'chains': typing.Union[list[str], None]}
+    parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
     index_type = 'day'
 
@@ -127,7 +127,7 @@ class ChainFees(absorb.Table):
 class FeesOfProtocols(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'protocols': typing.Union[list[str], None]}
+    parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}
     index_type = 'day'
 

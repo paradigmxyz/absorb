@@ -56,7 +56,7 @@ class Categories(absorb.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
     index_type = 'name'
-    parameter_types = {'categories': typing.Union[list[str], None]}
+    parameter_types = {'categories': (list, type(None))}
     default_parameters = {'categories': None}
     name_template = [
         'coin_metrics_{categories}',
@@ -85,7 +85,7 @@ class CategoryMetrics(absorb.Table):
     source = 'coingecko'
     write_range = 'overwrite_all'
     index_type = 'day'
-    parameter_types = {'categories': typing.Union[list[str], None]}
+    parameter_types = {'categories': (list, type(None))}
     default_parameters = {'categories': None}
     dependencies = [CoinMetrics, Categories]
     name_template = [

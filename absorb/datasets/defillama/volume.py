@@ -129,7 +129,7 @@ from . import common
 class ProtocolDexVolumes(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'protocols': typing.Union[list[str], None]}
+    parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}
     index_type = 'day'
 
@@ -164,7 +164,7 @@ class ProtocolDexVolumes(absorb.Table):
 class ChainDexVolumes(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'chains': typing.Union[list[str], None]}
+    parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
     index_type = 'day'
 
@@ -199,7 +199,7 @@ class ChainDexVolumes(absorb.Table):
 class ProtocolOptionsVolumes(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'protocols': typing.Union[list[str], None]}
+    parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}
     index_type = 'day'
 
@@ -231,7 +231,7 @@ class ProtocolOptionsVolumes(absorb.Table):
 class ChainOptionsVolumes(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'chains': typing.Union[list[str], None]}
+    parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
     index_type = 'day'
 

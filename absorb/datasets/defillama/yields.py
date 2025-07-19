@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 class Yields(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'pools': typing.Union[list[str], None], 'top_n': int}
+    parameter_types = {'pools': (list, type(None)), 'top_n': int}
     default_parameters = {'pools': None, 'top_n': 5000}
     index_type = 'day'
     name_template = [

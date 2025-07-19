@@ -27,7 +27,7 @@ class Stablecoins(absorb.Table):
 class StablecoinsOfChains(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'chains': typing.Union[list[str], None]}
+    parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
     index_type = 'day'
 
@@ -64,7 +64,7 @@ class StablecoinsOfChains(absorb.Table):
 class StablecoinsOfTokens(absorb.Table):
     source = 'defillama'
     write_range = 'overwrite_all'
-    parameter_types = {'tokens': typing.Union[list[str], None]}
+    parameter_types = {'tokens': (list, type(None))}
     default_parameters = {'tokens': None}
     index_type = 'day'
 
