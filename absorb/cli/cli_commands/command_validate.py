@@ -20,6 +20,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
     # collect errors
     instances = []
     errors = []
+    metadatas = {}
 
     # check that datasets_dir exists
     datasets_dir = absorb.ops.get_datasets_dir()
@@ -43,6 +44,13 @@ def validate_command(args: Namespace) -> dict[str, Any]:
             # load metadata
             with open(metadata_path, 'r') as f:
                 metadata = json.load(f)
+            metadatas[table_dir] = metadata
+
+            # validate that metadata is valid
+            errors += [
+                source + '.' + table + ' ' + error
+                for error in _validate_metadata(metadata)
+            ]
 
             # instantiate table
             instance = absorb.Table.instantiate(metadata)
@@ -129,6 +137,47 @@ def validate_command(args: Namespace) -> dict[str, Any]:
                         + table_dir
                     )
 
+    # validate tracked datasets
+    config = absorb.ops.get_config()
+    for metadata in config['tracked_tables']:
+        # check that metadata is valid
+        errors += [
+            metadata.get('source_name', 'unknown_source')
+            + '.'
+            + metadata.get('table_name', 'unknown_table')
+            + ' '
+            + error
+            for error in _validate_metadata(metadata)
+        ]
+
+        # check that tracked metadata directory exists
+        table_dir = os.path.join(
+            datasets_dir,
+            metadata['source_name'],
+            'tables',
+            metadata['table_name'],
+        )
+        if not os.path.isdir(table_dir):
+            errors.append(
+                metadata.get('source_name', 'unknown_source')
+                + '.'
+                + metadata.get('table_name', 'unknown_table')
+                + ' directory does not exist: '
+                + table_dir
+            )
+            continue
+
+        # check that tracked metadata matches table folder metadata
+        if json.dumps(metadata, sort_keys=True) != json.dumps(
+            metadatas.get(table_dir, {}), sort_keys=True
+        ):
+            errors.append(
+                metadata.get('source_name', 'unknown_source')
+                + '.'
+                + metadata.get('table_name', 'unknown_table')
+                + ' tracked metadata does not match table folder metadata'
+            )
+
     # print errors
     if len(errors) > 0:
         toolstr.print_text_box('Errors Found', style='red')
@@ -138,3 +187,26 @@ def validate_command(args: Namespace) -> dict[str, Any]:
         toolstr.print('no errors found', style='green')
 
     return {}
+
+
+def _validate_metadata(metadata: typing.Any) -> list[str]:
+    if not isinstance(metadata, dict):
+        return ['metadata is not a dictionary']
+
+    errors = []
+    for key, value_type in {
+        'source_name': str,
+        'table_name': str,
+        'table_class': str,
+        'table_version': str,
+        'parameters': dict,
+    }.items():
+        if key not in metadata:
+            errors.append(f'missing required key: {key}')
+            continue
+        if not isinstance(metadata[key], value_type):
+            errors.append(
+                f'key {key} is not of type {value_type.__name__}, got {type(metadata[key]).__name__}'
+            )
+
+    return errors
