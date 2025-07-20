@@ -254,7 +254,7 @@ def get_subcommands() -> list[
                 (
                     ['dataset'],
                     {
-                        'nargs': '?',
+                        'nargs': '+',
                         'help': 'dataset to track, format as "<source>.<dataset>"',
                     },
                 ),

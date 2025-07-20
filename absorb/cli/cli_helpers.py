@@ -11,7 +11,10 @@ if typing.TYPE_CHECKING:
 
 
 def open_interactive_session(*, variables: dict[str, typing.Any]) -> None:
-    header = 'data sorted in these variables:'
+    print()
+    header = (
+        'interactive python session started\n\ndata sorted in these variables:'
+    )
     for key, value in variables.items():
         header += (
             '\n- \033[1m\033[97m' + key + '\033[0m: ' + type(value).__name__
@@ -19,7 +22,8 @@ def open_interactive_session(*, variables: dict[str, typing.Any]) -> None:
     try:
         from IPython.terminal.embed import InteractiveShellEmbed
 
-        ipshell = InteractiveShellEmbed(colors='Linux')  # type: ignore
+        ipshell = InteractiveShellEmbed(colors='Linux', display_banner=False)  # type: ignore
+        print(header)
         ipshell(header=header, local_ns=variables)
     except ImportError:
         import code
