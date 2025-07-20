@@ -16,7 +16,7 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
         print('specify dataset to print info')
         sys.exit(0)
 
-    table = absorb.ops.resolve_table(args.dataset)
+    table = absorb.Table.instantiate(args.dataset)
     schema = table.get_schema()
 
     toolstr.print_text_box(
@@ -44,7 +44,7 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
         for key, value in table.parameter_types.items():
             if key in table.default_parameters:
                 default = (
-                    ' \[default = ' + str(table.default_parameters[key]) + ']'
+                    ' \\[default = ' + str(table.default_parameters[key]) + ']'
                 )
             else:
                 default = ''

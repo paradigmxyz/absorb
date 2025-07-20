@@ -143,13 +143,6 @@ def get_subcommands() -> list[
                     {'nargs': '*', 'help': 'dataset parameters'},
                 ),
                 (
-                    ['--all'],
-                    {
-                        'help': 'add all available datasets',
-                        'action': 'store_true',
-                    },
-                ),
-                (
                     ['--path'],
                     {'help': 'directory location to store the dataset'},
                 ),
@@ -412,9 +405,9 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TableDict]:
             sources.append(source)
             tables.append(table)
         else:
-            for source_dataset in absorb.ops.get_source_tables(dataset):
+            for table_class in absorb.ops.get_source_table_classes(dataset):
                 sources.append(dataset)
-                tables.append(source_dataset.__name__)
+                tables.append(table_class.__name__)
 
     # create TableDict dicts
     parsed = []
@@ -426,6 +419,7 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.TableDict]:
             table_class, args.parameters, use_all=len(tables) == 1
         )
         tracked_table: absorb.TableDict = {
+            'table_version': table_class.version,
             'source_name': source,
             'table_name': table_class.class_name(parameters=parameters),
             'table_class': table_class.full_class_name(),

@@ -14,7 +14,7 @@ def scan(
     parameters: dict[str, typing.Any] | None = None,
     scan_kwargs: dict[str, typing.Any] | None = None,
 ) -> pl.LazyFrame:
-    table = absorb.ops.resolve_table(dataset, parameters=parameters)
+    table = absorb.Table.instantiate(dataset, parameters=parameters)
     return table.scan(parameters=parameters, scan_kwargs=scan_kwargs)
 
 
@@ -25,7 +25,7 @@ def load(
     scan_kwargs: dict[str, typing.Any] | None = None,
 ) -> pl.DataFrame:
     """kwargs are passed to scan()"""
-    table = absorb.ops.resolve_table(dataset, parameters=parameters)
+    table = absorb.Table.instantiate(dataset, parameters=parameters)
     return table.load(parameters=parameters, scan_kwargs=scan_kwargs)
 
 

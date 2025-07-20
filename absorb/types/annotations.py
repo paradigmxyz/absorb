@@ -124,7 +124,7 @@ class TableDict(typing.TypedDict):
     table_name: str
     table_class: str
     parameters: dict[str, JSONValue]
-    table_version: NotRequired[str]
+    table_version: str
 
 
 TableReference = typing.Union[str, TableDict, table_class.Table]

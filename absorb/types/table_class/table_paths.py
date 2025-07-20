@@ -83,7 +83,7 @@ class TablePaths(table_base.TableBase):
         os.makedirs(table_dir, exist_ok=True)
 
         # set up metadata
-        metadata = self.create_table_metadata()
+        metadata = self.create_table_dict()
         metadata_path = os.path.join(table_dir, 'table_metadata.json')
         if os.path.isfile(metadata_path):
             with open(metadata_path, 'r') as f:
@@ -98,7 +98,7 @@ class TablePaths(table_base.TableBase):
             with open(metadata_path, 'w') as f:
                 json.dump(metadata, f)
 
-    def create_table_metadata(self) -> absorb.TableDict:
+    def create_table_dict(self) -> absorb.TableDict:
         """
         Create metadata for the table file.
         """

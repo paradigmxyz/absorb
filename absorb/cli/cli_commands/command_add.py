@@ -16,19 +16,14 @@ def add_command(args: Namespace) -> dict[str, Any]:
     import rich
 
     # parse inputs
-    if args.all:
-        track_datasets = absorb.ops.get_available_tables(
-            exclude_parameters=True
-        )
-    else:
-        track_datasets = cli_parsing._parse_datasets(args)
-    tracked_tables = absorb.ops.get_tracked_tables()
+    track_datasets = cli_parsing._parse_datasets(args)
 
     # add untracked collected
     if args.collected:
         track_datasets += absorb.ops.get_untracked_collected_tables()
 
     # filter already collected
+    tracked_tables = absorb.ops.get_tracked_tables()
     tracked = [json.dumps(table, sort_keys=True) for table in tracked_tables]
     already_tracked = {}
     not_tracked = {}
@@ -44,7 +39,8 @@ def add_command(args: Namespace) -> dict[str, Any]:
     sources = set(td['source_name'] for td in track_datasets)
     source_datasets = {
         source: [
-            table.class_name() for table in absorb.ops.get_source_tables(source)
+            table.class_name()
+            for table in absorb.ops.get_source_table_classes(source)
         ]
         for source in sources
     }

@@ -32,8 +32,8 @@ def setup_command(args: Namespace) -> dict[str, Any]:
         new_config = absorb.ops.get_default_config()
         for tracked_table in old_config['tracked_tables']:
             table = absorb.Table.instantiate(tracked_table)
-            metadata = table.create_table_metadata()
-            new_config['tracked_tables'].append(metadata)
+            table_dict = table.create_table_dict()
+            new_config['tracked_tables'].append(table_dict)
         absorb.ops.write_config(new_config)
 
     return {}

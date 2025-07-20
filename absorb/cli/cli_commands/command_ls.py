@@ -34,9 +34,9 @@ def ls_command(args: Namespace) -> dict[str, Any]:
         else:
             sources = absorb.ops.get_sources()
         for source in sorted(sources):
-            source_tables = absorb.ops.get_source_tables(source)
+            table_classes = absorb.ops.get_source_table_classes(source)
             if args.one_per_line:
-                for dataset in source_tables:
+                for dataset in table_classes:
                     toolstr.print_bullet(
                         '[white bold]'
                         + dataset.source
@@ -46,10 +46,10 @@ def ls_command(args: Namespace) -> dict[str, Any]:
                         **absorb.ops.bullet_styles,
                     )
             else:
-                if len(source_tables) > 0:
+                if len(table_classes) > 0:
                     names = [
                         cls.class_name(allow_generic=True)
-                        for cls in source_tables
+                        for cls in table_classes
                     ]
                     toolstr.print_bullet(
                         key=source,

@@ -114,13 +114,37 @@ class TableBase:
     # defaults
 
     @staticmethod
-    def instantiate(dataset: absorb.TableDict) -> absorb.Table:
-        import importlib
+    def instantiate(
+        reference: absorb.TableReference,
+        *,
+        parameters: dict[str, typing.Any] | None = None,
+    ) -> absorb.Table:
+        # reference already instantiated
+        if isinstance(reference, absorb.Table):
+            return reference
 
-        module_name, class_name = dataset['table_class'].rsplit('.', maxsplit=1)
-        module = importlib.import_module(module_name)
-        cls = getattr(module, class_name)
-        return cls(parameters=dataset['parameters'])  # type: ignore
+        # get class and parameters
+        if isinstance(reference, dict):
+            # reference is a table dict
+            cls = absorb.ops.get_table_class(
+                class_path=reference['table_class']
+            )
+            if parameters is not None:
+                raise Exception(
+                    'Cannot pass parameters when using a table dict'
+                )
+            parameters = reference['parameters']
+        elif isinstance(reference, str):
+            # reference is a str
+            source, table = reference.split('.')
+            class_name = absorb.ops.names._snake_to_camel(table)
+            class_path = 'absorb.datasets.' + source + '.' + class_name
+            cls = absorb.ops.get_table_class(class_path=class_path)
+            parameters = {}
+        else:
+            raise Exception()
+
+        return cls(parameters=parameters)
 
     # validity
 
