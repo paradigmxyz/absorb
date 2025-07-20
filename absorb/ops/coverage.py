@@ -24,6 +24,7 @@ def get_collected_range(
 
 
 def get_collected_tables() -> list[absorb.TableDict]:
+    import json
     import os
 
     datasets_dir = absorb.ops.get_datasets_dir()
@@ -35,15 +36,11 @@ def get_collected_tables() -> list[absorb.TableDict]:
         source_dir = os.path.join(datasets_dir, source)
         tables_dir = os.path.join(source_dir, 'tables')
         for table in os.listdir(tables_dir):
-            # TODO: get true parameters of colleceted datasets
-            # TODO: read this information from a table_metadata.json
-            camel_table = absorb.ops.names._snake_to_camel(table)
-            table_data: absorb.TableDict = {
-                'source_name': source,
-                'table_name': table,
-                'table_class': 'absorb.datasets.' + source + '.' + camel_table,
-                'parameters': {},
-            }
+            metadata_path = os.path.join(
+                tables_dir, table, 'table_metadata.json'
+            )
+            with open(metadata_path) as f:
+                table_data = json.load(f)
             tables.append(table_data)
     return tables
 
