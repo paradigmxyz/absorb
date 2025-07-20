@@ -16,11 +16,40 @@ class Metrics(absorb.Table):
     index_type = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
-        df = self.collect_chunk(None)
-        if df is not None:
-            return dict(df.schema)
-        else:
-            raise Exception('data not found')
+        import polars as pl
+
+        return {
+            'date': pl.Datetime(time_unit='us', time_zone=None),
+            'network': pl.String,
+            'market_cap_usd': pl.Float64,
+            'market_cap_eth': pl.Float64,
+            'txcount': pl.Float64,
+            'aa_last7d': pl.Float64,
+            'txcosts_median_eth': pl.Float64,
+            'daa': pl.Float64,
+            'gas_per_second': pl.Float64,
+            'fees_paid_eth': pl.Float64,
+            'profit_usd': pl.Float64,
+            'app_fees_eth': pl.Float64,
+            'fees_paid_usd': pl.Float64,
+            'txcosts_median_usd': pl.Float64,
+            'stables_mcap_eth': pl.Float64,
+            'fdv_eth': pl.Float64,
+            'stables_mcap': pl.Float64,
+            'costs_l1_usd': pl.Float64,
+            'costs_total_usd': pl.Float64,
+            'rent_paid_usd': pl.Float64,
+            'app_fees_usd': pl.Float64,
+            'tvl': pl.Float64,
+            'tvl_eth': pl.Float64,
+            'fdv_usd': pl.Float64,
+            'costs_blobs_usd': pl.Float64,
+            'rent_paid_eth': pl.Float64,
+            'costs_blobs_eth': pl.Float64,
+            'profit_eth': pl.Float64,
+            'costs_l1_eth': pl.Float64,
+            'costs_total_eth': pl.Float64,
+        }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import requests
