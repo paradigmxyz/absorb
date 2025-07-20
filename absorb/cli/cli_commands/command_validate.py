@@ -49,7 +49,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
             # validate that metadata is valid
             errors += [
                 source + '.' + table + ' ' + error
-                for error in _validate_metadata(metadata)
+                for error in absorb.ops.validate_table_dict(metadata)
             ]
 
             # instantiate table
@@ -147,7 +147,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
             + metadata.get('table_name', 'unknown_table')
             + ' '
             + error
-            for error in _validate_metadata(metadata)
+            for error in absorb.ops.validate_table_dict(metadata)
         ]
 
         # check that tracked metadata directory exists
@@ -187,26 +187,3 @@ def validate_command(args: Namespace) -> dict[str, Any]:
         toolstr.print('no errors found', style='green')
 
     return {}
-
-
-def _validate_metadata(metadata: typing.Any) -> list[str]:
-    if not isinstance(metadata, dict):
-        return ['metadata is not a dictionary']
-
-    errors = []
-    for key, value_type in {
-        'source_name': str,
-        'table_name': str,
-        'table_class': str,
-        'table_version': str,
-        'parameters': dict,
-    }.items():
-        if key not in metadata:
-            errors.append(f'missing required key: {key}')
-            continue
-        if not isinstance(metadata[key], value_type):
-            errors.append(
-                f'key {key} is not of type {value_type.__name__}, got {type(metadata[key]).__name__}'
-            )
-
-    return errors
