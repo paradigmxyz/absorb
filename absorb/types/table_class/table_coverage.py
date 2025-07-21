@@ -15,7 +15,12 @@ class TableCoverage(table_io.TableIO):
         if self.write_range == 'overwrite_all':
             return None
         else:
-            raise NotImplementedError()
+            raise NotImplementedError(
+                'get_available_range() not implemented for '
+                + self.source
+                + '.'
+                + str(type(self).__name__)
+            )
 
     def get_collected_range(self) -> absorb.Coverage | None:
         import os
@@ -47,7 +52,6 @@ class TableCoverage(table_io.TableIO):
                     return (df['min_timestamp'][0], df['max_timestamp'][0])
 
                 else:
-                    raise Exception()
                     return None
 
                 # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
@@ -59,6 +63,8 @@ class TableCoverage(table_io.TableIO):
                 raise Exception('too many files')
         elif self.is_range_sortable():
             files = sorted(glob.glob(glob_str))
+            if len(files) == 0:
+                return None
             start = self.parse_file_path(files[0])['chunk']
             end = self.parse_file_path(files[-1])['chunk']
             return (start, end)

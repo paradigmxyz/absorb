@@ -1,5 +1,6 @@
 """python interface for interacting with flashbots mempool dumpster"""
 
+from .types.errors import *
 from .types.table_class import Table
 from . import ops
 from .ops import scan, load, get_available_range, get_collected_range
