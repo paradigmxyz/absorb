@@ -11,7 +11,7 @@ class BaseQuery(absorb.Table):
         '{name}',
         'query_{query_id}',
     ]
-    required_packages = ['spice >= 0.2.3']
+    required_packages = ['dune_spice >= 0.2.6']
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import spice
@@ -31,6 +31,7 @@ class FullQuery(BaseQuery):
         'query_id': str,
         'spice_kwargs': dict[str, typing.Any],
     }
+    required_packages = ['dune_spice >= 0.2.6']
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
@@ -52,6 +53,7 @@ class AppendOnlyQuery(BaseQuery):
         'spice_kwargs': dict[str, typing.Any],
         'range_parameters': list[str],
     }
+    required_packages = ['dune_spice >= 0.2.6']
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
@@ -68,7 +70,8 @@ class AppendOnlyQuery(BaseQuery):
 class CexLabels(absorb.Table):
     source = 'dune'
     write_range = 'overwrite_all'
-    required_packages = ['cryo_manager']
+    required_packages = ['dune_spice >= 0.2.6']
+    index_type = 'name'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -87,7 +90,9 @@ class CexLabels(absorb.Table):
 
         evm_cex_query = 'https://dune.com/queries/3237025'
         solana_cex_query = 'https://dune.com/queries/5124188'
-        evm_cexes = spice.query(evm_cex_query).with_columns(ecosystem='EVM')
+        evm_cexes = spice.query(evm_cex_query).with_columns(
+            ecosystem=pl.lit('EVM')
+        )
         solana_cexes = (
             spice.query(solana_cex_query)
             .drop('blockchain')
