@@ -53,6 +53,14 @@ class SpotCandles(absorb.Table):
             'taker_buy_quote_volume': pl.Float64,
         }
 
+    def get_available_range(self) -> absorb.Coverage:
+        import datetime
+
+        return (
+            datetime.datetime(2025, 1, 1),
+            datetime.datetime(2025, 5, 1),
+        )
+
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_spot_candles(
             pair=self.parameters['pair'],
@@ -70,14 +78,6 @@ class SpotTrades(absorb.Table):
     default_parameters = {}
     name_template = 'spot_trades_{pair}'
 
-    def get_available_range(self) -> absorb.Coverage:
-        import datetime
-
-        return (
-            datetime.datetime(2025, 1, 1),
-            datetime.datetime(2025, 5, 1),
-        )
-
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
@@ -91,6 +91,14 @@ class SpotTrades(absorb.Table):
             'best_price_match': pl.Boolean,
             'trade_id': pl.Int64,
         }
+
+    def get_available_range(self) -> absorb.Coverage:
+        import datetime
+
+        return (
+            datetime.datetime(2025, 1, 1),
+            datetime.datetime(2025, 5, 1),
+        )
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_spot_trades(
@@ -122,6 +130,14 @@ class SpotAggregateTrades(absorb.Table):
             'first_trade_id': pl.Int64,
             'last_trade_id': pl.Int64,
         }
+
+    def get_available_range(self) -> absorb.Coverage:
+        import datetime
+
+        return (
+            datetime.datetime(2025, 1, 1),
+            datetime.datetime(2025, 5, 1),
+        )
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         return get_spot_aggregate_trades(
