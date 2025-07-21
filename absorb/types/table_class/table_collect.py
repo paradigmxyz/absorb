@@ -44,6 +44,8 @@ class TableCollect(table_coverage.TableCoverage):
             self._execute_collect_chunk(chunk, overwrite, verbose)
 
     def _check_ready_to_collect(self) -> None:
+        import os
+
         # check package dependencies
         missing_packages = self.get_missing_packages()
         if len(missing_packages) > 0:
@@ -52,7 +54,11 @@ class TableCollect(table_coverage.TableCoverage):
                 + ', '.join(missing_packages)
             )
 
-        # TODO: check credentials
+        # check credentials
+        for credential in self.required_credentials:
+            value = os.environ.get(credential)
+            if value is None or value == '':
+                raise Exception(credential + ' environment variable not set')
 
     def _get_chunks_to_collect(
         self, data_range: absorb.Coverage | None = None, overwrite: bool = False

@@ -28,6 +28,7 @@ class TableBase:
 
     # dependencies
     required_packages: list[str] = []
+    required_credentials: list[str] = []
 
     #
     # # parameters

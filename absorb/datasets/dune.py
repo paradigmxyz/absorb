@@ -12,6 +12,7 @@ class BaseQuery(absorb.Table):
         'query_{query_id}',
     ]
     required_packages = ['dune_spice >= 0.2.6']
+    required_credentials = ['DUNE_API_KEY']
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import spice
@@ -32,6 +33,7 @@ class FullQuery(BaseQuery):
         'spice_kwargs': dict[str, typing.Any],
     }
     required_packages = ['dune_spice >= 0.2.6']
+    required_credentials = ['DUNE_API_KEY']
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
@@ -54,6 +56,7 @@ class AppendOnlyQuery(BaseQuery):
         'range_parameters': list[str],
     }
     required_packages = ['dune_spice >= 0.2.6']
+    required_credentials = ['DUNE_API_KEY']
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
         import spice
@@ -71,6 +74,7 @@ class CexLabels(absorb.Table):
     source = 'dune'
     write_range = 'overwrite_all'
     required_packages = ['dune_spice >= 0.2.6']
+    required_credentials = ['DUNE_API_KEY']
     index_type = 'name'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
