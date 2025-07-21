@@ -13,7 +13,10 @@ if typing.TYPE_CHECKING:
 
 def remove_command(args: Namespace) -> dict[str, Any]:
     if args.all:
-        tracked_datasets = absorb.ops.get_tracked_tables()
+        tracked_datasets = [
+            absorb.Table.instantiate(table)
+            for table in absorb.ops.get_tracked_tables()
+        ]
     else:
         tracked_datasets = cli_parsing._parse_datasets(args)
     absorb.ops.stop_tracking_tables(tracked_datasets)

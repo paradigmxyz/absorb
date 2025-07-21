@@ -20,7 +20,10 @@ def add_command(args: Namespace) -> dict[str, Any]:
 
     # add untracked collected
     if args.collected:
-        track_datasets += absorb.ops.get_untracked_collected_tables()
+        track_datasets += [
+            absorb.Table.instantiate(table_dict)
+            for table_dict in absorb.ops.get_untracked_collected_tables()
+        ]
 
     # filter already collected
     tracked_tables = absorb.ops.get_tracked_tables()
@@ -28,7 +31,7 @@ def add_command(args: Namespace) -> dict[str, Any]:
     already_tracked = {}
     not_tracked = {}
     for ds in track_datasets:
-        ds_hash = json.dumps(ds, sort_keys=True)
+        ds_hash = json.dumps(ds.create_table_dict(), sort_keys=True)
         if ds_hash in tracked:
             already_tracked[ds_hash] = ds
         else:
@@ -36,19 +39,13 @@ def add_command(args: Namespace) -> dict[str, Any]:
     track_datasets = list(not_tracked.values())
 
     # check for invalid datasets
-    sources = set(td['source_name'] for td in track_datasets)
+    sources = set(td.source for td in track_datasets)
     source_datasets = {
-        source: [
-            table.class_name()
-            for table in absorb.ops.get_source_table_classes(source)
-        ]
+        source: absorb.ops.get_source_table_classes(source)
         for source in sources
     }
     for track_dataset in track_datasets:
-        if (
-            track_dataset['table_name']
-            not in source_datasets[track_dataset['source_name']]
-        ):
+        if type(track_dataset) not in source_datasets[track_dataset.source]:
             raise Exception('invalid dataset:')
 
     # print dataset summary

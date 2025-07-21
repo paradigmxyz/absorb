@@ -115,32 +115,46 @@ class TableBase:
 
     @staticmethod
     def instantiate(
-        reference: absorb.TableReference,
+        ref: absorb.TableReference,
         *,
         parameters: dict[str, typing.Any] | None = None,
+        raw_parameters: dict[str, str] | None = None,
+        use_all_parameters: bool = True,
     ) -> absorb.Table:
         # reference already instantiated
-        if isinstance(reference, absorb.Table):
-            return reference
+        if isinstance(ref, absorb.Table):
+            if parameters is not None or raw_parameters is not None:
+                raise Exception('Cannot pass parameters with table instance')
+            return ref
 
         # get class and parameters
-        if isinstance(reference, dict):
+        if isinstance(ref, dict):
             # reference is a table dict
-            cls = absorb.ops.get_table_class(
-                class_path=reference['table_class']
-            )
-            if parameters is not None:
-                raise Exception(
-                    'Cannot pass parameters when using a table dict'
-                )
-            parameters = reference['parameters']
-        elif isinstance(reference, str):
+            cls = absorb.ops.get_table_class(class_path=ref['table_class'])
+            if parameters is not None or raw_parameters is not None:
+                raise Exception('Cannot pass parameters with table dict')
+            parameters = ref['parameters']
+
+        elif isinstance(ref, str):
             # reference is a str
-            source, table = reference.split('.')
-            class_name = absorb.ops.names._snake_to_camel(table)
+            source, table_name = ref.split('.')
+            class_name = absorb.ops.names._snake_to_camel(table_name)
+
+            # identify class and parse name parameters
             class_path = 'absorb.datasets.' + source + '.' + class_name
             cls = absorb.ops.get_table_class(class_path=class_path)
-            parameters = {}
+            name_parameters: dict[str, typing.Any] = {}
+
+            # parse input parameters
+            parameters = _process_input_parameters(
+                parameters=parameters,
+                raw_parameters=raw_parameters,
+                cls=cls,
+            )
+
+            # merge name parameters into input parameters
+            parameters = dict(parameters, **name_parameters)
+
         else:
             raise Exception()
 
@@ -155,3 +169,31 @@ class TableBase:
             for package in cls.required_packages
             if not absorb.ops.is_package_installed(package)
         ]
+
+
+def _process_input_parameters(
+    parameters: dict[str, typing.Any] | None,
+    raw_parameters: dict[str, str] | None,
+    cls: type[TableBase],
+) -> dict[str, typing.Any]:
+    if parameters is None:
+        parameters = {}
+
+    # convert types of raw parameters
+    if raw_parameters is not None:
+        value: typing.Any
+        for key, value in raw_parameters.items():
+            parameter_type = cls.parameter_types[key]
+            if parameter_type == str:  # noqa: E721
+                pass
+            elif parameter_type == int:  # noqa: E721
+                value = int(value)
+            elif parameter_type == list[str]:
+                value = value.split(',')
+            elif parameter_type == list[int]:
+                value = [int(subvalue) for subvalue in value.split(',')]
+            else:
+                raise Exception('invalid parameter type: ' + str(parameter_type))
+            parameters[key] = value
+
+    return parameters

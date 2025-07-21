@@ -9,14 +9,12 @@ def _print_title(title: str) -> None:
     rich.print('[bold green]' + title + '[/bold green]')
 
 
-def _dataset_to_str(dataset: absorb.TableDict) -> str:
-    return dataset['source_name'] + '.' + dataset['table_name']
-
-
-def _print_dataset_bullet(dataset: absorb.TableDict) -> None:
+def _print_dataset_bullet(dataset: absorb.TableReference) -> None:
     import toolstr
 
+    table_dict = absorb.Table.instantiate(dataset).create_table_dict()
+    full_name = table_dict['source_name'] + '.' + table_dict['table_name']
     toolstr.print_bullet(
-        '[white bold]' + _dataset_to_str(dataset) + '[/white bold]',
+        '[white bold]' + full_name + '[/white bold]',
         **absorb.ops.bullet_styles,
     )

@@ -15,7 +15,10 @@ def setup_command(args: Namespace) -> dict[str, Any]:
     if len(args.dataset) > 0:
         datasets = cli_parsing._parse_datasets(args)
     else:
-        datasets = absorb.ops.get_tracked_tables()
+        datasets = [
+            absorb.Table.instantiate(table_dict)
+            for table_dict in absorb.ops.get_tracked_tables()
+        ]
 
     if args.regenerate_metadata:
         if len(datasets) == 1:

@@ -334,6 +334,39 @@ def get_subcommands() -> list[
     ]
 
 
+def get_common_args() -> list[tuple[list[str], dict[str, typing.Any]]]:
+    import argparse
+
+    return [
+        (
+            [
+                '--debug',
+                '--pdb',
+            ],
+            {
+                'help': 'enter debugger upon error',
+                'action': 'store_true',
+            },
+        ),
+        (
+            [
+                '-i',
+                '--interactive',
+            ],
+            {
+                'help': 'open data in interactive python session',
+                'action': 'store_true',
+            },
+        ),
+        (
+            ['--cd-destination-tempfile',],
+            {
+                'help': argparse.SUPPRESS,
+            },
+        ),
+    ]
+
+
 def parse_args() -> argparse.Namespace:
     import argparse
     import importlib
@@ -341,10 +374,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         formatter_class=cli_helpers.HelpFormatter, allow_abbrev=False
     )
-    parser.add_argument(
-        '--cd-destination-tempfile',
-        help=argparse.SUPPRESS,
-    )
+    parser.add_argument('--cd-destination-tempfile', help=argparse.SUPPRESS)
+    common_args = get_common_args()
     subparsers = parser.add_subparsers(dest='command')
 
     parsers = {}
@@ -355,24 +386,8 @@ def parse_args() -> argparse.Namespace:
         f = getattr(f_module, name + '_command')
         subparser = subparsers.add_parser(name, help=description)
         subparser.set_defaults(f_command=f)
-        for sub_args, sub_kwargs in arg_args:
+        for sub_args, sub_kwargs in arg_args + common_args:
             subparser.add_argument(*sub_args, **sub_kwargs)
-        subparser.add_argument(
-            '--debug',
-            '--pdb',
-            help='enter debugger upon error',
-            action='store_true',
-        )
-        subparser.add_argument(
-            '-i',
-            '--interactive',
-            help='open data in interactive python session',
-            action='store_true',
-        )
-        subparser.add_argument(
-            '--cd-destination-tempfile',
-            help=argparse.SUPPRESS,
-        )
         parsers[name] = subparser
 
     # parse args
@@ -388,88 +403,21 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def _parse_datasets(args: argparse.Namespace) -> list[absorb.TableDict]:
-    # parse datasets
-    sources = []
-    tables = []
-    if isinstance(args.dataset, list):
-        datasets = args.dataset
-    elif isinstance(args.dataset, str):
-        datasets = [args.dataset]
-    else:
-        raise Exception()
-    for dataset in datasets:
-        # get source and table
-        if '.' in dataset:
-            source, table = dataset.split('.')
-            sources.append(source)
-            tables.append(table)
-        else:
-            for table_class in absorb.ops.get_source_table_classes(dataset):
-                sources.append(dataset)
-                tables.append(table_class.__name__)
-
-    # create TableDict dicts
-    parsed = []
-    for source, table in zip(sources, tables):
-        table_class = absorb.ops.get_table_class(
-            source=source, table_name=table
-        )
-        parameters = _parse_parameters(
-            table_class, args.parameters, use_all=len(tables) == 1
-        )
-        tracked_table: absorb.TableDict = {
-            'table_version': table_class.version,
-            'source_name': source,
-            'table_name': table_class.class_name(parameters=parameters),
-            'table_class': table_class.full_class_name(),
-            'parameters': parameters,
-        }
-        parsed.append(tracked_table)
-
-    return parsed
-
-
-def _parse_parameters(
-    table_class: type[absorb.Table],
-    raw_parameters: list[str] | None,
-    use_all: bool = True,
-) -> dict[str, typing.Any]:
+def _parse_datasets(args: argparse.Namespace) -> list[absorb.Table]:
     # parse parameters
     parameters: dict[str, typing.Any] = {}
-    value: typing.Any
-    if raw_parameters is not None:
-        for parameter in raw_parameters:
+    if args.parameters is not None:
+        for parameter in args.parameters:
             key, value = parameter.split('=')
-
-            # set parameter type
-            if key not in table_class.parameter_types:
-                if use_all:
-                    raise Exception(
-                        'unknown parameter: '
-                        + str(key)
-                        + ' not in '
-                        + str(list(parameters.keys()))
-                    )
-                else:
-                    continue
-            parameter_type = table_class.parameter_types[key]
-            if parameter_type == str:  # noqa: E721
-                pass
-            elif parameter_type == int:  # noqa: E721
-                value = int(value)
-            elif parameter_type == list[str]:
-                value = value.split(',')
-            elif parameter_type == list[int]:
-                value = [int(subvalue) for subvalue in value.split(',')]
-            else:
-                raise Exception(
-                    'invalid parameter type: ' + str(parameter_type)
-                )
-
             parameters[key] = value
 
-    return parameters
+    # parse tables
+    tables = []
+    for table_str in args.dataset:
+        table = absorb.Table.instantiate(table_str, raw_parameters=parameters)
+        tables.append(table)
+
+    return tables
 
 
 def _parse_ranges(

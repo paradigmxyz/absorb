@@ -71,7 +71,9 @@ def get_tracked_tables() -> list[absorb.TableDict]:
     return get_config()['tracked_tables']
 
 
-def start_tracking_tables(tables: list[absorb.TableDict]) -> None:
+def start_tracking_tables(
+    tables: typing.Sequence[absorb.TableReference],
+) -> None:
     import json
 
     config = get_config()
@@ -79,23 +81,31 @@ def start_tracking_tables(tables: list[absorb.TableDict]) -> None:
         json.dumps(table, sort_keys=True) for table in config['tracked_tables']
     }
     for table in tables:
-        as_str = json.dumps(table, sort_keys=True)
+        instance = absorb.Table.instantiate(table)
+        table_dict = instance.create_table_dict()
+        as_str = json.dumps(table_dict, sort_keys=True)
         if as_str not in tracked_tables:
-            config['tracked_tables'].append(table)
+            config['tracked_tables'].append(table_dict)
             tracked_tables.add(as_str)
     write_config(config)
 
 
-def stop_tracking_tables(tables: list[absorb.TableDict]) -> None:
+def stop_tracking_tables(
+    tables: typing.Sequence[absorb.TableReference],
+) -> None:
     import json
 
-    tables_str = [json.dumps(table, sort_keys=True) for table in tables]
+    drop_these = set()
+    for table in tables:
+        table_dict = absorb.Table.instantiate(table).create_table_dict()
+        table_str = json.dumps(table_dict, sort_keys=True)
+        drop_these.add(table_str)
 
     config = get_config()
     config['tracked_tables'] = [
         table
         for table in config['tracked_tables']
-        if json.dumps(table, sort_keys=True) not in tables_str
+        if json.dumps(table, sort_keys=True) not in drop_these
     ]
 
     write_config(config)

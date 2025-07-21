@@ -17,7 +17,10 @@ def collect_command(args: Namespace) -> dict[str, Any]:
     if len(args.dataset) > 0:
         datasets = cli_parsing._parse_datasets(args)
     else:
-        datasets = absorb.ops.get_tracked_tables()
+        datasets = [
+            absorb.Table.instantiate(table)
+            for table in absorb.ops.get_tracked_tables()
+        ]
 
     # print datasets to collect
     if len(datasets) == 0:
@@ -32,7 +35,7 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             text_style='bold white',
         )
         for d, dataset in enumerate(datasets):
-            name = dataset['source_name'] + '.' + dataset['table_name']
+            name = dataset.source + '.' + dataset.name()
             absorb.ops.print_bullet(key=name, value=None, number=d + 1)
         print()
 
@@ -43,19 +46,18 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             print()
 
         # instantiate dataset
-        instance = absorb.Table.instantiate(dataset)
-        if instance.write_range == 'append_only':
+        if dataset.write_range == 'append_only':
             data_ranges = cli_parsing._parse_ranges(
-                args.range, index_type=instance.index_type
+                args.range, index_type=dataset.index_type
             )
         else:
             data_ranges = None
 
         # collect dataset
         if args.setup_only:
-            instance.setup_table_dir()
+            dataset.setup_table_dir()
         else:
-            instance.collect(
+            dataset.collect(
                 data_range=data_ranges,
                 dry=args.dry,
                 overwrite=args.overwrite,
