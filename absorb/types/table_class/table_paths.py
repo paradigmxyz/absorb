@@ -84,7 +84,9 @@ class TablePaths(table_base.TableBase):
 
         # set up metadata
         metadata = self.create_table_dict()
-        metadata_path = os.path.join(table_dir, 'table_metadata.json')
+        metadata_path = absorb.ops.get_table_metadata_path(
+            self.name(), source=self.source
+        )
         if os.path.isfile(metadata_path):
             with open(metadata_path, 'r') as f:
                 existing_metadata = json.load(f)

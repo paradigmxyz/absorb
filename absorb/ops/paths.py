@@ -46,21 +46,22 @@ def get_source_dir(source: str, *, warn: bool = False) -> str:
 
 
 def get_table_dir(
-    dataset: absorb.TableDict | str | None = None,
+    table: str | absorb.TableDict,
     *,
     source: str | None = None,
-    table: str | None = None,
     warn: bool = False,
 ) -> str:
     import os
 
-    if isinstance(dataset, str):
-        source, table = dataset.split('.')
-    elif isinstance(dataset, dict):
-        source = dataset['source_name']
-        table = dataset['table_name']
-    elif source is not None and table is not None:
-        pass
+    if isinstance(table, str):
+        if '.' in table:
+            source, table = table.split('.')
+        else:
+            if source is None:
+                raise Exception('source must be provided if table is a string')
+    elif isinstance(table, dict):
+        source = table['source_name']
+        table = table['table_name']
     else:
         raise Exception('invalid format')
 
@@ -69,13 +70,15 @@ def get_table_dir(
 
 
 def get_table_metadata_path(
-    dataset: absorb.TableDict | str, *, warn: bool = False
+    table: str | absorb.TableDict,
+    *,
+    source: str | None = None,
+    warn: bool = False,
 ) -> str:
     import os
 
-    return os.path.join(
-        absorb.ops.get_table_dir(dataset, warn=warn), 'table_metadata.json'
-    )
+    table_dir = absorb.ops.get_table_dir(table, source=source, warn=warn)
+    return os.path.join(table_dir, 'table_metadata.json')
 
 
 def get_table_filepath(

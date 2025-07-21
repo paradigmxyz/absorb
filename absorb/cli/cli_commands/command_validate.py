@@ -33,13 +33,13 @@ def validate_command(args: Namespace) -> dict[str, Any]:
         source_dir = os.path.join(datasets_dir, source)
         tables_dir = os.path.join(source_dir, 'tables')
         for table in os.listdir(tables_dir):
-            # check that each dataset has a table_metadata.json
+            # check that each dataset has a metadata file
             table_dir = os.path.join(tables_dir, table)
-            metadata_path = os.path.join(table_dir, 'table_metadata.json')
+            metadata_path = absorb.ops.get_table_metadata_path(
+                table, source=source
+            )
             if not os.path.isfile(metadata_path):
-                errors.append(
-                    f'{source}/{table} is missing table_metadata.json'
-                )
+                errors.append(f'{source}/{table} is missing a metadata file')
 
             # load metadata
             with open(metadata_path, 'r') as f:
@@ -123,7 +123,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
             # check there are no extra files beyond metadata and parquet files
             target_parquet_files = glob.glob(instance.get_glob())
             for filename in os.listdir(table_dir):
-                if filename == 'table_metadata.json':
+                if filename == os.path.basename(metadata_path):
                     continue
                 path = os.path.join(table_dir, filename)
                 if path not in target_parquet_files:

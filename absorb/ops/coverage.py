@@ -36,10 +36,8 @@ def get_collected_tables() -> list[absorb.TableDict]:
         source_dir = os.path.join(datasets_dir, source)
         tables_dir = os.path.join(source_dir, 'tables')
         for table in os.listdir(tables_dir):
-            metadata_path = os.path.join(
-                tables_dir, table, 'table_metadata.json'
-            )
-            with open(metadata_path) as f:
+            path = absorb.ops.get_table_metadata_path(table, source=source)
+            with open(path) as f:
                 table_data = json.load(f)
             tables.append(table_data)
     return tables
