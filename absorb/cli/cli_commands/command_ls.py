@@ -131,7 +131,7 @@ def _print_datasets(datasets: list[absorb.TableDict], args: Namespace) -> None:
                 if dataset['source_name'] == source:
                     try:
                         instance = absorb.Table.instantiate(dataset)
-                        name = instance.class_name(allow_generic=True)
+                        name = instance.name()
                     except Exception:
                         name = (
                             dataset['source_name'] + '.' + dataset['table_name']
