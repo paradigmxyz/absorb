@@ -359,7 +359,9 @@ def get_common_args() -> list[tuple[list[str], dict[str, typing.Any]]]:
             },
         ),
         (
-            ['--cd-destination-tempfile',],
+            [
+                '--cd-destination-tempfile',
+            ],
             {
                 'help': argparse.SUPPRESS,
             },
@@ -368,35 +370,33 @@ def get_common_args() -> list[tuple[list[str], dict[str, typing.Any]]]:
 
 
 def parse_args() -> argparse.Namespace:
+    """parse input arguments into a Namespace object"""
     import argparse
     import importlib
+    import sys
 
+    # create top-level parser
     parser = argparse.ArgumentParser(
         formatter_class=cli_helpers.HelpFormatter, allow_abbrev=False
     )
     parser.add_argument('--cd-destination-tempfile', help=argparse.SUPPRESS)
-    common_args = get_common_args()
-    subparsers = parser.add_subparsers(dest='command')
 
-    parsers = {}
+    # create subparsers
+    subparsers = parser.add_subparsers(dest='command')
+    common_args = get_common_args()
     for name, description, arg_args in get_subcommands():
-        f_module = importlib.import_module(
-            'absorb.cli.cli_commands.command_' + name
-        )
-        f = getattr(f_module, name + '_command')
+        module_name = 'absorb.cli.cli_commands.command_' + name
+        f_module = importlib.import_module(module_name)
         subparser = subparsers.add_parser(name, help=description)
-        subparser.set_defaults(f_command=f)
+        subparser.set_defaults(f_command=getattr(f_module, name + '_command'))
         for sub_args, sub_kwargs in arg_args + common_args:
             subparser.add_argument(*sub_args, **sub_kwargs)
-        parsers[name] = subparser
 
     # parse args
     args = parser.parse_args()
 
     # display help if no command specified
     if args.command is None:
-        import sys
-
         parser.print_help()
         sys.exit(0)
 
@@ -404,6 +404,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def _parse_datasets(args: argparse.Namespace) -> list[absorb.Table]:
+    """parse the datasets parameter into a list of instantiated Tables"""
     # parse parameters
     parameters: dict[str, typing.Any] = {}
     if args.parameters is not None:
