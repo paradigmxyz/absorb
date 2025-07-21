@@ -54,15 +54,12 @@ class SpotCandles(absorb.Table):
         }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
-        if self.parameters['market'] == 'spot':
-            return get_spot_candles(
-                pair=self.parameters['pair'],
-                timestamp=chunk,  # type: ignore
-                interval=self.parameters['interval'],
-                window='daily',
-            )
-        else:
-            raise Exception('invalid market')
+        return get_spot_candles(
+            pair=self.parameters['pair'],
+            timestamp=chunk,  # type: ignore
+            interval=self.parameters['interval'],
+            window='daily',
+        )
 
 
 class SpotTrades(absorb.Table):
@@ -72,6 +69,14 @@ class SpotTrades(absorb.Table):
     parameter_types = {'pair': str}
     default_parameters = {}
     name_template = 'spot_trades_{pair}'
+
+    def get_available_range(self) -> absorb.Coverage:
+        import datetime
+
+        return (
+            datetime.datetime(2025, 1, 1),
+            datetime.datetime(2025, 5, 1),
+        )
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -88,14 +93,11 @@ class SpotTrades(absorb.Table):
         }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
-        if self.parameters['market'] == 'spot':
-            return get_spot_trades(
-                pair=self.parameters['pair'],
-                timestamp=chunk,  # type: ignore
-                window='daily',
-            )
-        else:
-            raise Exception('invalid market')
+        return get_spot_trades(
+            pair=self.parameters['pair'],
+            timestamp=chunk,  # type: ignore
+            window='daily',
+        )
 
 
 class SpotAggregateTrades(absorb.Table):
@@ -122,14 +124,11 @@ class SpotAggregateTrades(absorb.Table):
         }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
-        if self.parameters['market'] == 'spot':
-            return get_spot_aggregate_trades(
-                pair=self.parameters['pair'],
-                timestamp=chunk,  # type: ignore
-                window='daily',
-            )
-        else:
-            raise Exception('invalid market')
+        return get_spot_aggregate_trades(
+            pair=self.parameters['pair'],
+            timestamp=chunk,  # type: ignore
+            window='daily',
+        )
 
 
 def get_spot_url(
