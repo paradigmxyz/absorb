@@ -168,13 +168,31 @@ def get_subcommands() -> list[
                 ),
                 (
                     ['--parameters'],
-                    {'nargs': '*', 'help': 'dataset parameters'},
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAM=VALUE',
+                    },
                 ),
                 (
                     ['--all'],
                     {
                         'help': 'add all available datasets',
                         'action': 'store_true',
+                    },
+                ),
+                (
+                    ['--delete'],
+                    {
+                        'action': 'store_true',
+                        'help': 'delete the dataset files from disk',
+                    },
+                ),
+                (
+                    ['--delete-only'],
+                    {
+                        'action': 'store_true',
+                        'help': 'keep tracking table, but delete the dataset files from disk',
                     },
                 ),
             ],
@@ -364,6 +382,7 @@ def get_common_args() -> list[tuple[list[str], dict[str, typing.Any]]]:
             ],
             {
                 'help': 'path to absorb root directory',
+                'metavar': 'PATH',
             },
         ),
         (
