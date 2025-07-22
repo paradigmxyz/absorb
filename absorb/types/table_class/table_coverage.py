@@ -26,7 +26,7 @@ class TableCoverage(table_io.TableIO):
         import os
         import glob
 
-        dir_path = self.get_dir_path()
+        dir_path = self.get_table_dir()
         if not os.path.isdir(dir_path):
             return None
 

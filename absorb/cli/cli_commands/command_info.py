@@ -79,7 +79,7 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
 
     import os
 
-    path = table.get_dir_path()
+    path = table.get_table_dir()
     if os.path.isdir(path):
         bytes_str = absorb.ops.format_bytes(absorb.ops.get_dir_size(path))
     else:

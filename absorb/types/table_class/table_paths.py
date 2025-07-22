@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 
 
 class TablePaths(table_base.TableBase):
-    def get_dir_path(self, warn: bool = True) -> str:
+    def get_table_dir(self, warn: bool = True) -> str:
         return absorb.ops.paths.get_table_dir(
             source=self.source, table=self.name(), warn=warn
         )
@@ -79,7 +79,7 @@ class TablePaths(table_base.TableBase):
         import os
 
         # create directory
-        table_dir = self.get_dir_path()
+        table_dir = self.get_table_dir()
         os.makedirs(table_dir, exist_ok=True)
 
         # set up metadata

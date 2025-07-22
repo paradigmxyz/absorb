@@ -141,7 +141,7 @@ class TableCollect(table_coverage.TableCoverage):
                 indent=4,
             )
         absorb.ops.print_bullet('overwrite', str(overwrite))
-        absorb.ops.print_bullet('output dir', self.get_dir_path())
+        absorb.ops.print_bullet('output dir', self.get_table_dir())
         absorb.ops.print_bullet(
             'collection start time', str(datetime.datetime.now())
         )
