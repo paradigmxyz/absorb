@@ -1,0 +1,76 @@
+from __future__ import annotations
+
+import typing
+
+import absorb
+from . import table_coverage
+
+
+class TableCreate(table_coverage.TableCoverage):
+    def __init__(self, parameters: dict[str, absorb.JSONValue] | None = None):
+        # set parameters
+        if hasattr(type(self), 'parameters'):
+            raise Exception(
+                'parameters should not be set at the class level, use cls.default_parameters'
+            )
+        if parameters is None:
+            parameters = {}
+        else:
+            parameters = parameters.copy()
+
+        # set default parameters
+        for key, value in self.default_parameters.items():
+            parameters.setdefault(key, value)
+
+        # make sure that parameters match the parameter types
+        if set(parameters.keys()) != set(self.parameter_types.keys()):
+            raise Exception(
+                self.name() + ': parameters must match parameter_types spec'
+            )
+        self.parameters = parameters
+
+        # make sure that all required parameters are set
+        required_parameters: list[str] = []
+        for parameter in required_parameters:
+            if not hasattr(self, parameter) or getattr(self, parameter) is None:
+                raise Exception('missing table parameter: ' + str(parameter))
+
+        # make sure that append only tables have an index type
+        if self.write_range == 'append_only' and (
+            not hasattr(self, 'index_type') or self.index_type is None
+        ):
+            raise Exception('index_type is required for append only tables')
+
+    @staticmethod
+    def instantiate(
+        ref: absorb.TableReference,
+        *,
+        parameters: dict[str, typing.Any] | None = None,
+        raw_parameters: dict[str, str] | None = None,
+        use_all_parameters: bool = True,
+    ) -> absorb.Table:
+        # reference already instantiated
+        if isinstance(ref, absorb.Table):
+            if parameters is not None or raw_parameters is not None:
+                raise Exception('Cannot pass parameters with table instance')
+            return ref
+
+        # get class and parameters
+        if isinstance(ref, dict):
+            # reference is a table dict
+            cls = absorb.ops.get_table_class(class_path=ref['table_class'])
+            if parameters is not None or raw_parameters is not None:
+                raise Exception('Cannot pass parameters with table dict')
+            parameters = ref['parameters']
+        elif isinstance(ref, str):
+            # reference is a str
+            cls, parameters = absorb.ops.parse_table_str(
+                ref,
+                parameters=parameters,
+                raw_parameters=raw_parameters,
+                use_all_parameters=use_all_parameters,
+            )
+        else:
+            raise Exception()
+
+        return cls(parameters=parameters)

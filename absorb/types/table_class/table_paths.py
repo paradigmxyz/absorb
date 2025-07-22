@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import typing
 import absorb
-from . import table_base
+from . import table_names
 
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T')
     import polars as pl
 
 
-class TablePaths(table_base.TableBase):
+class TablePaths(table_names.TableNames):
     def get_table_dir(self, warn: bool = True) -> str:
         return absorb.ops.paths.get_table_dir(
             source=self.source, table=self.name(), warn=warn

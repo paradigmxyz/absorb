@@ -41,14 +41,14 @@ def ls_command(args: Namespace) -> dict[str, Any]:
                         '[white bold]'
                         + dataset.source
                         + '.'
-                        + dataset.class_name(allow_generic=True)
+                        + dataset.name_classmethod(allow_generic=True)
                         + '[/white bold]',
                         **absorb.ops.bullet_styles,
                     )
             else:
                 if len(table_classes) > 0:
                     names = [
-                        cls.class_name(allow_generic=True)
+                        cls.name_classmethod(allow_generic=True)
                         for cls in table_classes
                     ]
                     toolstr.print_bullet(
