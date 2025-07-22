@@ -140,7 +140,11 @@ def get_subcommands() -> list[
                 ),
                 (
                     ['--parameters'],
-                    {'nargs': '*', 'help': 'dataset parameters'},
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters as `key=value` args',
+                        'metavar': 'PARAMS',
+                    },
                 ),
                 (
                     ['--path'],
@@ -150,7 +154,7 @@ def get_subcommands() -> list[
                     ['--collected'],
                     {
                         'action': 'store_true',
-                        'help': 'add datasets that are already collected',
+                        'help': 'add all datasets that are already collected',
                     },
                 ),
             ],
@@ -217,7 +221,11 @@ def get_subcommands() -> list[
                 ),
                 (
                     ['--parameters'],
-                    {'nargs': '*', 'help': 'dataset parameters'},
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAMS',
+                    },
                 ),
                 (
                     ['--glob'],
@@ -238,7 +246,11 @@ def get_subcommands() -> list[
                 ),
                 (
                     ['--parameters'],
-                    {'nargs': '*', 'help': 'dataset parameters'},
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAMS',
+                    },
                 ),
                 (
                     ['--glob'],
@@ -285,7 +297,11 @@ def get_subcommands() -> list[
                 ),
                 (
                     ['--parameters'],
-                    {'nargs': '*', 'help': 'dataset parameters'},
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAMS',
+                    },
                 ),
                 (
                     ['--count'],
@@ -345,7 +361,11 @@ def get_subcommands() -> list[
                 ),
                 (
                     ['--parameters'],
-                    {'nargs': '*', 'help': 'dataset parameters'},
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAMS',
+                    },
                 ),
                 (
                     ['--verbose', '-v'],
@@ -379,7 +399,8 @@ def get_common_args() -> list[tuple[list[str], dict[str, typing.Any]]]:
                 '--interactive',
             ],
             {
-                'help': 'open data in interactive python session',
+                # 'help': 'open data in interactive python session',
+                'help': argparse.SUPPRESS,
                 'action': 'store_true',
             },
         ),
