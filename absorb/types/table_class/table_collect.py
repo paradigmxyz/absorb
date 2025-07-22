@@ -55,10 +55,12 @@ class TableCollect(table_coverage.TableCoverage):
             )
 
         # check credentials
-        for credential in self.required_credentials:
-            value = os.environ.get(credential)
-            if value is None or value == '':
-                raise Exception(credential + ' environment variable not set')
+        missing_credentials = self.get_missing_credentials()
+        if len(missing_credentials) > 0:
+            raise Exception(
+                'required credentials not found: '
+                + ', '.join(missing_credentials)
+            )
 
     def _get_chunks_to_collect(
         self, data_range: absorb.Coverage | None = None, overwrite: bool = False

@@ -62,3 +62,14 @@ class TableBase:
             for package in cls.required_packages
             if not absorb.ops.is_package_installed(package)
         ]
+
+    @classmethod
+    def get_missing_credentials(self) -> list[str]:
+        import os
+
+        missing = []
+        for credential in self.required_credentials:
+            value = os.environ.get(credential)
+            if value is None or value == '':
+                missing.append(credential)
+        return missing

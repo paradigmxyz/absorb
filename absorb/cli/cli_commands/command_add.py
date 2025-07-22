@@ -68,4 +68,26 @@ def add_command(args: Namespace) -> dict[str, Any]:
     # start tracking tables
     absorb.ops.start_tracking_tables(track_datasets)
 
+    # check for missing packages or credentials
+    warnings = []
+    for table in track_datasets:
+        name = table.name()
+
+        missing_packages = table.get_missing_packages()
+        for package in missing_packages:
+            warnings.append(
+                f'[red]missing package[/red]: [white]{package}[/white] for [yellow]{name}[/yellow]'
+            )
+
+        missing_credentials = table.get_missing_credentials()
+        for credential in missing_credentials:
+            warnings.append(
+                f'[red]missing credentials[/red]: [white]{credential}[/white] for [yellow]{name}[/yellow]'
+            )
+    if len(warnings) > 0:
+        print()
+        rich.print('[red]Warnings:[/red]')
+        for warning in warnings:
+            rich.print('- ' + warning)
+
     return {}
