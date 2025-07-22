@@ -18,6 +18,7 @@ class TableBase:
     #
 
     source: str
+    description: str | None = None
     write_range: typing.Literal[
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]

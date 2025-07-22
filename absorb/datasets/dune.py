@@ -72,6 +72,7 @@ class AppendOnlyQuery(BaseQuery):
 
 class CexLabels(absorb.Table):
     source = 'dune'
+    description = "dune's CEX labels for EVM and Solana addresses"
     write_range = 'overwrite_all'
     required_packages = ['dune_spice >= 0.2.6']
     required_credentials = ['DUNE_API_KEY']

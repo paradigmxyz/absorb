@@ -24,6 +24,12 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
     )
 
     # metadata
+    if table.description is not None:
+        absorb.ops.print_bullet(
+            key='description',
+            value=table.description,
+        )
+
     for attr in [
         'source',
         'write_range',

@@ -30,6 +30,7 @@ CandleInterval = typing.Literal[
 
 class SpotCandles(absorb.Table):
     source = 'binance'
+    description = 'OHLCV candles for spot pairs at various time intervals'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'interval': str}
