@@ -25,6 +25,13 @@ def get_absorb_root(*, warn: bool = False) -> str:
     return path
 
 
+def set_absorb_root(path: str) -> None:
+    import os
+
+    os.environ['ABSORB_ROOT'] = path
+    _cache['root_dir_warning_shown'] = False
+
+
 def get_config_path(*, warn: bool = False) -> str:
     import os
 

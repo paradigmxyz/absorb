@@ -360,6 +360,14 @@ def get_common_args() -> list[tuple[list[str], dict[str, typing.Any]]]:
         ),
         (
             [
+                '--absorb-root',
+            ],
+            {
+                'help': 'path to absorb root directory',
+            },
+        ),
+        (
+            [
                 '--cd-destination-tempfile',
             ],
             {
