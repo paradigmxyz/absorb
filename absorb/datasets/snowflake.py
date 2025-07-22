@@ -17,7 +17,7 @@ class Query(absorb.Table):
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         raise NotImplementedError()
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import garlic
 
         sql = self.parameters['sql']

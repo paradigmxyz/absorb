@@ -28,6 +28,8 @@ class TableBase:
     # can be a str duration like '1h' or a float multiple of index type
     update_latency: tooltime.Timelength | float | None = None
 
+    chunk_datatype: typing.Literal['dataframe', 'files'] = 'dataframe'
+
     # dependencies
     required_packages: list[str] = []
     required_credentials: list[str] = []

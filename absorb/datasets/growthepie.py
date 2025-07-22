@@ -51,7 +51,7 @@ class Metrics(absorb.Table):
             'costs_total_eth': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import requests
         import polars as pl
 

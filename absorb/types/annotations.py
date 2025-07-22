@@ -5,6 +5,8 @@ import typing
 import datetime
 import types
 
+import polars as pl
+
 from . import table_class
 
 
@@ -79,6 +81,14 @@ MultiChunkRange = typing.Mapping[
     str, typing.Union[ScalarChunkRange, list[ScalarChunk]]
 ]
 Coverage = typing.Union[ChunkList, ScalarChunkRange, MultiChunkRange]
+
+
+class ChunkPaths(typing.TypedDict):
+    type: typing.Literal['files']
+    paths: list[str]
+
+
+ChunkData = typing.Union[pl.DataFrame, ChunkPaths]
 
 
 def get_index_type_type(

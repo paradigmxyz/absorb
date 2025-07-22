@@ -39,7 +39,7 @@ class Yields(absorb.Table):
             'revenue': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import time
         import polars as pl
 

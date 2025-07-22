@@ -37,7 +37,7 @@ if typing.TYPE_CHECKING:
 #             'revenue_usd': pl.Int64,
 #         }
 
-#     def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+#     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
 #         import polars as pl
 
 #         if self.parameters['protocols'] is not None:
@@ -81,7 +81,7 @@ class Fees(absorb.Table):
             'revenue_usd': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_historical_fees()
 
 
@@ -102,7 +102,7 @@ class ChainFees(absorb.Table):
             'revenue_usd': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -141,7 +141,7 @@ class FeesOfProtocols(absorb.Table):
             'revenue_usd': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import polars as pl
 
         protocols = self.parameters['protocols']

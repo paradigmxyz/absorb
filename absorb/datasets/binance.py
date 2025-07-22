@@ -62,7 +62,7 @@ class SpotCandles(absorb.Table):
             datetime.datetime(2025, 5, 1),
         )
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_spot_candles(
             pair=self.parameters['pair'],
             timestamp=chunk,  # type: ignore
@@ -101,7 +101,7 @@ class SpotTrades(absorb.Table):
             datetime.datetime(2025, 5, 1),
         )
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_spot_trades(
             pair=self.parameters['pair'],
             timestamp=chunk,  # type: ignore
@@ -140,7 +140,7 @@ class SpotAggregateTrades(absorb.Table):
             datetime.datetime(2025, 5, 1),
         )
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_spot_aggregate_trades(
             pair=self.parameters['pair'],
             timestamp=chunk,  # type: ignore

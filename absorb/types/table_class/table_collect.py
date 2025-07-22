@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 class TableCollect(table_coverage.TableCoverage):
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         raise NotImplementedError()
 
     def collect(
@@ -183,28 +183,59 @@ class TableCollect(table_coverage.TableCoverage):
             print('collecting', as_str)
 
         # collect chunk
-        df = self.collect_chunk(chunk=chunk)
+        data = self.collect_chunk(chunk=chunk)
 
         # validate chunk
-        self.validate_chunk(chunk=chunk, df=df)
+        self.validate_chunk(chunk=chunk, data=data)
 
         # write file
-        if df is not None:
-            path = self.get_file_path(chunk=chunk, df=df)
-            absorb.ops.write_file(df=df, path=path)
+        if self.chunk_datatype == 'dataframe' and data is not None:
+            if not isinstance(data, pl.DataFrame):
+                raise Exception(
+                    'collected data is not a DataFrame: ' + str(type(data))
+                )
+            path = self.get_file_path(chunk=chunk, df=data)
+            absorb.ops.write_file(df=data, path=path)
 
         # print post-summary
-        if verbose >= 1 and df is None:
+        if verbose >= 1 and data is None:
             print('could not collect data for', str(chunk))
 
-    def validate_chunk(self, chunk: absorb.Chunk, df: pl.DataFrame | None) -> None:
-        if df is None:
+    def validate_chunk(
+        self, chunk: absorb.Chunk, data: absorb.ChunkData | None
+    ) -> None:
+        import os
+        import polars as pl
+
+        if data is None:
             return
 
-        if df is not None:
-            assert dict(df.schema) == self.get_schema(), (
+        if self.chunk_datatype == 'dataframe':
+            if not isinstance(data, pl.DataFrame):
+                raise Exception(
+                    'collected data is not a DataFrame: ' + str(type(data))
+                )
+            assert dict(data.schema) == self.get_schema(), (
                 'collected data does not match schema: '
-                + str(dict(df.schema))
+                + str(dict(data.schema))
                 + ' != '
                 + str(self.get_schema())
             )
+        elif self.chunk_datatype == 'files':
+            if not isinstance(data, dict) or data.get('type') != 'files':
+                raise Exception(
+                    'collected data is not a path dict: ' + str(type(data))
+                )
+            for path in data['paths']:
+                assert os.path.exists(path), (
+                    'collected data does not exist: ' + path
+                )
+                file_schema = pl.scan_parquet(path).collect_schema()
+                assert dict(file_schema) == self.get_schema(), (
+                    'collected data does not match schema: '
+                    + str(dict(file_schema))
+                    + ' != '
+                    + str(self.get_schema())
+                )
+        else:
+            raise Exception('invalid data format: ' + str(type(data)))

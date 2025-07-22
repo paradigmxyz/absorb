@@ -27,7 +27,7 @@ class XatuTable(absorb.Table):
     name_template = '{class_name}_{network}'
     required_packages = ['yaml >= 5.4.1']
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return _fetch(
             datatype=self.datatype,
             network=self.parameters['network'],

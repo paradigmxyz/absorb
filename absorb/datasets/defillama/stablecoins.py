@@ -20,7 +20,7 @@ class Stablecoins(absorb.Table):
 
         return {'timestamp': pl.Float64, 'circulating_usd': pl.Float64}
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_historical_total_stablecoins()
 
 
@@ -42,7 +42,7 @@ class StablecoinsOfChains(absorb.Table):
             'bridged_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -81,7 +81,7 @@ class StablecoinsOfTokens(absorb.Table):
             'bridged_to': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import polars as pl
 
         tokens = self.parameters['tokens']
@@ -111,7 +111,7 @@ class StablecoinPrices(absorb.Table):
             'price': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_historical_stablecoin_prices()
 
 

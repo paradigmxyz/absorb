@@ -38,7 +38,7 @@ class CoinMetrics(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         top_n = self.parameters['top_n']
         if top_n is None:
             top_n = 1000
@@ -68,7 +68,7 @@ class Categories(absorb.Table):
 
         return {'coin': pl.String, 'category': pl.String}
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         return get_current_coin_categories(
             categories=self.parameters['categories']
         )
@@ -103,7 +103,7 @@ class CategoryMetrics(absorb.Table):
             'volume_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> pl.DataFrame | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         coin_metrics = absorb.load('coingecko.coin_metrics')
         coin_categories = absorb.load('coingecko.categories')
         return get_historical_category_metrics(
