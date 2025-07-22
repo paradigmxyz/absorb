@@ -185,6 +185,9 @@ class TableCollect(table_coverage.TableCoverage):
         # collect chunk
         df = self.collect_chunk(chunk=chunk)
 
+        # validate chunk
+        self.validate_chunk(chunk=chunk, df=df)
+
         # write file
         if df is not None:
             path = self.get_file_path(chunk=chunk, df=df)
@@ -193,3 +196,15 @@ class TableCollect(table_coverage.TableCoverage):
         # print post-summary
         if verbose >= 1 and df is None:
             print('could not collect data for', str(chunk))
+
+    def validate_chunk(self, chunk: absorb.Chunk, df: pl.DataFrame | None) -> None:
+        if df is None:
+            return
+
+        if df is not None:
+            assert dict(df.schema) == self.get_schema(), (
+                'collected data does not match schema: '
+                + str(dict(df.schema))
+                + ' != '
+                + str(self.get_schema())
+            )
