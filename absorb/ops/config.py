@@ -13,6 +13,7 @@ def get_default_config() -> absorb.Config:
     return {
         'version': absorb.__version__,
         'tracked_tables': [],
+        'use_git': True,
     }
 
 

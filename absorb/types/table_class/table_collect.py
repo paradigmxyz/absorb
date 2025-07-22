@@ -190,6 +190,8 @@ class TableCollect(table_coverage.TableCoverage):
 
         # write file
         if self.chunk_datatype == 'dataframe' and data is not None:
+            import polars as pl
+
             if not isinstance(data, pl.DataFrame):
                 raise Exception(
                     'collected data is not a DataFrame: ' + str(type(data))

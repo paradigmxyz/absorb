@@ -22,6 +22,13 @@ def validate_command(args: Namespace) -> dict[str, Any]:
     errors = []
     metadatas = {}
 
+    # check that config is valid
+    config = absorb.ops.get_config()
+    default_config = absorb.ops.get_default_config()
+    assert config.keys() == default_config.keys(), (
+        'config keys do not match default config keys'
+    )
+
     # check that datasets_dir exists
     datasets_dir = absorb.ops.get_datasets_dir()
     if not os.path.isdir(datasets_dir):

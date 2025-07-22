@@ -143,3 +143,4 @@ TableReference = typing.Union[str, TableDict, table_class.Table]
 class Config(typing.TypedDict):
     version: str
     tracked_tables: list[TableDict]
+    use_git: bool

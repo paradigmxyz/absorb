@@ -53,7 +53,7 @@ def get_source_dir(source: str, *, warn: bool = False) -> str:
 
 
 def get_table_dir(
-    table: str | absorb.TableDict,
+    table: str | absorb.TableDict | absorb.Table,
     *,
     source: str | None = None,
     warn: bool = False,
@@ -69,6 +69,9 @@ def get_table_dir(
     elif isinstance(table, dict):
         source = table['source_name']
         table = table['table_name']
+    elif isinstance(table, absorb.Table):
+        source = table.source
+        table = table.name()
     else:
         raise Exception('invalid format')
 
@@ -77,7 +80,7 @@ def get_table_dir(
 
 
 def get_table_metadata_path(
-    table: str | absorb.TableDict,
+    table: str | absorb.TableDict | absorb.Table,
     *,
     source: str | None = None,
     warn: bool = False,
