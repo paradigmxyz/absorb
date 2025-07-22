@@ -1,12 +1,51 @@
 from __future__ import annotations
 
+import absorb
+
+
+def setup_git(track_datasets: list[absorb.Table] | None = None) -> None:
+    import os
+
+    absorb_root = absorb.ops.get_absorb_root()
+
+    # initialize repo
+    if not git_is_repo_root(absorb_root):
+        git_initialize_repo(absorb_root)
+
+    # setup gitignore
+    gitignore_path = os.path.join(absorb_root, '.gitignore')
+    if not os.path.isfile(gitignore_path):
+        default_gitignore = '*.parquet'
+        with open(gitignore_path, 'w') as f:
+            f.write(default_gitignore)
+    if not git_is_file_tracked(gitignore_path, repo_root=absorb_root):
+        git_add_and_commit_file(gitignore_path, repo_root=absorb_root)
+
+    # add config file
+    config_path = absorb.ops.get_config_path()
+    if not git_is_file_tracked(config_path, repo_root=absorb_root):
+        git_add_and_commit_file(config_path, repo_root=absorb_root)
+
+    # add metadata of existing tables
+    if track_datasets is not None:
+        n_added = 0
+        for dataset in track_datasets:
+            metadata_path = absorb.ops.get_table_metadata_path(dataset)
+            if not git_is_file_tracked(metadata_path, repo_root=absorb_root):
+                git_add_file(metadata_path, repo_root=absorb_root)
+                n_added += 1
+        if n_added > 0:
+            git_commit(
+                message='added ' + str(n_added) + ' table metadata files',
+                repo_root=absorb_root,
+            )
+
 
 def git_is_file_tracked(path: str, repo_root: str) -> bool:
     """Check if a file is currently being tracked by git"""
     import subprocess
 
     try:
-        # Method 1: Use git ls-files to check if file is tracked
         result = subprocess.run(
             ['git', 'ls-files', path],
             cwd=repo_root,
@@ -14,11 +53,8 @@ def git_is_file_tracked(path: str, repo_root: str) -> bool:
             capture_output=True,
             text=True,
         )
-        # If the file is tracked, git ls-files returns the filename
-        # If not tracked, it returns empty string
         return bool(result.stdout.strip())
     except subprocess.CalledProcessError:
-        # If git command fails, assume file is not tracked
         return False
 
 
@@ -74,9 +110,8 @@ def git_remove_and_commit_file(
     git_commit(message=message, repo_root=repo_root)
 
 
-def git_commit(message: str, repo_root: str) -> None:
+def git_commit(message: str, repo_root: str, *, verbose: bool = False) -> None:
     """Commit staged changes"""
-    # Use list format to handle messages with spaces/quotes safely
     import subprocess
 
     try:
@@ -87,7 +122,8 @@ def git_commit(message: str, repo_root: str) -> None:
             capture_output=True,
             text=True,
         )
-        print(f'Committed: {result.stdout.strip()}')
+        if verbose:
+            print(f'Committed: {result.stdout.strip()}')
     except subprocess.CalledProcessError as e:
         error_msg = e.stderr.strip() if e.stderr else str(e)
         print(f'Error committing: {error_msg}')
@@ -101,7 +137,7 @@ def run_git_command(cmd: list[str], repo_root: str) -> str:
     try:
         result = subprocess.run(
             cmd,
-            cwd=repo_root,  # Use cwd parameter instead of cd &&
+            cwd=repo_root,
             check=True,
             capture_output=True,
             text=True,

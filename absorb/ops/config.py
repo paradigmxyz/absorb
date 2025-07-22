@@ -36,7 +36,9 @@ def get_config() -> absorb.Config:
         raise Exception('invalid config format')
 
 
-def write_config(config: absorb.Config) -> None:
+def write_config(
+    config: absorb.Config, commit_message: str | None = None
+) -> None:
     import json
     import os
 
@@ -49,8 +51,28 @@ def write_config(config: absorb.Config) -> None:
 
     path = paths.get_config_path()
     os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    # load old config for change detection
+    if os.path.isfile(path):
+        with open(path, 'r') as f:
+            old_config = json.load(f)
+    else:
+        old_config = None
+
+    # write config
     with open(path, 'w') as f:
         json.dump(config, f)
+
+    # version control
+    if config['use_git']:
+        if json.dumps(config, sort_keys=True) != json.dumps(
+            old_config, sort_keys=True
+        ):
+            absorb.ops.git_add_and_commit_file(
+                paths.get_config_path(),
+                repo_root=paths.get_absorb_root(),
+                message=commit_message,
+            )
 
 
 def validate_config(
@@ -88,7 +110,10 @@ def start_tracking_tables(
         if as_str not in tracked_tables:
             config['tracked_tables'].append(table_dict)
             tracked_tables.add(as_str)
-    write_config(config)
+
+    names = ', '.join(absorb.Table.instantiate(table).name() for name in tables)
+    message = 'Start tracking ' + str(len(tables)) + ' tables: ' + names
+    write_config(config, message)
 
 
 def stop_tracking_tables(
@@ -109,7 +134,11 @@ def stop_tracking_tables(
         if json.dumps(table, sort_keys=True) not in drop_these
     ]
 
-    write_config(config)
+    names = ', '.join(
+        absorb.Table.instantiate(table).name() for table in tables
+    )
+    message = 'Stop tracking ' + str(len(tables)) + ' tables: ' + names
+    write_config(config, message)
 
 
 #

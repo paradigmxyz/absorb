@@ -65,6 +65,10 @@ def add_command(args: Namespace) -> dict[str, Any]:
             'to proceed with data collection, use [white bold]absorb collect[/white bold]'
         )
 
+    # setup directories
+    for table in track_datasets:
+        table.setup_table_dir()
+
     # start tracking tables
     absorb.ops.start_tracking_tables(track_datasets)
 

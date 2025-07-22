@@ -195,6 +195,13 @@ def get_subcommands() -> list[
                         'help': 'keep tracking table, but delete the dataset files from disk',
                     },
                 ),
+                (
+                    ['--confirm'],
+                    {
+                        'action': 'store_true',
+                        'help': 'confirm the deletion of dataset files',
+                    },
+                ),
             ],
         ),
         (
