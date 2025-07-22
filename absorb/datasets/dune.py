@@ -86,7 +86,7 @@ class CexLabels(absorb.Table):
             'cex_name': pl.String,
             'distinct_name': pl.String,
             'added_by': pl.String,
-            'added_date': pl.Datetime('ms'),
+            'added_date': pl.String,
             'ecosystem': pl.String,
         }
 
