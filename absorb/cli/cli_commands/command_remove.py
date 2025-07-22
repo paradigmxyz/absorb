@@ -30,29 +30,10 @@ def remove_command(args: Namespace) -> dict[str, Any]:
         print()
         for dataset in tracked_datasets:
             print('deleting files of ' + dataset.full_name())
-            delete_table_dir(dataset, confirm=args.confirm)
+            absorb.ops.delete_table_dir(dataset, confirm=args.confirm)
         print('...done')
     else:
         print()
         print('to delete table data files, use the --delete flag')
 
     return {}
-
-
-def delete_table_dir(table: absorb.Table, confirm: bool = False) -> None:
-    import os
-    import shutil
-
-    if not confirm:
-        raise Exception('use confirm=True to delete table and its data files')
-
-    table_dir = table.get_table_dir()
-    if os.path.isdir(table_dir):
-        shutil.rmtree(table_dir)
-
-    if absorb.ops.get_config()['use_git']:
-        absorb.ops.git_remove_and_commit_file(
-            absorb.ops.get_table_metadata_path(table),
-            repo_root=absorb.ops.get_absorb_root(),
-            message='Remove table metadata for ' + table.full_name(),
-        )

@@ -46,6 +46,12 @@ def get_datasets_dir(*, warn: bool = False) -> str:
     return os.path.join(get_absorb_root(warn=warn), 'datasets')
 
 
+def get_source_tables_dir(source: str, *, warn: bool = False) -> str:
+    import os
+
+    return os.path.join(get_datasets_dir(warn=warn), source, 'tables')
+
+
 def get_source_dir(source: str, *, warn: bool = False) -> str:
     import os
 
@@ -245,3 +251,22 @@ def format_bytes(bytes_size: int | float) -> str:
             return f'{bytes_size:.2f} {unit}'
         bytes_size /= 1024.0
     return f'{bytes_size:.2f} PB'
+
+
+def delete_table_dir(table: absorb.Table, confirm: bool = False) -> None:
+    import os
+    import shutil
+
+    if not confirm:
+        raise Exception('use confirm=True to delete table and its data files')
+
+    table_dir = table.get_table_dir()
+    if os.path.isdir(table_dir):
+        shutil.rmtree(table_dir)
+
+    if absorb.ops.get_config()['use_git']:
+        absorb.ops.git_remove_and_commit_file(
+            absorb.ops.get_table_metadata_path(table),
+            repo_root=absorb.ops.get_absorb_root(),
+            message='Remove table metadata for ' + table.full_name(),
+        )

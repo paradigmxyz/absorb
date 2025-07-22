@@ -185,7 +185,7 @@ def get_spot_url(
             'spot/{window}/{datatype}/{pair}/{pair}-{datatype}-{date_str}.zip'
         )
 
-    root = 'https://data.binance.vision/data'
+    root = 'https://data.binance.vision/data/'
     tail = template.format(
         datatype=datatype,
         pair=pair,
@@ -193,7 +193,7 @@ def get_spot_url(
         interval=interval,
         date_str=date_str,
     )
-    return os.path.join(root, tail)
+    return root + tail
 
 
 def get_spot_trades(

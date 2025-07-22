@@ -37,8 +37,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
 
     # check each collected dataset
     for source in os.listdir(datasets_dir):
-        source_dir = os.path.join(datasets_dir, source)
-        tables_dir = os.path.join(source_dir, 'tables')
+        tables_dir = absorb.ops.get_source_tables_dir(source)
         for table in os.listdir(tables_dir):
             # check that each dataset has a metadata file
             table_dir = os.path.join(tables_dir, table)
@@ -158,12 +157,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
         ]
 
         # check that tracked metadata directory exists
-        table_dir = os.path.join(
-            datasets_dir,
-            metadata['source_name'],
-            'tables',
-            metadata['table_name'],
-        )
+        table_dir = absorb.ops.get_table_dir(metadata)
         if not os.path.isdir(table_dir):
             errors.append(
                 metadata.get('source_name', 'unknown_source')
