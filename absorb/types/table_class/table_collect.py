@@ -118,9 +118,7 @@ class TableCollect(table_coverage.TableCoverage):
 
         rich.print(
             '[bold][green]collecting dataset:[/green] [white]'
-            + self.source
-            + '.'
-            + self.name()
+            + self.full_name()
             + '[/white][/bold]'
         )
         absorb.ops.print_bullet('n_chunks', str(len(chunks)))

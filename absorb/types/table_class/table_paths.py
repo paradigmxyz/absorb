@@ -103,7 +103,7 @@ class TablePaths(table_names.TableNames):
                 absorb.ops.git_add_and_commit_file(
                     metadata_path,
                     repo_root=absorb.ops.get_absorb_root(),
-                    message='Collect new table metadata: ' + self.name(),
+                    message='Collect new table metadata: ' + self.full_name(),
                 )
 
     def create_table_dict(self) -> absorb.TableDict:

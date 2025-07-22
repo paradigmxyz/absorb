@@ -35,7 +35,7 @@ def collect_command(args: Namespace) -> dict[str, Any]:
             text_style='bold white',
         )
         for d, dataset in enumerate(datasets):
-            name = dataset.source + '.' + dataset.name()
+            name = dataset.full_name()
             absorb.ops.print_bullet(key=name, value=None, number=d + 1)
         print()
 

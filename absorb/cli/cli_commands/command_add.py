@@ -75,7 +75,7 @@ def add_command(args: Namespace) -> dict[str, Any]:
     # check for missing packages or credentials
     warnings = []
     for table in track_datasets:
-        name = table.name()
+        name = table.full_name()
 
         missing_packages = table.get_missing_packages()
         for package in missing_packages:

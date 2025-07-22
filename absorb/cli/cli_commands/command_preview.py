@@ -44,14 +44,14 @@ def preview_command(args: Namespace) -> dict[str, Any]:
 
         # print total number of rows
         dataset_n_rows = absorb.scan(dataset).select(pl.len()).collect().item()
-        n_rows[dataset.name()] = dataset_n_rows
+        n_rows[dataset.full_name()] = dataset_n_rows
         print(dataset_n_rows, 'rows,', len(df.columns), 'columns')
 
     # load interactive previews
     if args.interactive:
         if len(datasets) == 1:
             dataset = datasets[0]
-            if n_rows[dataset.name()] <= 1_000_000:
+            if n_rows[dataset.full_name()] <= 1_000_000:
                 return {'df': absorb.load(dataset)}
             else:
                 return {'lf': absorb.scan(dataset)}
@@ -59,7 +59,7 @@ def preview_command(args: Namespace) -> dict[str, Any]:
             dfs = {}
             lfs = {}
             for dataset in datasets:
-                table_name = dataset.name()
+                table_name = dataset.full_name()
                 if n_rows[table_name] <= 1_000_000:
                     dfs[table_name] = absorb.load(dataset)
                 else:

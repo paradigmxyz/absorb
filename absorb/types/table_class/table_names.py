@@ -37,6 +37,22 @@ class TableNames(table_base.TableBase):
             parameters=self.parameters,
         )
 
+    def full_name_classmethod(
+        cls,
+        allow_generic: bool = False,
+        parameters: dict[str, absorb.JSONValue] | None = None,
+    ) -> str:
+        return (
+            cls.source
+            + '.'
+            + cls.name_classmethod(
+                allow_generic=allow_generic, parameters=parameters
+            )
+        )
+
+    def full_name(self) -> str:
+        return self.source + '.' + self.name()
+
     @classmethod
     def parse_name_parameters(cls, table_name: str) -> dict[str, typing.Any]:
         name_templates = (

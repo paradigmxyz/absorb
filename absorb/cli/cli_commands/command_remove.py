@@ -29,8 +29,7 @@ def remove_command(args: Namespace) -> dict[str, Any]:
     if args.delete:
         print()
         for dataset in tracked_datasets:
-            name = dataset.name()
-            print('deleting files of ' + name)
+            print('deleting files of ' + dataset.full_name())
             delete_table_dir(dataset, confirm=args.confirm)
         print('...done')
     else:
@@ -55,5 +54,5 @@ def delete_table_dir(table: absorb.Table, confirm: bool = False) -> None:
         absorb.ops.git_remove_and_commit_file(
             absorb.ops.get_table_metadata_path(table),
             repo_root=absorb.ops.get_absorb_root(),
-            message='Remove table metadata for ' + table.name(),
+            message='Remove table metadata for ' + table.full_name(),
         )

@@ -111,7 +111,9 @@ def start_tracking_tables(
             config['tracked_tables'].append(table_dict)
             tracked_tables.add(as_str)
 
-    names = ', '.join(absorb.Table.instantiate(table).name() for name in tables)
+    names = ', '.join(
+        absorb.Table.instantiate(table).full_name() for name in tables
+    )
     message = 'Start tracking ' + str(len(tables)) + ' tables: ' + names
     write_config(config, message)
 
@@ -135,7 +137,7 @@ def stop_tracking_tables(
     ]
 
     names = ', '.join(
-        absorb.Table.instantiate(table).name() for table in tables
+        absorb.Table.instantiate(table).full_name() for table in tables
     )
     message = 'Stop tracking ' + str(len(tables)) + ' tables: ' + names
     write_config(config, message)

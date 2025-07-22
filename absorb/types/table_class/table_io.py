@@ -24,7 +24,7 @@ class TableIO(table_paths.TablePaths):
             return pl.scan_parquet(self.get_glob(), **scan_kwargs)
         except Exception as e:
             if e.args[0].startswith('expected at least 1 source'):
-                raise Exception('no data to load for ' + str(self.name()))
+                raise Exception('no data to load for ' + str(self.full_name()))
             else:
                 raise e
 
@@ -35,6 +35,6 @@ class TableIO(table_paths.TablePaths):
             return self.scan(**kwargs).collect()
         except pl.exceptions.ComputeError as e:
             if e.args[0].startswith('expected at least 1 source'):
-                raise Exception('no data to load for ' + str(self.name()))
+                raise Exception('no data to load for ' + str(self.full_name()))
             else:
                 raise e
