@@ -87,6 +87,12 @@ class TableCollect(table_coverage.TableCoverage):
                 return [available_range]
 
         else:
+            index_type = self.index_type
+            if index_type is None:
+                raise Exception(
+                    'index type is required if not using overwrite_all'
+                )
+
             # get coverage range for collection
             if data_range is None:
                 if overwrite:
@@ -100,10 +106,10 @@ class TableCollect(table_coverage.TableCoverage):
 
             # partition coverage into chunks
             data_ranges = absorb.ops.coverage_to_list(
-                coverage, index_type=self.index_type
+                coverage, index_type=index_type
             )
             return absorb.ops.partition_into_chunks(
-                data_ranges, index_type=self.index_type
+                data_ranges, index_type=index_type
             )
 
     def _summarize_collection_plan(

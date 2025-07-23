@@ -22,7 +22,7 @@ class TableBase:
     write_range: typing.Literal[
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]
-    index_type: absorb.IndexType
+    index_type: absorb.IndexType | None = None
 
     # for ongoing datasets, time to wait before checking if new data is posted
     # can be a str duration like '1h' or a float multiple of index type

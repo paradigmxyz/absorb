@@ -21,7 +21,7 @@ def print_bullet(
 
 
 def format_coverage(
-    coverage: absorb.Coverage | None, index_type: absorb.IndexType
+    coverage: absorb.Coverage | None, index_type: absorb.IndexType | None
 ) -> str:
     if coverage is None:
         return 'None'
@@ -46,8 +46,12 @@ def format_coverage(
         raise Exception()
 
 
-def format_chunk(chunk: absorb.Chunk, index_type: absorb.IndexType) -> str:
+def format_chunk(
+    chunk: absorb.Chunk, index_type: absorb.IndexType | None
+) -> str:
     if chunk is None:
+        return '-'
+    if index_type is None:
         return '-'
 
     if index_type == 'hour':

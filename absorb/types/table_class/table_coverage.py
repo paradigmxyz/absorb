@@ -79,10 +79,15 @@ class TableCoverage(table_io.TableIO):
         if collected_range is None:
             return [available_range]
         else:
+            index_type = self.index_type
+            if index_type is None:
+                raise Exception(
+                    'ranges computations require index_type to be set'
+                )
             return absorb.ops.get_range_diff(
                 subtract_this=collected_range,
                 from_this=available_range,
-                index_type=self.index_type,
+                index_type=index_type,
             )
 
     @classmethod

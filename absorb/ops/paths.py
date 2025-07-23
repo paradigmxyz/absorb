@@ -99,7 +99,7 @@ def get_table_metadata_path(
 
 def get_table_filepath(
     chunk: absorb.Chunk,
-    index_type: absorb.IndexType,
+    index_type: absorb.IndexType | None,
     filename_template: str,
     table: str,
     *,
@@ -125,7 +125,7 @@ def get_table_filepath(
 
 def get_table_filename(
     chunk: absorb.Chunk,
-    index_type: absorb.IndexType,
+    index_type: absorb.IndexType | None,
     filename_template: str,
     table: str,
     *,
@@ -141,6 +141,10 @@ def get_table_filename(
         if glob:
             format_params['chunk'] = '*'
         else:
+            if index_type is None:
+                raise Exception(
+                    'index_type must be provided if {chunk} is in filename_template'
+                )
             if isinstance(chunk, str):
                 chunk_str = chunk
             else:
@@ -151,7 +155,7 @@ def get_table_filename(
 
 def get_table_filepaths(
     chunks: typing.Any,
-    index_type: absorb.IndexType,
+    index_type: absorb.IndexType | None,
     filename_template: str,
     table: str,
     *,
