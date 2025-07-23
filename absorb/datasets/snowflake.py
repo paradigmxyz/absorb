@@ -11,8 +11,11 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'snowflake'
     write_range = 'overwrite_all'
-    parameter_types = {'name': str, 'sql': str}
-    required_packages = ['garlic >= 1.1']
+    # parameter_types = {'name': str, 'sql': str}
+    # parameter_types = {'name': str}
+    required_packages = ['paradigm_garlic >= 0.1.2']
+    sql: str
+    # name_template = 'snowflake_query_{name}'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         raise NotImplementedError()
@@ -20,8 +23,10 @@ class Query(absorb.Table):
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import garlic
 
-        sql = self.parameters['sql']
-        return garlic.query(sql)
+        if not hasattr(self, 'sql'):
+            raise ValueError('SQL query must be defined in the subclass.')
+
+        return garlic.query(self.sql)
 
     def get_available_range(self) -> absorb.Coverage:
-        raise NotImplementedError()
+        return None

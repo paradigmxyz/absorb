@@ -54,7 +54,7 @@ datasources = [
     "google-cloud>=0.34.0",
     "google>=3.0.0",
     "nitwit>=0.1.1",
-    "paradigm-garlic>=0.1.1",
+    "paradigm-garlic>=0.1.3",
 ]
 interactive = [
     "ipython>=8.18.1",
