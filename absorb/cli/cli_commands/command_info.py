@@ -23,14 +23,9 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
         'dataset = ' + args.dataset, style='green', text_style='bold white'
     )
 
-    # metadata
-    if table.description is not None:
-        absorb.ops.print_bullet(
-            key='description',
-            value=table.description,
-        )
-
     for attr in [
+        'description',
+        'url',
         'source',
         'write_range',
         'index_type',
