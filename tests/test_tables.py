@@ -1,4 +1,6 @@
 import absorb
+import absorb.datasets.allium
+import absorb.datasets.snowflake
 
 import pytest
 
@@ -8,6 +10,12 @@ required_attrs = [
     'write_range',
     'description',
     'url',
+]
+
+
+skip_initializing = [
+    absorb.datasets.snowflake.Query,
+    absorb.datasets.allium.Query,
 ]
 
 
@@ -50,6 +58,8 @@ def test_tables_implement_get_schema(table: type[absorb.Table]) -> None:
     )
 
     # attempt to call get_schema()
+    if table in skip_initializing:
+        return
     table_instance = None
     try:
         table_instance = table()

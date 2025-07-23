@@ -20,7 +20,15 @@ class Query(absorb.Table):
     # name_template = 'snowflake_query_{name}'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
-        raise NotImplementedError()
+        import garlic
+
+        sql = (
+            'WITH cte AS ('
+            + self.sql.rstrip(';')
+            + '), SELECT * FROM cte LIMIT 0'
+        )
+        result = garlic.query(sql)
+        return dict(result.schema)
 
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         import garlic
@@ -29,6 +37,3 @@ class Query(absorb.Table):
             raise ValueError('SQL query must be defined in the subclass.')
 
         return garlic.query(self.sql)
-
-    def get_available_range(self) -> absorb.Coverage:
-        return None
