@@ -13,6 +13,8 @@ if typing.TYPE_CHECKING:
 
 class Chains(absorb.Table):
     source = 'chains'
+    description = 'Registry of EVM chains and their chain IDs'
+    url = 'https://github.com/ethereum-lists/chains'
     write_range = 'overwrite_all'
     index_type = 'number'
 

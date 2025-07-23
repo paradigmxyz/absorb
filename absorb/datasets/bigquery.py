@@ -11,6 +11,8 @@ if typing.TYPE_CHECKING:
 
 class Query(absorb.Table):
     source = 'bigquery'
+    description = 'Query data from Google BigQuery'
+    url = 'https://cloud.google.com/bigquery?hl=en'
     write_range = 'overwrite_all'
     parameter_types = {'sql': str, 'name': str}
     required_packages = [

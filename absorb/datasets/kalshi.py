@@ -15,6 +15,8 @@ path_template = '/Users/stormslivkoff/data/kalshi/raw_archive/market_data_{year}
 
 class Metrics(absorb.Table):
     source = 'kalshi'
+    description = 'Daily summary data for each Kalshi market'
+    url = 'https://kalshi.com/'
     write_range = 'append_only'
     index_type = 'day'
 
@@ -64,6 +66,8 @@ class Metrics(absorb.Table):
 
 class Metadata(absorb.Table):
     source = 'kalshi'
+    description = 'Metadata for each Kalshi market'
+    url = 'https://kalshi.com/'
     cadence = None
     write_range = 'overwrite_all'
     index_type = 'day'

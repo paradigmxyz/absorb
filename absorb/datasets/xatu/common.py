@@ -21,6 +21,8 @@ url_templates = {
 
 class XatuTable(absorb.Table):
     source: str
+    description = 'Xatu data from EthPandaOps'
+    url = 'https://ethpandaops.io/data/xatu/'
     datatype: str
     per: typing.Literal['day', 'hour']
     parameter_types = {'network': str}

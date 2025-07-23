@@ -10,6 +10,8 @@ if typing.TYPE_CHECKING:
 
 class Treasuries(absorb.Table):
     source = 'tic'
+    description = 'Holdings of US Treasury securities per each country'
+    url = 'https://home.treasury.gov/data/treasury-international-capital-tic-system'
     write_range = 'overwrite_all'
     index_type = 'month'
 

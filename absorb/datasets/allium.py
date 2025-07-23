@@ -11,9 +11,13 @@ if typing.TYPE_CHECKING:
 
 class Query(snowflake.Query):
     source = 'allium'
+    url = 'https://docs.allium.so/historical-data/overview'
 
 
 class StablecoinSupply(Query):
+    description = 'Stablecoin supply data from Allium'
+    url = 'https://docs.allium.so/historical-data/stablecoins'
+
     sql = """
     SELECT *
     FROM CROSSCHAIN_ALLIUM.STABLECOIN.SUPPLY_BETA

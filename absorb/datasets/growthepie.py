@@ -11,6 +11,8 @@ if typing.TYPE_CHECKING:
 
 
 class Metrics(absorb.Table):
+    description = 'On-chain metrics for Ethereum and its rollups'
+    url = 'https://www.growthepie.com/'
     source = 'growthepie'
     write_range = 'overwrite_all'
     index_type = 'day'

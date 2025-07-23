@@ -16,7 +16,9 @@ if typing.TYPE_CHECKING:
 
 
 class VeraChunkedDataset(absorb.Table):
+    source = 'vera'
     vera_filetype: str
+    url = 'https://verifieralliance.org/'
     index_type = 'number_range'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
@@ -31,43 +33,43 @@ class VeraChunkedDataset(absorb.Table):
 
 
 class Code(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance code dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'code'
 
 
 class Contracts(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance contracts dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'contracts'
 
 
 class ContractDeployments(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance contract deployments dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'contract_deployments'
 
 
 class CompiledContracts(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance compiled contracts dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'compiled_contracts'
 
 
 class CompiledContractsSources(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance compiled contract sourcecode dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'compiled_contracts_sources'
 
 
 class Sources(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance sourcecode dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'sources'
 
 
 class VerifiedContracts(VeraChunkedDataset):
-    source = 'vera'
+    description = 'Verifier Alliance verified contracts dataset'
     write_range = 'overwrite_all'
     vera_filetype = 'verified_contracts'
 

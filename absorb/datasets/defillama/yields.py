@@ -12,6 +12,8 @@ if typing.TYPE_CHECKING:
 
 class Yields(absorb.Table):
     source = 'defillama'
+    description = 'Yields of each pool in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'pools': (list, type(None)), 'top_n': int}
     default_parameters = {'pools': None, 'top_n': 5000}

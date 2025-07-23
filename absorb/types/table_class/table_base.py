@@ -12,13 +12,14 @@ if typing.TYPE_CHECKING:
 
 class TableBase:
     version: str = '0.1.0'
+    source: str
+    description: str | None = None
+    url: str | None = None
 
     #
     # # structure
     #
 
-    source: str
-    description: str | None = None
     write_range: typing.Literal[
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]

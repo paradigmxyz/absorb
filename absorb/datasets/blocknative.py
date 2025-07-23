@@ -14,6 +14,8 @@ url_template = (
 
 class Mempool(absorb.Table):
     source = 'blocknative'
+    description = 'Snapshots of the Ethereum mempool'
+    url = 'https://docs.blocknative.com/data-archive/mempool-archive'
     write_range = 'overwrite_all'
     index_type = 'hour'
 

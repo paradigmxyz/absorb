@@ -18,6 +18,8 @@ endpoints = {
 
 class CoinMetrics(absorb.Table):
     source = 'coingecko'
+    description = 'Price, market cap, and volume data for coins'
+    url = 'https://coingecko.com/'
     write_range = 'overwrite_all'
     index_type = 'day'
     parameter_types = {'top_n': int}
@@ -54,6 +56,8 @@ class CoinMetrics(absorb.Table):
 
 class Categories(absorb.Table):
     source = 'coingecko'
+    description = 'Categorizations of coins'
+    url = 'https://coingecko.com/'
     write_range = 'overwrite_all'
     index_type = 'name'
     parameter_types = {'categories': (list, type(None))}
@@ -83,6 +87,8 @@ class Categories(absorb.Table):
 
 class CategoryMetrics(absorb.Table):
     source = 'coingecko'
+    description = 'Aggregated metrics for each category of coins'
+    url = 'https://coingecko.com/'
     write_range = 'overwrite_all'
     index_type = 'day'
     parameter_types = {'categories': (list, type(None))}

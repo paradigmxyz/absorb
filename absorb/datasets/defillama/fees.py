@@ -70,6 +70,8 @@ if typing.TYPE_CHECKING:
 
 class Fees(absorb.Table):
     source = 'defillama'
+    description = 'Total fees collected by protocols across all chains'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     index_type = 'day'
 
@@ -87,6 +89,8 @@ class Fees(absorb.Table):
 
 class ChainFees(absorb.Table):
     source = 'defillama'
+    description = 'Total fees collected by each protocol and each chain'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
@@ -126,6 +130,8 @@ class ChainFees(absorb.Table):
 
 class FeesOfProtocols(absorb.Table):
     source = 'defillama'
+    description = 'Total fees collected by each protocol and each chain'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}

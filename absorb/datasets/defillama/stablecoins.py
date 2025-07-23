@@ -12,6 +12,8 @@ if typing.TYPE_CHECKING:
 
 class Stablecoins(absorb.Table):
     source = 'defillama'
+    description = 'Total circulating stablecoins in USD'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     index_type = 'day'
 
@@ -26,6 +28,8 @@ class Stablecoins(absorb.Table):
 
 class StablecoinsOfChains(absorb.Table):
     source = 'defillama'
+    description = 'Circulating stablecoins per chain in USD'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
@@ -63,6 +67,8 @@ class StablecoinsOfChains(absorb.Table):
 
 class StablecoinsOfTokens(absorb.Table):
     source = 'defillama'
+    description = 'Circulating stablecoins per token and per chain in USD'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'tokens': (list, type(None))}
     default_parameters = {'tokens': None}
@@ -99,6 +105,8 @@ class StablecoinsOfTokens(absorb.Table):
 
 class StablecoinPrices(absorb.Table):
     source = 'defillama'
+    description = 'Prices of stablecoins in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     index_type = 'day'
 

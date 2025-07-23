@@ -31,6 +31,7 @@ CandleInterval = typing.Literal[
 class SpotCandles(absorb.Table):
     source = 'binance'
     description = 'OHLCV candles for spot pairs at various time intervals'
+    url = 'https://data.binance.vision/?prefix=data/spot/daily/klines/'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str, 'interval': str}
@@ -73,6 +74,8 @@ class SpotCandles(absorb.Table):
 
 class SpotTrades(absorb.Table):
     source = 'binance'
+    description = 'Trades for a given spot pair'
+    url = 'https://data.binance.vision/?prefix=data/spot/daily/trades/'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str}
@@ -111,6 +114,10 @@ class SpotTrades(absorb.Table):
 
 class SpotAggregateTrades(absorb.Table):
     source = 'binance'
+    description = (
+        'Trades aggregated by price for spot pairs on short time scales'
+    )
+    url = 'https://data.binance.vision/?prefix=data/spot/daily/aggTrades/'
     write_range = 'append_only'
     index_type = 'day'
     parameter_types = {'pair': str}

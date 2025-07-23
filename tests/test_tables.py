@@ -6,6 +6,8 @@ import pytest
 required_attrs = [
     'source',
     'write_range',
+    'description',
+    'url',
 ]
 
 
@@ -24,6 +26,14 @@ def test_tables_have_attrs(table: type[absorb.Table], attr: str) -> None:
         'missing attribute '
         + attr
         + ' for '
+        + str(table.source)
+        + '.'
+        + str(table.__name__)
+    )
+    assert getattr(table, attr) is not None, (
+        'attribute '
+        + attr
+        + ' is None for '
         + str(table.source)
         + '.'
         + str(table.__name__)

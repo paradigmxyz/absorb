@@ -11,6 +11,8 @@ if typing.TYPE_CHECKING:
 class Query(absorb.Table):
     source = 'snowflake'
     write_range = 'overwrite_all'
+    description = 'Snowflake SQL query'
+    url = 'https://www.snowflake.com/en/'
     # parameter_types = {'name': str, 'sql': str}
     # parameter_types = {'name': str}
     required_packages = ['paradigm_garlic >= 0.1.2']

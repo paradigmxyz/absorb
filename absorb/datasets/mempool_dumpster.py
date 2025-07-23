@@ -11,6 +11,8 @@ url_template = 'https://mempool-dumpster.flashbots.net/ethereum/mainnet/{year}-{
 
 class Transactions(absorb.Table):
     source = 'mempool_dumpster'
+    url = 'https://github.com/flashbots/mempool-dumpster'
+    description = 'Archive of the Ethereum mempool collected by Flashbots'
     write_range = 'append_only'
     index_type = 'day'
 

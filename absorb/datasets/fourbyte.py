@@ -10,6 +10,7 @@ if typing.TYPE_CHECKING:
 
 class FourbyteDatatype(absorb.Table):
     source = 'fourbyte'
+    url = 'https://www.4byte.directory/'
     write_range = 'append_only'
     index_type = 'number_range'
 
@@ -39,10 +40,12 @@ class FourbyteDatatype(absorb.Table):
 
 
 class Functions(FourbyteDatatype):
+    description = 'Functions listed on 4byte.directory'
     endpoint = 'https://www.4byte.directory/api/v1/signatures/'
 
 
 class Events(FourbyteDatatype):
+    description = 'Event types listed on 4byte.directory'
     endpoint = 'https://www.4byte.directory/api/v1/event-signatures/'
 
 

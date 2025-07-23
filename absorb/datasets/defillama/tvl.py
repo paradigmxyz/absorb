@@ -11,6 +11,8 @@ if typing.TYPE_CHECKING:
 
 class ChainTvls(absorb.Table):
     source = 'defillama'
+    description = 'TVL of each chain in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
@@ -46,6 +48,8 @@ class ChainTvls(absorb.Table):
 
 class ProtocolTvls(absorb.Table):
     source = 'defillama'
+    description = 'TVL of each protocol on each chain in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}
@@ -82,6 +86,8 @@ class ProtocolTvls(absorb.Table):
 
 class ProtocolTvlsPerToken(absorb.Table):
     source = 'defillama'
+    description = 'TVL of each token in each protocol in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}

@@ -7,6 +7,7 @@ import absorb
 
 class BaseQuery(absorb.Table):
     source = 'dune'
+    url = 'https://dune.com/'
     name_template = [
         '{name}',
         'query_{query_id}',
@@ -26,6 +27,7 @@ class BaseQuery(absorb.Table):
 class FullQuery(BaseQuery):
     """collect the full output of a query"""
 
+    description = 'Dune query'
     write_range = 'overwrite_all'
     parameter_types = {
         'name': str,
@@ -48,6 +50,7 @@ class FullQuery(BaseQuery):
 class AppendOnlyQuery(BaseQuery):
     """collect the output of a query, time-partitioned"""
 
+    description = 'Dune query has an append-only structure'
     write_range = 'append_only'
     parameter_types = {
         'name': str,
@@ -72,7 +75,8 @@ class AppendOnlyQuery(BaseQuery):
 
 class CexLabels(absorb.Table):
     source = 'dune'
-    description = "dune's CEX labels for EVM and Solana addresses"
+    description = 'CEX labels for EVM and Solana addresses'
+    url = 'https://dune.com/'
     write_range = 'overwrite_all'
     required_packages = ['dune_spice >= 0.2.6']
     required_credentials = ['DUNE_API_KEY']

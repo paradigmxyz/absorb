@@ -10,6 +10,8 @@ if typing.TYPE_CHECKING:
 
 class Commits(absorb.Table):
     source = 'git'
+    description = 'Commit history of git repository'
+    url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
     parameter_types = {'paths': list[str]}
     index_type = 'name'
@@ -48,6 +50,8 @@ class Commits(absorb.Table):
 
 class Authors(absorb.Table):
     source = 'git'
+    description = 'Author stats of git repository'
+    url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
     parameter_types = {'path': str}
     require_name = True
@@ -84,6 +88,8 @@ class Authors(absorb.Table):
 
 class FileDiffs(absorb.Table):
     source = 'git'
+    description = 'File diffs of git repository'
+    url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
     parameter_types = {'path': str}
     require_name = True
@@ -113,6 +119,8 @@ class FileDiffs(absorb.Table):
 
 class FileDiffStats(absorb.Table):
     source = 'git'
+    description = 'File diff statistics of git repository'
+    url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
     parameter_types = {'path': str}
     require_name = True

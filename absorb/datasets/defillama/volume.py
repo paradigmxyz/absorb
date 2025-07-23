@@ -128,6 +128,8 @@ from . import common
 
 class ProtocolDexVolumes(absorb.Table):
     source = 'defillama'
+    description = 'Volume of each dex protocol on each chain in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}
@@ -163,6 +165,8 @@ class ProtocolDexVolumes(absorb.Table):
 
 class ChainDexVolumes(absorb.Table):
     source = 'defillama'
+    description = 'Volume of each dex protocol on each chain in USD over time'
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
@@ -198,6 +202,10 @@ class ChainDexVolumes(absorb.Table):
 
 class ProtocolOptionsVolumes(absorb.Table):
     source = 'defillama'
+    description = (
+        'Volume of each options protocol on each chain in USD over time'
+    )
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'protocols': (list, type(None))}
     default_parameters = {'protocols': None}
@@ -230,6 +238,10 @@ class ProtocolOptionsVolumes(absorb.Table):
 
 class ChainOptionsVolumes(absorb.Table):
     source = 'defillama'
+    description = (
+        'Volume of each options protocol on each chain in USD over time'
+    )
+    url = 'https://defillama.com/'
     write_range = 'overwrite_all'
     parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}

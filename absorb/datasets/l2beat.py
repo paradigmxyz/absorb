@@ -23,6 +23,8 @@ endpoints = {
 
 class Metrics(absorb.Table):
     source = 'l2beat'
+    description = 'On-chain metrics for Ethereum and its rollups'
+    url = 'https://l2beat.com/'
     write_range = 'overwrite_all'
     index_type = 'day'
 

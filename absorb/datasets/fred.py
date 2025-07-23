@@ -193,6 +193,8 @@ tables: list[type[absorb.Table]] = []
 for name, (series_id, cadence, lower_name) in get_series_catalog().items():
     namespace = {'default_parameters': {'series_id': name}}
     cls: Metric = type(name, (Metric,), namespace)  # type: ignore
+    cls.description = 'FRED data for ' + name
+    cls.url = 'https://fred.stlouisfed.org/series/' + series_id
     cls.index_type = cadence  # type: ignore
     cls.name_template = lower_name
     cls.required_credentials = ['FRED_API_KEY']
