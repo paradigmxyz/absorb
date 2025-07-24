@@ -10,10 +10,16 @@ if typing.TYPE_CHECKING:
 
 
 def get_default_config() -> absorb.Config:
+    import os
+    import subprocess
+
+    output = subprocess.check_output(['which', 'git'], text=True)
+    use_git = os.path.isfile(output.strip())
+
     return {
         'version': absorb.__version__,
         'tracked_tables': [],
-        'use_git': True,
+        'use_git': use_git,
     }
 
 
@@ -141,6 +147,18 @@ def stop_tracking_tables(
     )
     message = 'Stop tracking ' + str(len(tables)) + ' tables: ' + names
     write_config(config, message)
+
+
+def enable_git_tracking() -> None:
+    config = get_config()
+    config['use_git'] = True
+    write_config(config, 'Enable git tracking')
+
+
+def disable_git_tracking() -> None:
+    config = get_config()
+    config['use_git'] = False
+    write_config(config, 'Disable git tracking')
 
 
 #

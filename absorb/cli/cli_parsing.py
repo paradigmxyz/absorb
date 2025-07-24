@@ -353,6 +353,20 @@ def get_subcommands() -> list[
                         'help': 'regenerate configuration, preserving as many settings as possible',
                     },
                 ),
+                (
+                    ['--enable-git'],
+                    {
+                        'action': 'store_true',
+                        'help': 'enable git tracking for config and metadata',
+                    },
+                ),
+                (
+                    ['--disable-git'],
+                    {
+                        'action': 'store_true',
+                        'help': 'disable git tracking for config and metadata',
+                    },
+                ),
             ],
         ),
         (

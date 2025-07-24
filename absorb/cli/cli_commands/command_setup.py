@@ -42,6 +42,13 @@ def setup_command(args: Namespace) -> dict[str, Any]:
             new_config['tracked_tables'].append(table_dict)
         absorb.ops.write_config(new_config)
 
+    if args.disable_git:
+        absorb.ops.disable_git_tracking()
+        config = absorb.ops.get_config()
+    if args.enable_git:
+        absorb.ops.enable_git_tracking()
+        config = absorb.ops.get_config()
+
     # setup git tracking
     config = absorb.ops.get_config()
     if config['use_git']:

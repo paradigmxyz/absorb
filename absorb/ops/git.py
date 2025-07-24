@@ -114,6 +114,25 @@ def git_commit(message: str, repo_root: str, *, verbose: bool = False) -> None:
     """Commit staged changes"""
     import subprocess
 
+    # Check if there are staged changes
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--cached', '--name-only'],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        if not result.stdout.strip():
+            # No staged changes
+            if verbose:
+                print('Nothing to commit, working tree clean')
+            return
+    except subprocess.CalledProcessError as e:
+        # If git diff fails, log it but continue with commit attempt
+        print(f'Warning: Could not check for staged changes: {e}')
+
+    # Proceed with commit
     try:
         result = subprocess.run(
             ['git', 'commit', '-m', message],
