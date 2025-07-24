@@ -11,6 +11,7 @@ def parse_table_str(
     parameters: dict[str, typing.Any] | None = None,
     raw_parameters: dict[str, str] | None = None,
     use_all_parameters: bool = True,
+    allow_generic: bool = False,
 ) -> tuple[type[absorb.Table], dict[str, typing.Any]]:
     """
     Parses a table string of the form 'source.table_name' and returns the class
@@ -18,21 +19,19 @@ def parse_table_str(
     """
     source, table_name = ref.split('.')
 
-    # identify class and parse name parameters
-    try:
-        class_name = absorb.ops.names._snake_to_camel(table_name)
-        class_path = 'absorb.datasets.' + source + '.' + class_name
-        cls = absorb.ops.get_table_class(class_path=class_path)
-        name_parameters: dict[str, typing.Any] = {}
-    except AttributeError:
-        for cls in absorb.ops.get_source_table_classes(source):
-            try:
-                name_parameters = cls.parse_name_parameters(table_name)
-                break
-            except absorb.NameParseError:
-                continue
-        else:
-            raise Exception('Could not find table class for: ' + source)
+    for cls in absorb.ops.get_source_table_classes(source):
+        try:
+            name_parameters = cls.parse_name_parameters(table_name)
+            for key, value in name_parameters.items():
+                if '{' + key + '}' == value and not allow_generic:
+                    raise absorb.NameParseError(
+                        f'Generic parameter {key} not allowed in {ref}'
+                    )
+            break
+        except absorb.NameParseError:
+            continue
+    else:
+        raise Exception('Could not find table class for: ' + ref)
 
     # parse input parameters
     if parameters is None:
@@ -46,7 +45,7 @@ def parse_table_str(
     parameters = dict(parameters, **name_parameters)
 
     # only use subset relevant to Table class
-    for key, value in parameters.items():
+    for key, value in list(parameters.items()):
         if key not in cls.parameter_types:
             if not use_all_parameters:
                 del parameters[key]
@@ -64,9 +63,6 @@ def parse_string_from_template(template: str, string: str) -> dict[str, str]:
     # Find all placeholders in the template
     placeholder_pattern = r'\{([^}]+)\}'
     placeholders = re.findall(placeholder_pattern, template)
-
-    if not placeholders:
-        raise absorb.NameParseError('No placeholders found in template')
 
     # Escape special regex characters in the template, but preserve placeholders
     regex_pattern = re.escape(template)
@@ -107,7 +103,10 @@ def convert_raw_parameter_types(
 ) -> dict[str, typing.Any]:
     parameters = {}
     for key, value in raw_parameters.items():
-        parameter_type = parameter_types[key]
+        if key == 'class_name':
+            parameter_type: type | tuple[type, ...] = str
+        else:
+            parameter_type = parameter_types[key]
         if parameter_type == str:  # noqa: E721
             converted: typing.Any = value
         elif parameter_type == int:  # noqa: E721

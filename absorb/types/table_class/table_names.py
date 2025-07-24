@@ -61,6 +61,9 @@ class TableNames(table_base.TableBase):
             else [cls.name_template]
         )
         for template in name_templates:
+            template = template.replace(
+                '{class_name}', absorb.ops.names._camel_to_snake(cls.__name__)
+            )
             try:
                 raw = absorb.ops.parse_string_from_template(
                     template, table_name
