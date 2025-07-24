@@ -73,52 +73,86 @@ def ls_command(args: Namespace) -> dict[str, Any]:
     if 'tracked' in sections:
         if 'available' in sections:
             print()
-        cli_outputs._print_title(
-            'Tracked datasets (n = {})'.format(len(tracked_datasets))
+        _print_tracked_datasets(
+            tracked_datasets,
+            verbose=args.verbose,
+            one_per_line=args.one_per_line,
         )
-        if len(tracked_datasets) == 0:
-            print('[none]')
-        else:
-            _print_datasets(tracked_datasets, args)
 
     # get untracked collected datasets
     if 'untracked_collected' in sections:
-        untracked_collected_datasets = (
-            absorb.ops.get_untracked_collected_tables(
-                tracked_datasets=tracked_datasets
-            )
+        _print_untracked_datasets(
+            tracked_datasets=tracked_datasets,
+            source=args.source,
+            verbose=args.verbose,
+            one_per_line=args.one_per_line,
+            skip_line='tracked' in sections or 'available' in sections,
         )
-        if args.source is not None:
-            untracked_collected_datasets = [
-                dataset
-                for dataset in untracked_collected_datasets
-                if dataset['source_name'] == args.source
-            ]
-        untracked_collected_datasets = sorted(
-            untracked_collected_datasets,
-            key=lambda x: (x['source_name'], x['table_name']),
-        )
-
-        # print untracked collected datasets
-        if len(untracked_collected_datasets) > 0:
-            if 'tracked' in sections or 'available' in sections:
-                print()
-            cli_outputs._print_title(
-                'Untracked collected datasets (n = {})'.format(
-                    len(untracked_collected_datasets)
-                )
-            )
-            _print_datasets(untracked_collected_datasets, args)
 
     return {}
 
 
-def _print_datasets(datasets: list[absorb.TableDict], args: Namespace) -> None:
+def _print_tracked_datasets(
+    tracked_datasets: list[absorb.TableDict],
+    verbose: bool = False,
+    one_per_line: bool = False,
+) -> None:
+    cli_outputs._print_title(
+        'Tracked datasets (n = {})'.format(len(tracked_datasets))
+    )
+    if len(tracked_datasets) == 0:
+        print('[none]')
+    else:
+        _print_datasets(
+            tracked_datasets, verbose=verbose, one_per_line=one_per_line
+        )
+
+
+def _print_untracked_datasets(
+    tracked_datasets: list[absorb.TableDict],
+    source: str | None = None,
+    skip_line: bool = False,
+    verbose: bool = False,
+    one_per_line: bool = False,
+) -> None:
+    untracked_collected_datasets = absorb.ops.get_untracked_collected_tables(
+        tracked_datasets=tracked_datasets
+    )
+    if source is not None:
+        untracked_collected_datasets = [
+            dataset
+            for dataset in untracked_collected_datasets
+            if dataset['source_name'] == source
+        ]
+    untracked_collected_datasets = sorted(
+        untracked_collected_datasets,
+        key=lambda x: (x['source_name'], x['table_name']),
+    )
+
+    # print untracked collected datasets
+    if len(untracked_collected_datasets) > 0:
+        if skip_line:
+            print()
+        cli_outputs._print_title(
+            'Untracked collected datasets (n = {})'.format(
+                len(untracked_collected_datasets)
+            )
+        )
+        _print_datasets(
+            untracked_collected_datasets,
+            verbose=verbose,
+            one_per_line=one_per_line,
+        )
+
+
+def _print_datasets(
+    datasets: list[absorb.TableDict], verbose: bool, one_per_line: bool
+) -> None:
     import toolstr
 
-    if args.verbose:
+    if verbose:
         _print_datasets_verbose(datasets)
-    elif args.one_per_line:
+    elif one_per_line:
         for dataset in datasets:
             cli_outputs._print_dataset_bullet(dataset)
     else:

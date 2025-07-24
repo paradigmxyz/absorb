@@ -3,24 +3,82 @@ from __future__ import annotations
 import typing
 import absorb
 
+from . import command_ls
+
 if typing.TYPE_CHECKING:
     import argparse
 
 
 def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
-    import toolstr
-
-    if args.dataset is None:
+    if args.dataset_or_source is None:
         import sys
 
         print('specify dataset to print info')
         sys.exit(0)
 
-    table = absorb.Table.instantiate(args.dataset)
+    if '.' in args.dataset_or_source:
+        return print_dataset_info(args)
+    else:
+        return print_source_info(args)
+
+
+def print_source_info(args: argparse.Namespace) -> dict[str, typing.Any]:
+    import toolstr
+
+    source = args.dataset_or_source
+    toolstr.print_text_box(
+        'Data source = ' + source, style='green', text_style='bold white'
+    )
+    classes = absorb.ops.get_source_table_classes(source)
+    if len(classes) == 1:
+        print(str(len(classes)), 'table recipe:')
+    else:
+        print(str(len(classes)), 'table recipes:')
+    for cls in classes:
+        toolstr.print_bullet(
+            key='[white bold]'
+            + cls.source
+            + '.'
+            + cls.name_classmethod(allow_generic=True)
+            + '[/white bold]',
+            value=str(cls.description),
+            **absorb.ops.bullet_styles,
+        )
+
+    tracked_datasets = absorb.ops.get_tracked_tables()
+    if source is not None:
+        tracked_datasets = [
+            dataset
+            for dataset in tracked_datasets
+            if dataset['source_name'] == source
+        ]
+
+    print()
+    command_ls._print_tracked_datasets(
+        tracked_datasets, verbose=args.verbose, one_per_line=True
+    )
+    # print()
+    command_ls._print_untracked_datasets(
+        tracked_datasets,
+        verbose=args.verbose,
+        one_per_line=True,
+        source=source,
+        skip_line=False,
+    )
+
+    return {}
+
+
+def print_dataset_info(args: argparse.Namespace) -> dict[str, typing.Any]:
+    import toolstr
+
+    table = absorb.Table.instantiate(args.dataset_or_source)
     schema = table.get_schema()
 
     toolstr.print_text_box(
-        'dataset = ' + args.dataset, style='green', text_style='bold white'
+        'dataset = ' + args.dataset_or_source,
+        style='green',
+        text_style='bold white',
     )
 
     for attr in [

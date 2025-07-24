@@ -66,7 +66,7 @@ def get_subcommands() -> list[
             'show info about a specific dataset or source',
             [
                 (
-                    ['dataset'],
+                    ['dataset_or_source'],
                     {
                         'help': 'dataset or data source',
                     },
