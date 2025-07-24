@@ -70,7 +70,14 @@ def get_subcommands() -> list[
                     {
                         'help': 'dataset or data source',
                     },
-                )
+                ),
+                (
+                    ['--verbose', '-v'],
+                    {
+                        'action': 'store_true',
+                        'help': 'show verbose details',
+                    },
+                ),
             ],
         ),
         (

@@ -61,18 +61,21 @@ def info_command(args: argparse.Namespace) -> dict[str, typing.Any]:
     print()
     toolstr.print('[green bold]status[/green bold]')
     # absorb.ops.print_bullet(key='tracked', value=table.is_tracked())
-    available_range = table.get_available_range()
-    if available_range is not None:
-        formatted_available_range = absorb.ops.format_coverage(
-            available_range, table.index_type
+
+    if args.verbose:
+        available_range = table.get_available_range()
+        if available_range is not None:
+            formatted_available_range = absorb.ops.format_coverage(
+                available_range, table.index_type
+            )
+        else:
+            formatted_available_range = 'not available'
+        absorb.ops.print_bullet(
+            key='available range',
+            value=formatted_available_range,
         )
-    else:
-        formatted_available_range = 'not available'
+
     collected_range = table.get_collected_range()
-    absorb.ops.print_bullet(
-        key='available range',
-        value=formatted_available_range,
-    )
     absorb.ops.print_bullet(
         key='collected range',
         value=absorb.ops.format_coverage(collected_range, table.index_type),
