@@ -113,6 +113,18 @@ def start_tracking_tables(
         instance = absorb.Table.instantiate(table)
         table_dict = instance.create_table_dict()
         as_str = json.dumps(table_dict, sort_keys=True)
+
+        # check for name collisions
+        for tracked_table in config['tracked_tables']:
+            if table_dict['table_name'] == tracked_table[
+                'table_name'
+            ] and as_str != json.dumps(tracked_table, sort_keys=True):
+                raise Exception(
+                    'name collision, cannot add new tracked table: '
+                    + str(table_dict['table_name'])
+                )
+
+        # add to tracked tables
         if as_str not in tracked_tables:
             config['tracked_tables'].append(table_dict)
             tracked_tables.add(as_str)
