@@ -80,7 +80,7 @@ class CexLabels(absorb.Table):
     write_range = 'overwrite_all'
     required_packages = ['dune_spice >= 0.2.6']
     required_credentials = ['DUNE_API_KEY']
-    index_type = 'name'
+    index_type = 'id'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

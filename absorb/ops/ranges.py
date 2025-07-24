@@ -142,9 +142,9 @@ def get_range_diff(
     non_range_types = [
         'number_list',
         'timestamp',
-        'name',
-        'name_range',
-        'name_list',
+        'id',
+        'id_range',
+        'id_list',
     ]
 
     if (

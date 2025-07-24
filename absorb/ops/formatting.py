@@ -98,9 +98,9 @@ def format_chunk(
         template = '%0' + str(width) + 'd'
         start, end = chunk  # type: ignore
         return (template % start) + '_to_' + (template % end)
-    elif index_type == 'name':
+    elif index_type == 'id':
         return chunk  # type: ignore
-    elif index_type == 'name_list':
+    elif index_type == 'id_list':
         return '_'.join(chunk)  # type: ignore
     elif index_type is None:
         return str(chunk)

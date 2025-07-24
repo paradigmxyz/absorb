@@ -26,8 +26,8 @@ PrimitiveIndexType = typing.Literal[
     'number_range',
     'number_list',
     # names
-    'name',
-    'name_list',
+    'id',
+    'id_list',
 ]
 
 
@@ -108,8 +108,8 @@ def get_index_type_type(
             'timestamp_range': tuple[datetime.datetime, datetime.datetime],
             'count': int,
             'count_range': tuple[int, int],
-            'name': str,
-            'name_list': list[str],
+            'id': str,
+            'id_list': list[str],
             None: None,
         }[index_type]
     elif isinstance(index_type, dict):

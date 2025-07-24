@@ -59,7 +59,7 @@ class Categories(absorb.Table):
     description = 'Categorizations of coins'
     url = 'https://coingecko.com/'
     write_range = 'overwrite_all'
-    index_type = 'name'
+    index_type = 'id'
     parameter_types = {'categories': (list, type(None))}
     default_parameters = {'categories': None}
     name_template = [
