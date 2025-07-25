@@ -30,7 +30,14 @@ def remove_command(args: Namespace) -> dict[str, Any]:
         print()
         for dataset in tracked_datasets:
             print('deleting files of ' + dataset.full_name())
-            absorb.ops.delete_table_dir(dataset, confirm=args.confirm)
+            try:
+                absorb.ops.delete_table_dir(dataset, confirm=args.confirm)
+            except absorb.ConfirmError:
+                import sys
+                import toolstr
+
+                toolstr.print('[red]use --confirm to delete files[/red]')
+                sys.exit(0)
         print('...done')
     else:
         print()

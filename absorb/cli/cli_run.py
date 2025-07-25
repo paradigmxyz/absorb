@@ -16,7 +16,11 @@ def run_cli() -> None:
         if args.interactive:
             cli_helpers.open_interactive_session(variables=data)
     except BaseException as e:
-        if args.debug:
+        if isinstance(e, SystemExit) and len(e.args) > 0 and e.args[0] == 0:
+            pass
+        elif args.debug:
             cli_helpers._enter_debugger()
         else:
-            raise e
+            import toolstr
+
+            toolstr.print('[red]error:[/red] ' + str(e.args[0]))
