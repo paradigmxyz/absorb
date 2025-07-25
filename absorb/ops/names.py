@@ -32,6 +32,14 @@ def _snake_to_camel(name: str) -> str:
     return result[0].upper() + ''.join(result[1:])
 
 
+def is_valid_name(name: str) -> bool:
+    import re
+
+    if '__' in name or name[0] == '_' or name[-1] == '_':
+        return False
+    return bool(re.match(r'^[a-zA-Z0-9_]+$', name))
+
+
 def get_table_name(
     *,
     class_name: str,

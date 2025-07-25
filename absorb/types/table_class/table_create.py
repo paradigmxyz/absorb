@@ -42,6 +42,14 @@ class TableCreate(table_coverage.TableCoverage):
         ):
             raise Exception('index_type is required for append only tables')
 
+        # make sure that table name is valid
+        if not absorb.ops.is_valid_name(self.name()):
+            raise Exception(f'table name "{self.name()}" is not valid')
+
+        # make sure that source name is valid
+        if not absorb.ops.is_valid_name(self.source):
+            raise Exception(f'source name "{self.source}" is not valid')
+
     @staticmethod
     def instantiate(
         ref: absorb.TableReference,
