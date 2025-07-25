@@ -12,6 +12,7 @@ if typing.TYPE_CHECKING:
 
 def preview_command(args: Namespace) -> dict[str, Any]:
     import polars as pl
+    import toolstr
 
     preview_length = args.count
     offset = args.offset
@@ -24,7 +25,7 @@ def preview_command(args: Namespace) -> dict[str, Any]:
     for d, dataset in enumerate(datasets):
         # load dataset preview
         df = (
-            absorb.scan(dataset)
+            absorb.query(dataset)
             .slice(offset)
             .head(preview_length + 1)
             .collect()
@@ -33,6 +34,9 @@ def preview_command(args: Namespace) -> dict[str, Any]:
         # print number of rows in preview
         if d > 0:
             print()
+        if len(datasets) > 1:
+            toolstr.print_text_box(dataset.full_name(), style='bold')
+
         if len(df) > preview_length:
             if offset > 0:
                 print(preview_length, 'rows starting from offset', offset)
