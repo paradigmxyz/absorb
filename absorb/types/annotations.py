@@ -140,7 +140,14 @@ class TableDict(typing.TypedDict):
 TableReference = typing.Union[str, TableDict, table_class.Table]
 
 
+class Bucket(typing.TypedDict):
+    rclone_remote: str | None
+    bucket: str | None
+    path_prefix: str | None
+
+
 class Config(typing.TypedDict):
     version: str
     tracked_tables: list[TableDict]
     use_git: bool
+    default_bucket: Bucket

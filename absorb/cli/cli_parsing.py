@@ -367,6 +367,55 @@ def get_subcommands() -> list[
                         'help': 'disable git tracking for config and metadata',
                     },
                 ),
+                (
+                    ['--set-default-rclone-remote'],
+                    {
+                        'help': 'set rclone remote to use for bucket uploads and downloads',
+                        'metavar': 'REMOTE',
+                    },
+                ),
+                (
+                    ['--set-default-bucket'],
+                    {
+                        'help': 'set default bucket for upload and downloads',
+                        'metavar': 'BUCKET',
+                    },
+                ),
+                (
+                    ['--set-default-path-prefix'],
+                    {
+                        'help': 'set default path prefix for bucket paths',
+                        'metavar': 'PREFIX',
+                    },
+                ),
+                (
+                    ['--clear-default-rclone-remote'],
+                    {
+                        'help': 'clear rclone remote to use for bucket uploads and downloads',
+                        'action': 'store_true',
+                    },
+                ),
+                (
+                    ['--clear-default-bucket'],
+                    {
+                        'help': 'clear bucket to use for upload and downloads',
+                        'action': 'store_true',
+                    },
+                ),
+                (
+                    ['--clear-default-path-prefix'],
+                    {
+                        'help': 'clear default path prefix for bucket paths',
+                        'action': 'store_true',
+                    },
+                ),
+                (
+                    ['-v', '--verbose'],
+                    {
+                        'action': 'store_true',
+                        'help': 'display extra information',
+                    },
+                ),
             ],
         ),
         (
@@ -393,6 +442,104 @@ def get_subcommands() -> list[
                     {
                         'action': 'store_true',
                         'help': 'display extra information',
+                    },
+                ),
+            ],
+        ),
+        (
+            'upload',
+            'upload datasets to a cloud bucket',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAMS',
+                    },
+                ),
+                (
+                    ['--rclone-remote'],
+                    {
+                        'help': 'name of rclone remote to use',
+                        'metavar': 'REMOTE',
+                    },
+                ),
+                (
+                    ['--bucket'],
+                    {
+                        'help': 'name of bucket to upload to',
+                        'metavar': 'BUCKET',
+                    },
+                ),
+                (
+                    ['--path-prefix'],
+                    {
+                        'help': 'path prefix to use for the bucket',
+                        'metavar': 'PREFIX',
+                    },
+                ),
+                (
+                    ['--dry'],
+                    {
+                        'action': 'store_true',
+                        'help': 'perform dry run (avoids uploading data)',
+                    },
+                ),
+            ],
+        ),
+        (
+            'download',
+            'download datasets to a cloud bucket',
+            [
+                (
+                    ['dataset'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset to track, format as "<source>.<dataset>"',
+                    },
+                ),
+                (
+                    ['--parameters'],
+                    {
+                        'nargs': '*',
+                        'help': 'dataset parameters',
+                        'metavar': 'PARAMS',
+                    },
+                ),
+                (
+                    ['--rclone-remote'],
+                    {
+                        'help': 'name of rclone remote to use',
+                        'metavar': 'REMOTE',
+                    },
+                ),
+                (
+                    ['--bucket'],
+                    {
+                        'help': 'name of bucket to download to',
+                        'metavar': 'BUCKET',
+                    },
+                ),
+                (
+                    ['--path-prefix'],
+                    {
+                        'help': 'path prefix to use for the bucket',
+                        'metavar': 'PREFIX',
+                    },
+                ),
+                (
+                    ['--dry'],
+                    {
+                        'action': 'store_true',
+                        'help': 'perform dry run (avoids downloading data)',
                     },
                 ),
             ],
@@ -520,3 +667,24 @@ def _parse_ranges(
     # 'id_range',
     # 'count',
     # None,
+
+
+def _parse_bucket(args: argparse.Namespace) -> absorb.Bucket:
+    default_bucket = absorb.ops.get_config()['default_bucket']
+    if args.rclone_remote is not None:
+        rclone_remote = args.rclone_remote
+    else:
+        rclone_remote = default_bucket['rclone_remote']
+    if args.path_prefix is not None:
+        path_prefix = args.path_prefix
+    else:
+        path_prefix = default_bucket['path_prefix']
+    if args.bucket is not None:
+        bucket = args.bucket
+    else:
+        bucket = default_bucket['bucket']
+    return {
+        'rclone_remote': rclone_remote,
+        'bucket': bucket,
+        'path_prefix': path_prefix,
+    }

@@ -29,6 +29,7 @@ classifiers = [
 ]
 dependencies = [
     "polars >= 1.0",
+    "rclone-python>=0.1.23",
     "requests>=2.0",
     "rich>=13.9.4",
     "rich_argparse >= 1.5.2",

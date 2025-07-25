@@ -44,6 +44,7 @@ def setup_command(args: Namespace) -> dict[str, Any]:
             new_config['tracked_tables'].append(table_dict)
         absorb.ops.write_config(new_config)
 
+    # change git settings
     if args.disable_git:
         absorb.ops.disable_git_tracking()
         config = absorb.ops.get_config()
@@ -55,6 +56,19 @@ def setup_command(args: Namespace) -> dict[str, Any]:
     config = absorb.ops.get_config()
     if config['use_git']:
         absorb.ops.setup_git(track_datasets=datasets)
+
+    if args.set_default_rclone_remote:
+        absorb.ops.set_default_rclone_remote(args.set_default_rclone_remote)
+    if args.set_default_bucket:
+        absorb.ops.set_default_bucket(args.set_default_bucket)
+    if args.set_default_path_prefix:
+        absorb.ops.set_default_path_prefix(args.set_default_path_prefix)
+    if args.clear_default_rclone_remote:
+        absorb.ops.clear_default_rclone_remote()
+    if args.clear_default_bucket:
+        absorb.ops.clear_default_bucket()
+    if args.clear_default_path_prefix:
+        absorb.ops.clear_default_path_prefix()
 
     # print config
     toolstr.print_text_box(
@@ -69,7 +83,7 @@ def setup_command(args: Namespace) -> dict[str, Any]:
             for subkey, subvalue in value.items():
                 absorb.ops.print_bullet(key=subkey, value=subvalue, indent=4)
         else:
-            absorb.ops.print_bullet(key=key, value=value)
+            absorb.ops.print_bullet(key=key, value=str(value))
     print()
     names = [
         table['source_name'] + '.' + table['table_name']

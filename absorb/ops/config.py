@@ -20,6 +20,11 @@ def get_default_config() -> absorb.Config:
         'version': absorb.__version__,
         'tracked_tables': [],
         'use_git': use_git,
+        'default_bucket': {
+            'rclone_remote': None,
+            'bucket': None,
+            'path_prefix': None,
+        },
     }
 
 
@@ -255,3 +260,39 @@ def compare_versions(installed: str, operator: str, required: str) -> bool:
         )
 
     return False
+
+
+def set_default_rclone_remote(rclone_remote: str) -> None:
+    config = get_config()
+    config['default_bucket']['rclone_remote'] = rclone_remote
+    write_config(config, 'Set default rclone remote to ' + rclone_remote)
+
+
+def set_default_bucket(bucket: str) -> None:
+    config = get_config()
+    config['default_bucket']['bucket'] = bucket
+    write_config(config, 'Set default bucket to ' + bucket)
+
+
+def set_default_path_prefix(path_prefix: str) -> None:
+    config = get_config()
+    config['default_bucket']['path_prefix'] = path_prefix
+    write_config(config, 'Set default path prefix to ' + path_prefix)
+
+
+def clear_default_rclone_remote() -> None:
+    config = get_config()
+    config['default_bucket']['rclone_remote'] = None
+    write_config(config, 'Cleared default rclone remote')
+
+
+def clear_default_bucket() -> None:
+    config = get_config()
+    config['default_bucket']['bucket'] = None
+    write_config(config, 'Cleared default bucket')
+
+
+def clear_default_path_prefix() -> None:
+    config = get_config()
+    config['default_bucket']['path_prefix'] = None
+    write_config(config, 'Cleared default path prefix')

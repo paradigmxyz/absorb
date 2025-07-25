@@ -1,3 +1,4 @@
+from .buckets import *
 from .catalog import *
 from .config import *
 from .coverage import *
