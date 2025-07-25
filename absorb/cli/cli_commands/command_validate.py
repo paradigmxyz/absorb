@@ -28,6 +28,12 @@ def validate_command(args: Namespace) -> dict[str, Any]:
     assert config.keys() == default_config.keys(), (
         'config keys do not match default config keys'
     )
+    for key, value in default_config.items():
+        if isinstance(value, dict):
+            assert config[key].keys() == value.keys(), (  # type: ignore
+                f'config {key} subkeys do not match subkeys of '
+                + ', '.join(value.keys())
+            )
 
     # check that datasets_dir exists
     datasets_dir = absorb.ops.get_datasets_dir()
