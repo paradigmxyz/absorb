@@ -21,8 +21,9 @@ def get_default_config() -> absorb.Config:
         'tracked_tables': [],
         'use_git': use_git,
         'default_bucket': {
-            'rclone_remote': None,
+            'provider': None,
             'bucket': None,
+            'rclone_remote': None,
             'path_prefix': None,
         },
     }
@@ -274,6 +275,12 @@ def set_default_bucket(bucket: str) -> None:
     write_config(config, 'Set default bucket to ' + bucket)
 
 
+def set_default_provider(provider: str) -> None:
+    config = get_config()
+    config['default_bucket']['provider'] = provider
+    write_config(config, 'Set default provider to ' + provider)
+
+
 def set_default_path_prefix(path_prefix: str) -> None:
     config = get_config()
     config['default_bucket']['path_prefix'] = path_prefix
@@ -290,6 +297,12 @@ def clear_default_bucket() -> None:
     config = get_config()
     config['default_bucket']['bucket'] = None
     write_config(config, 'Cleared default bucket')
+
+
+def clear_default_provider() -> None:
+    config = get_config()
+    config['default_bucket']['provider'] = None
+    write_config(config, 'Cleared default provider')
 
 
 def clear_default_path_prefix() -> None:

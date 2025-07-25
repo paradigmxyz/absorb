@@ -409,6 +409,13 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--set-default-provider'],
+                    {
+                        'help': 'set default bucket provider for upload and downloads',
+                        'metavar': 'PROVIDER',
+                    },
+                ),
+                (
                     ['--set-default-path-prefix'],
                     {
                         'help': 'set default path prefix for bucket paths',
@@ -426,6 +433,13 @@ def get_subcommands() -> list[
                     ['--clear-default-bucket'],
                     {
                         'help': 'clear bucket to use for upload and downloads',
+                        'action': 'store_true',
+                    },
+                ),
+                (
+                    ['--clear-default-provider'],
+                    {
+                        'help': 'clear provider to use for upload and downloads',
                         'action': 'store_true',
                     },
                 ),
@@ -710,8 +724,13 @@ def _parse_bucket(args: argparse.Namespace) -> absorb.Bucket:
         bucket = args.bucket
     else:
         bucket = default_bucket['bucket']
+    if args.provider is not None:
+        provider = args.provider
+    else:
+        provider = default_bucket['provider']
     return {
         'rclone_remote': rclone_remote,
         'bucket': bucket,
         'path_prefix': path_prefix,
+        'provider': provider,
     }

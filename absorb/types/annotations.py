@@ -149,6 +149,7 @@ class Bucket(typing.TypedDict):
     rclone_remote: str | None
     bucket: str | None
     path_prefix: str | None
+    provider: str | None
 
 
 class Config(typing.TypedDict):

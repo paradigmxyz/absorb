@@ -9,21 +9,30 @@ if typing.TYPE_CHECKING:
 
 
 def scan(
-    dataset: absorb.TableReference,
+    table: absorb.TableReference,
     *,
+    bucket: bool | absorb.Bucket = False,
     scan_kwargs: dict[str, typing.Any] | None = None,
 ) -> pl.LazyFrame:
-    table = absorb.Table.instantiate(dataset)
-    return table.scan(scan_kwargs=scan_kwargs)
+    if bucket:
+        if isinstance(bucket, bool):
+            bucket = absorb.ops.get_default_bucket()
+        return absorb.ops.scan_bucket(
+            table=table, bucket=bucket, scan_kwargs=scan_kwargs
+        )
+    else:
+        table = absorb.Table.instantiate(table)
+        return table.scan(scan_kwargs=scan_kwargs)
 
 
 def load(
-    dataset: absorb.TableReference,
+    table: absorb.TableReference,
     *,
+    bucket: bool | absorb.Bucket = False,
     scan_kwargs: dict[str, typing.Any] | None = None,
 ) -> pl.DataFrame:
     """kwargs are passed to scan()"""
-    table = absorb.Table.instantiate(dataset)
+    table = absorb.Table.instantiate(table)
     return table.load(scan_kwargs=scan_kwargs)
 
 

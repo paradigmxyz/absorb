@@ -61,12 +61,16 @@ def setup_command(args: Namespace) -> dict[str, Any]:
         absorb.ops.set_default_rclone_remote(args.set_default_rclone_remote)
     if args.set_default_bucket:
         absorb.ops.set_default_bucket(args.set_default_bucket)
+    if args.set_default_provider:
+        absorb.ops.set_default_provider(args.set_default_provider)
     if args.set_default_path_prefix:
         absorb.ops.set_default_path_prefix(args.set_default_path_prefix)
     if args.clear_default_rclone_remote:
         absorb.ops.clear_default_rclone_remote()
     if args.clear_default_bucket:
         absorb.ops.clear_default_bucket()
+    if args.clear_default_provider:
+        absorb.ops.clear_default_provider()
     if args.clear_default_path_prefix:
         absorb.ops.clear_default_path_prefix()
 
