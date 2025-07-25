@@ -329,6 +329,26 @@ def get_subcommands() -> list[
             ],
         ),
         (
+            'sql',
+            'run SQL query',
+            [
+                (
+                    ['sql'],
+                    {
+                        'help': 'SQL query to run',
+                    },
+                ),
+                (
+                    ['--output-file'],
+                    {
+                        'help': 'parquet file to save query results',
+                        'nargs': '?',
+                        'metavar': 'FILE',
+                    },
+                ),
+            ],
+        ),
+        (
             'setup',
             'setup environment',
             [

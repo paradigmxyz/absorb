@@ -9,5 +9,6 @@ from .names import *
 from .networking import *
 from .parsing import *
 from .paths import *
+from .queries import *
 from .ranges import *
 from .validation import *
