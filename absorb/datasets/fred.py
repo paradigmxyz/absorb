@@ -17,7 +17,7 @@ class Metric(absorb.Table):
         import polars as pl
 
         return {
-            'date': pl.Datetime(),
+            'timestamp': pl.Datetime(time_unit='ms'),
             'raw_value': pl.Float64,
             'value': pl.Float64,
             'metric': pl.String,
