@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 def sql_command(args: Namespace) -> dict[str, Any]:
-    lf = absorb.ops.sql_query(args.sql)
+    lf = absorb.ops.sql_query(args.sql, backend=args.backend)
     df = lf.collect()
     print(df)
 

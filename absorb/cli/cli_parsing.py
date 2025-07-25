@@ -339,6 +339,13 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--backend'],
+                    {
+                        'default': 'absorb',
+                        'help': 'SQL backend to use {absorb, dune, snowflake}',
+                    },
+                ),
+                (
                     ['--output-file'],
                     {
                         'help': 'parquet file to save query results',

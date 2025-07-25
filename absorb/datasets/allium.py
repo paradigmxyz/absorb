@@ -18,10 +18,7 @@ class StablecoinSupply(Query):
     description = 'Stablecoin supply data from Allium'
     url = 'https://docs.allium.so/historical-data/stablecoins'
 
-    sql = """
-    SELECT *
-    FROM CROSSCHAIN_ALLIUM.STABLECOIN.SUPPLY_BETA
-    """
+    sql = 'SELECT * FROM CROSSCHAIN_ALLIUM.STABLECOIN.SUPPLY_BETA'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

@@ -8,16 +8,31 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
-def sql_query(sql: str) -> pl.LazyFrame:
-    # create table context
-    context = create_sql_context()
+def sql_query(
+    sql: str,
+    *,
+    backend: typing.Literal['absorb', 'dune', 'snowflake'] = 'absorb',
+) -> pl.LazyFrame:
+    if backend == 'absorb':
+        # create table context
+        context = create_sql_context()
 
-    # modify query to allow dots in names
-    for table in context.tables():
-        if '.' in table and table in sql:
-            sql = sql.replace(table, '"' + table + '"')
+        # modify query to allow dots in names
+        for table in context.tables():
+            if '.' in table and table in sql:
+                sql = sql.replace(table, '"' + table + '"')
 
-    return context.execute(sql)  # type: ignore
+        return context.execute(sql)  # type: ignore
+    elif backend == 'dune':
+        import spice
+
+        return spice.query(sql).lazy()
+    elif backend == 'snowflake':
+        import garlic
+
+        return garlic.query(sql).lazy()
+    else:
+        raise Exception('invalid backend: ' + backend)
 
 
 def create_sql_context(
