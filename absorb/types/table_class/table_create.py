@@ -54,28 +54,32 @@ class TableCreate(table_coverage.TableCoverage):
     def instantiate(
         ref: absorb.TableReference,
         *,
-        parameters: dict[str, typing.Any] | None = None,
         raw_parameters: dict[str, str] | None = None,
         use_all_parameters: bool = True,
     ) -> absorb.Table:
-        # reference already instantiated
         if isinstance(ref, absorb.Table):
-            if parameters is not None or raw_parameters is not None:
+            # reference already instantiated
+            if raw_parameters is not None:
                 raise Exception('Cannot pass parameters with table instance')
             return ref
-
-        # get class and parameters
-        if isinstance(ref, dict):
+        elif isinstance(ref, dict):
             # reference is a table dict
             cls = absorb.ops.get_table_class(class_path=ref['table_class'])
-            if parameters is not None or raw_parameters is not None:
+            if raw_parameters is not None:
                 raise Exception('Cannot pass parameters with table dict')
             parameters = ref['parameters']
         elif isinstance(ref, str):
             # reference is a str
             cls, parameters = absorb.ops.parse_table_str(
                 ref,
-                parameters=parameters,
+                raw_parameters=raw_parameters,
+                use_all_parameters=use_all_parameters,
+            )
+        elif isinstance(ref, tuple):
+            tuple_name, tuple_parameters = ref
+            cls, parameters = absorb.ops.parse_table_str(
+                tuple_name,
+                parameters=tuple_parameters,
                 raw_parameters=raw_parameters,
                 use_all_parameters=use_all_parameters,
             )

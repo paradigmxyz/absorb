@@ -137,7 +137,12 @@ class TableDict(typing.TypedDict):
     table_version: str
 
 
-TableReference = typing.Union[str, TableDict, table_class.Table]
+TableReference = typing.Union[
+    str,
+    tuple[str, dict[str, JSONValue]],
+    TableDict,
+    table_class.Table,
+]
 
 
 class Bucket(typing.TypedDict):

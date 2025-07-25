@@ -13,7 +13,6 @@ class TableIO(table_paths.TablePaths):
     def scan(
         self,
         *,
-        parameters: dict[str, absorb.JSONValue] | None = None,
         scan_kwargs: dict[str, typing.Any] | None = None,
     ) -> pl.LazyFrame:
         import polars as pl
@@ -29,6 +28,7 @@ class TableIO(table_paths.TablePaths):
                 raise e
 
     def load(self, **kwargs: typing.Any) -> pl.DataFrame:
+        """kwargs are the parameters of Table.scan()"""
         import polars as pl
 
         try:

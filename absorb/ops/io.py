@@ -11,22 +11,20 @@ if typing.TYPE_CHECKING:
 def scan(
     dataset: absorb.TableReference,
     *,
-    parameters: dict[str, typing.Any] | None = None,
     scan_kwargs: dict[str, typing.Any] | None = None,
 ) -> pl.LazyFrame:
-    table = absorb.Table.instantiate(dataset, parameters=parameters)
-    return table.scan(parameters=parameters, scan_kwargs=scan_kwargs)
+    table = absorb.Table.instantiate(dataset)
+    return table.scan(scan_kwargs=scan_kwargs)
 
 
 def load(
     dataset: absorb.TableReference,
     *,
-    parameters: dict[str, typing.Any] | None = None,
     scan_kwargs: dict[str, typing.Any] | None = None,
 ) -> pl.DataFrame:
     """kwargs are passed to scan()"""
-    table = absorb.Table.instantiate(dataset, parameters=parameters)
-    return table.load(parameters=parameters, scan_kwargs=scan_kwargs)
+    table = absorb.Table.instantiate(dataset)
+    return table.load(scan_kwargs=scan_kwargs)
 
 
 def write_file(*, df: pl.DataFrame, path: str) -> None:
