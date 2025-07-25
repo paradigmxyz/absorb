@@ -262,7 +262,9 @@ def delete_table_dir(table: absorb.Table, confirm: bool = False) -> None:
     import shutil
 
     if not confirm:
-        raise absorb.ConfirmError('use confirm=True to delete table and its data files')
+        raise absorb.ConfirmError(
+            'use confirm=True to delete table and its data files'
+        )
 
     table_dir = table.get_table_dir()
     if os.path.isdir(table_dir):

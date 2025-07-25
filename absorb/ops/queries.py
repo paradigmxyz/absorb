@@ -3,9 +3,34 @@ from __future__ import annotations
 import typing
 
 import absorb
+from . import io
 
 if typing.TYPE_CHECKING:
     import polars as pl
+
+
+def query(
+    table: absorb.TableReference,
+    *,
+    update: bool = False,
+    collect_if_missing: bool = True,
+    scan_kwargs: dict[str, typing.Any] | None = None,
+) -> pl.LazyFrame:
+    table = absorb.Table.instantiate(table)
+
+    # check if collected
+    if not table.is_collected():
+        if collect_if_missing or update:
+            table.collect()
+        else:
+            raise Exception(
+                f'Table {table.source}.{table.name()} is not collected.'
+            )
+    elif update:
+        table.collect()
+
+    # scan the table
+    return io.scan(table, scan_kwargs=scan_kwargs)
 
 
 def sql_query(

@@ -15,6 +15,12 @@ class TableCollect(table_coverage.TableCoverage):
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         raise NotImplementedError()
 
+    def is_collected(self) -> bool:
+        import glob
+
+        data_glob = self.get_glob()
+        return len(glob.glob(data_glob)) > 0
+
     def collect(
         self,
         data_range: typing.Any | None = None,
