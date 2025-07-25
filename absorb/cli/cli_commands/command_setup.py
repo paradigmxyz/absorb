@@ -12,6 +12,8 @@ if typing.TYPE_CHECKING:
 
 
 def setup_command(args: Namespace) -> dict[str, Any]:
+    import toolstr
+
     # get list of input tables
     if len(args.dataset) > 0:
         datasets = cli_parsing._parse_datasets(args)
@@ -53,5 +55,37 @@ def setup_command(args: Namespace) -> dict[str, Any]:
     config = absorb.ops.get_config()
     if config['use_git']:
         absorb.ops.setup_git(track_datasets=datasets)
+
+    # print config
+    toolstr.print_text_box(
+        'Current config', style='green', text_style='bold white'
+    )
+    config = absorb.ops.get_config()
+    for key, value in config.items():
+        if key == 'tracked_tables':
+            continue
+        if isinstance(value, dict):
+            absorb.ops.print_bullet(key=key, value='')
+            for subkey, subvalue in value.items():
+                absorb.ops.print_bullet(key=subkey, value=subvalue, indent=4)
+        else:
+            absorb.ops.print_bullet(key=key, value=value)
+    print()
+    names = [
+        table['source_name'] + '.' + table['table_name']
+        for table in config['tracked_tables']
+    ]
+    toolstr.print_header(
+        'Tracked datasets (' + str(len(names)) + ')',
+        style='green',
+        text_style='bold white',
+    )
+    for n, name in enumerate(sorted(names)):
+        if not args.verbose:
+            if n == 5:
+                print('...')
+            if n > 4 and n != len(names) - 1:
+                continue
+        absorb.ops.print_bullet(key=None, value=name, number=n + 1)
 
     return {}
