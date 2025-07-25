@@ -721,16 +721,16 @@ def _parse_bucket(args: argparse.Namespace) -> absorb.Bucket:
     else:
         path_prefix = default_bucket['path_prefix']
     if args.bucket is not None:
-        bucket = args.bucket
+        bucket_name = args.bucket
     else:
-        bucket = default_bucket['bucket']
+        bucket_name = default_bucket['bucket_name']
     if args.provider is not None:
         provider = args.provider
     else:
         provider = default_bucket['provider']
     return {
         'rclone_remote': rclone_remote,
-        'bucket': bucket,
+        'bucket_name': bucket_name,
         'path_prefix': path_prefix,
         'provider': provider,
     }

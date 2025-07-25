@@ -147,7 +147,7 @@ TableReference = typing.Union[
 
 class Bucket(typing.TypedDict):
     rclone_remote: str | None
-    bucket: str | None
+    bucket_name: str | None
     path_prefix: str | None
     provider: str | None
 

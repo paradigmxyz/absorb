@@ -21,7 +21,7 @@ def upload_command(args: Namespace) -> dict[str, typing.Any]:
         'uploading '
         + str(len(tables))
         + ' tables to bucket '
-        + str(bucket['bucket'])
+        + str(bucket['bucket_name'])
     )
     for table in tables:
         print('- ' + table.full_name())

@@ -22,7 +22,7 @@ def get_default_config() -> absorb.Config:
         'use_git': use_git,
         'default_bucket': {
             'provider': None,
-            'bucket': None,
+            'bucket_name': None,
             'rclone_remote': None,
             'path_prefix': None,
         },
@@ -271,7 +271,7 @@ def set_default_rclone_remote(rclone_remote: str) -> None:
 
 def set_default_bucket(bucket: str) -> None:
     config = get_config()
-    config['default_bucket']['bucket'] = bucket
+    config['default_bucket']['bucket_name'] = bucket
     write_config(config, 'Set default bucket to ' + bucket)
 
 
@@ -295,7 +295,7 @@ def clear_default_rclone_remote() -> None:
 
 def clear_default_bucket() -> None:
     config = get_config()
-    config['default_bucket']['bucket'] = None
+    config['default_bucket']['bucket_name'] = None
     write_config(config, 'Cleared default bucket')
 
 

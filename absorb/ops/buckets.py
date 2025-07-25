@@ -26,7 +26,7 @@ def check_bucket_setup(bucket: absorb.Bucket | None = None) -> str | None:
         return 'No rclone remotes are configured. Configure a remote using `rclone config` on the command line'
 
     if bucket is not None:
-        for key in ['rclone_remote', 'bucket', 'path_prefix']:
+        for key in ['rclone_remote', 'bucket_name', 'path_prefix']:
             if key not in bucket:
                 return f'Bucket configuration is missing required key: {key}'
         if not rclone_python.rclone.check_remote_existing(
@@ -81,7 +81,7 @@ def get_table_bucket_glob(
         protocol = 's3'
     else:
         raise Exception()
-    bucket_name = bucket['bucket']
+    bucket_name = bucket['bucket_name']
     if bucket_name is None:
         raise Exception('bucket must be specified')
     path_prefix = bucket.get('path_prefix')
@@ -181,21 +181,21 @@ def _download_table_from_bucket(
 def get_rclone_bucket_path(
     *,
     rclone_remote: str | None,
-    bucket: str | None,
+    bucket_name: str | None,
     path_prefix: str | None,
     table: absorb.Table,
     provider: str | None = None,
 ) -> str:
     if rclone_remote is None:
         raise Exception('rclone_remote must be specified')
-    if bucket is None:
-        raise Exception('bucket must be specified')
+    if bucket_name is None:
+        raise Exception('bucket_name must be specified')
     if path_prefix is None:
         raise Exception('path_prefix must be specified')
     return (
         rclone_remote.strip('/')
         + ':'
-        + bucket.strip('/')
+        + bucket_name.strip('/')
         + '/'
         + path_prefix.strip('/')
         + '/datasets/'
