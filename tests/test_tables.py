@@ -1,6 +1,6 @@
 import absorb
-import absorb.datasets.allium
-import absorb.datasets.snowflake
+import absorb.catalog.allium
+import absorb.catalog.snowflake
 
 import pytest
 
@@ -14,8 +14,8 @@ required_attrs = [
 
 
 skip_initializing = [
-    absorb.datasets.snowflake.Query,
-    absorb.datasets.allium.Query,
+    absorb.catalog.snowflake.Query,
+    absorb.catalog.allium.Query,
 ]
 
 

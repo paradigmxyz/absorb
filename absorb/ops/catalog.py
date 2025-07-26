@@ -15,7 +15,7 @@ def get_source_module(source: str) -> types.ModuleType:
     import importlib
 
     return importlib.import_module(
-        'absorb.datasets.' + names._camel_to_snake(source)
+        'absorb.catalog.' + names._camel_to_snake(source)
     )
 
 
@@ -42,11 +42,11 @@ def get_table_class(
 
 
 def get_sources(*, snake: bool = True) -> list[str]:
-    import absorb.datasets
+    import absorb.catalog
 
     sources = [
         filename.rsplit('.py', maxsplit=1)[0]
-        for filename in os.listdir(absorb.datasets.__path__[0])
+        for filename in os.listdir(absorb.catalog.__path__[0])
         if not filename.startswith('__')
     ]
 
