@@ -12,26 +12,45 @@ def parse_table_str(
     raw_parameters: dict[str, str] | None = None,
     use_all_parameters: bool = True,
     allow_generic: bool = False,
+    use_config: bool = True,
 ) -> tuple[type[absorb.Table], dict[str, typing.Any]]:
     """
     Parses a table string of the form 'source.table_name' and returns the class
     and parameters.
     """
     source, table_name = ref.split('.')
+    cls: type[absorb.Table] | None = None
+    match_these_parameters: dict[str, typing.Any] | None = None
 
-    for cls in absorb.ops.get_source_table_classes(source):
-        try:
-            name_parameters = cls.parse_name_parameters(table_name)
-            for key, value in name_parameters.items():
-                if '{' + key + '}' == value and not allow_generic:
-                    raise absorb.NameParseError(
-                        f'Generic parameter {key} not allowed in {ref}'
-                    )
-            break
-        except absorb.NameParseError:
-            continue
-    else:
-        raise Exception('Could not find table class for: ' + ref)
+    # check absorb config first
+    if use_config:
+        config = absorb.ops.get_config()
+        for table in config['tracked_tables']:
+            if (
+                table['source_name'] == source
+                and table['table_name'] == table_name
+            ):
+                cls = absorb.ops.get_table_class(
+                    class_path=table['table_class']
+                )
+                match_these_parameters = table['parameters']
+                break
+
+    # if not in config, check classes of source
+    if cls is None:
+        for cls in absorb.ops.get_source_table_classes(source):
+            try:
+                name_parameters = cls.parse_name_parameters(table_name)
+                for key, value in name_parameters.items():
+                    if '{' + key + '}' == value and not allow_generic:
+                        raise absorb.NameParseError(
+                            f'Generic parameter {key} not allowed in {ref}'
+                        )
+                break
+            except absorb.NameParseError:
+                continue
+        else:
+            raise Exception('Could not find table class for: ' + ref)
 
     # parse input parameters
     if parameters is None:
@@ -53,6 +72,23 @@ def parse_table_str(
                 raise Exception(
                     'Invalid parameter ' + key + ' for ' + cls.full_class_name()
                 )
+
+    if match_these_parameters is not None:
+        for key, value in parameters.items():
+            if key not in match_these_parameters:
+                raise Exception(
+                    'extra parameter '
+                    + key
+                    + ' for '
+                    + cls.full_class_name()
+                    + ' not found in config'
+                )
+            if value != match_these_parameters[key]:
+                raise Exception(
+                    f'Parameter {key} with value {value} does not match '
+                    f'the config value {match_these_parameters[key]}'
+                )
+        parameters = match_these_parameters
 
     return cls, parameters
 

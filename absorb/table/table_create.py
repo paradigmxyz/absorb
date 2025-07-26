@@ -56,6 +56,7 @@ class TableCreate(table_coverage.TableCoverage):
         *,
         raw_parameters: dict[str, str] | None = None,
         use_all_parameters: bool = True,
+        use_config: bool = True,
     ) -> absorb.Table:
         if isinstance(ref, absorb.Table):
             # reference already instantiated
@@ -74,6 +75,7 @@ class TableCreate(table_coverage.TableCoverage):
                 ref,
                 raw_parameters=raw_parameters,
                 use_all_parameters=use_all_parameters,
+                use_config=use_config,
             )
         elif isinstance(ref, tuple):
             tuple_name, tuple_parameters = ref
@@ -82,6 +84,7 @@ class TableCreate(table_coverage.TableCoverage):
                 parameters=tuple_parameters,
                 raw_parameters=raw_parameters,
                 use_all_parameters=use_all_parameters,
+                use_config=use_config,
             )
         else:
             raise Exception()
