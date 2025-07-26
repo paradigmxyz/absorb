@@ -15,22 +15,35 @@ def query(
     update: bool = False,
     collect_if_missing: bool = True,
     scan_kwargs: dict[str, typing.Any] | None = None,
+    bucket: bool | absorb.Bucket = False,
 ) -> pl.LazyFrame:
-    table = absorb.Table.instantiate(table)
+    if bucket:
+        if isinstance(bucket, bool):
+            bucket = absorb.ops.get_default_bucket()
+        if update:
+            raise Exception('Cannot auto update bucketed table')
+        return absorb.ops.scan_bucket(
+            table,
+            bucket=bucket,
+            scan_kwargs=scan_kwargs,
+        )
 
-    # check if collected
-    if not table.is_collected():
-        if collect_if_missing or update:
+    else:
+        table = absorb.Table.instantiate(table)
+
+        # check if collected
+        if not table.is_collected():
+            if collect_if_missing or update:
+                table.collect()
+            else:
+                raise Exception(
+                    f'Table {table.source}.{table.name()} is not collected.'
+                )
+        elif update:
             table.collect()
-        else:
-            raise Exception(
-                f'Table {table.source}.{table.name()} is not collected.'
-            )
-    elif update:
-        table.collect()
 
-    # scan the table
-    return io.scan(table, scan_kwargs=scan_kwargs)
+        # scan the table
+        return io.scan(table, scan_kwargs=scan_kwargs)
 
 
 def sql_query(
