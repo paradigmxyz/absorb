@@ -13,6 +13,7 @@ if typing.TYPE_CHECKING:
 
 def setup_command(args: Namespace) -> dict[str, Any]:
     import toolstr
+    import os
 
     # get list of input tables
     if len(args.dataset) > 0:
@@ -105,5 +106,11 @@ def setup_command(args: Namespace) -> dict[str, Any]:
             if n > 4 and n != len(names) - 1:
                 continue
         absorb.ops.print_bullet(key=None, value=name, number=n + 1)
+
+    print()
+    if 'ABSORB_ROOT' in os.environ:
+        print('config stored at ABSORB_ROOT:', absorb.ops.get_absorb_root())
+    else:
+        print('using default config, set ABSORB_ROOT to a config')
 
     return {}
