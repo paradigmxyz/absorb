@@ -50,13 +50,19 @@ def validate_command(args: Namespace) -> dict[str, Any]:
             metadata_path = absorb.ops.get_table_metadata_path(
                 table, source=source
             )
-            if not os.path.isfile(metadata_path):
-                errors.append(f'{source}/{table} is missing a metadata file')
 
             # load metadata
-            with open(metadata_path, 'r') as f:
-                metadata = json.load(f)
-            metadatas[table_dir] = metadata
+            if os.path.isfile(metadata_path):
+                with open(metadata_path, 'r') as f:
+                    metadata = json.load(f)
+                metadatas[table_dir] = metadata
+            else:
+                data_glob = glob.glob(os.path.join(table_dir, '*.parquet'))
+                if len(data_glob) > 0:
+                    errors.append(
+                        f'{source}/{table} has parquet files but no metadata file'
+                    )
+                continue
 
             # validate that metadata is valid
             errors += [
