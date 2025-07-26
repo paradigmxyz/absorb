@@ -61,6 +61,18 @@ interactive = [
     "ipython>=8.18.1",
     "ipdb>=0.13.13",
 ]
+all = [
+    "typing-extensions >=4.9.0",
+    "dune-spice>=0.2.7",
+    "google-auth>=2.40.3",
+    "google-cloud-bigquery>=3.34.0",
+    "google-cloud>=0.34.0",
+    "google>=3.0.0",
+    "nitwit>=0.1.1",
+    "paradigm-garlic>=0.1.3",
+    "ipython>=8.18.1",
+    "ipdb>=0.13.13",
+]
 
 [dependency-groups]
 dev = [
