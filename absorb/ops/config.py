@@ -106,64 +106,66 @@ def get_tracked_tables() -> list[absorb.TableDict]:
     return get_config()['tracked_tables']
 
 
-def start_tracking_tables(
-    tables: typing.Sequence[absorb.TableReference],
-) -> None:
+def add(tables: typing.Sequence[absorb.TableReference]) -> None:
+    """start tracking tables"""
     import json
 
+    table_objs = [absorb.Table.instantiate(table) for table in tables]
     config = get_config()
     tracked_tables = {
-        json.dumps(table, sort_keys=True) for table in config['tracked_tables']
+        json.dumps(table, sort_keys=True): table
+        for table in config['tracked_tables']
     }
-    for table in tables:
-        instance = absorb.Table.instantiate(table)
-        table_dict = instance.create_table_dict()
-        as_str = json.dumps(table_dict, sort_keys=True)
+
+    # check for validity
+    for table in table_objs:
+        as_dict = table.create_table_dict()
+        name = as_dict['table_name']
+        as_str = json.dumps(as_dict, sort_keys=True)
 
         # check for name collisions
-        for tracked_table in config['tracked_tables']:
-            if table_dict['table_name'] == tracked_table[
-                'table_name'
-            ] and as_str != json.dumps(tracked_table, sort_keys=True):
-                raise Exception(
-                    'name collision, cannot add new tracked table: '
-                    + str(table_dict['table_name'])
-                )
+        for tracked_str, tracked_dict in tracked_tables.items():
+            if name == tracked_dict['table_name'] and as_str != tracked_str:
+                raise Exception('name collision, cannot add: ' + name)
 
-        # add to tracked tables
+        # check that table is registered
+        if type(table) not in absorb.ops.get_source_table_classes(table.source):
+            raise Exception('table ' + name + ' is not registered to source')
+
+        # add to tracked tables if not already tracked
         if as_str not in tracked_tables:
-            config['tracked_tables'].append(table_dict)
-            tracked_tables.add(as_str)
+            config['tracked_tables'].append(as_dict)
+            tracked_tables[as_str] = as_dict
 
-    names = ', '.join(
-        absorb.Table.instantiate(table).full_name() for name in tables
-    )
+    # setup directory for each table
+    for table in table_objs:
+        table.setup_table_dir()
+
+    # write new config
+    names = ', '.join(table_obj.full_name() for table_obj in table_objs)
     message = 'Start tracking ' + str(len(tables)) + ' tables: ' + names
     write_config(config, message)
 
 
-def stop_tracking_tables(
-    tables: typing.Sequence[absorb.TableReference],
-) -> None:
+def remove(tables: typing.Sequence[absorb.TableReference]) -> None:
+    """stop tracking tables"""
     import json
 
-    drop_these = set()
-    for table in tables:
-        table_dict = absorb.Table.instantiate(table).create_table_dict()
-        table_str = json.dumps(table_dict, sort_keys=True)
-        drop_these.add(table_str)
+    # gather tables to drop
+    drop_tables = [absorb.Table.instantiate(table) for table in tables]
+    drop_names = {table.name() for table in drop_tables}
 
+    # create new tracked tables
     config = get_config()
     config['tracked_tables'] = [
         table
         for table in config['tracked_tables']
-        if json.dumps(table, sort_keys=True) not in drop_these
+        if table['table_name'] not in drop_names
     ]
 
-    names = ', '.join(
-        absorb.Table.instantiate(table).full_name() for table in tables
-    )
-    message = 'Stop tracking ' + str(len(tables)) + ' tables: ' + names
+    # write new config
+    names = ', '.join(table.full_name() for table in drop_tables)
+    message = 'Stop tracking ' + str(len(drop_names)) + ' tables: ' + names
     write_config(config, message)
 
 

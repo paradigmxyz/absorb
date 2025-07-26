@@ -21,17 +21,20 @@ def remove_command(args: Namespace) -> dict[str, Any]:
         tracked_datasets = cli_parsing._parse_datasets(args)
 
     if not args.delete_only:
-        absorb.ops.stop_tracking_tables(tracked_datasets)
+        absorb.ops.remove(tracked_datasets)
         cli_outputs._print_title('Stopped tracking')
         for dataset in tracked_datasets:
             cli_outputs._print_dataset_bullet(dataset)
 
-    if args.delete:
+    if args.delete or args.delete_only:
         print()
         for dataset in tracked_datasets:
             print('deleting files of ' + dataset.full_name())
             try:
-                absorb.ops.delete_table_dir(dataset, confirm=args.confirm)
+                if args.delete_only:
+                    absorb.ops.delete_table_data(dataset, confirm=args.confirm)
+                else:
+                    absorb.ops.delete_table_dir(dataset, confirm=args.confirm)
             except absorb.ConfirmError:
                 import sys
                 import toolstr

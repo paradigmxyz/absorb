@@ -276,3 +276,17 @@ def delete_table_dir(table: absorb.Table, confirm: bool = False) -> None:
             repo_root=absorb.ops.get_absorb_root(),
             message='Remove table metadata for ' + table.full_name(),
         )
+
+
+def delete_table_data(table: absorb.Table, confirm: bool = False) -> None:
+    import os
+    import glob
+
+    if not confirm:
+        raise absorb.ConfirmError(
+            'use confirm=True to delete table and its data files'
+        )
+
+    data_glob = table.get_glob()
+    for path in glob.glob(data_glob):
+        os.remove(path)

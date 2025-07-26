@@ -106,8 +106,9 @@ def git_remove_and_commit_file(
 
         message = 'Remove ' + os.path.relpath(path, repo_root)
 
-    git_remove_file(path=path, repo_root=repo_root)
-    git_commit(message=message, repo_root=repo_root)
+    if git_is_file_tracked(path, repo_root=repo_root):
+        git_remove_file(path=path, repo_root=repo_root)
+        git_commit(message=message, repo_root=repo_root)
 
 
 def git_commit(message: str, repo_root: str, *, verbose: bool = False) -> None:

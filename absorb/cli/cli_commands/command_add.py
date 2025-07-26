@@ -38,15 +38,8 @@ def add_command(args: Namespace) -> dict[str, Any]:
             not_tracked[ds_hash] = ds
     track_datasets = list(not_tracked.values())
 
-    # check for invalid datasets
-    sources = set(td.source for td in track_datasets)
-    source_datasets = {
-        source: absorb.ops.get_source_table_classes(source)
-        for source in sources
-    }
-    for track_dataset in track_datasets:
-        if type(track_dataset) not in source_datasets[track_dataset.source]:
-            raise Exception('invalid dataset:')
+    # start tracking tables
+    absorb.ops.add(track_datasets)
 
     # print dataset summary
     if len(already_tracked) > 0:
@@ -64,13 +57,6 @@ def add_command(args: Namespace) -> dict[str, Any]:
         rich.print(
             'to proceed with data collection, use [white bold]absorb collect[/white bold]'
         )
-
-    # setup directories
-    for table in track_datasets:
-        table.setup_table_dir()
-
-    # start tracking tables
-    absorb.ops.start_tracking_tables(track_datasets)
 
     # check for missing packages or credentials
     warnings = []
