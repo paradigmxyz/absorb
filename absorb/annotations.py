@@ -7,7 +7,7 @@ import types
 
 import polars as pl
 
-from . import table_class
+from . import table
 
 
 # chunk formats
@@ -141,7 +141,7 @@ TableReference = typing.Union[
     str,
     tuple[str, dict[str, JSONValue]],
     TableDict,
-    table_class.Table,
+    table.Table,
 ]
 
 

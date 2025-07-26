@@ -1,7 +1,7 @@
 """python interface for interacting with flashbots mempool dumpster"""
 
-from .types.errors import *
-from .types.table_class import Table
+from .errors import *
+from .table import Table
 from . import ops
 from .ops import (
     scan,
@@ -15,7 +15,7 @@ from .ops import (
 import typing
 
 if typing.TYPE_CHECKING:
-    from .types.annotations import *
+    from .annotations import *
 
 
 __version__ = '0.2.0'
