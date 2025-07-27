@@ -71,28 +71,34 @@ class TableCoverage(table_io.TableIO):
         else:
             raise Exception()
 
-    def get_missing_ranges(self) -> absorb.Coverage | None:
-        collected_range = self.get_collected_range()
+    def get_missing_ranges(self) -> absorb.Coverage:
+        if self.write_range == 'overwrite_all':
+            raise Exception(
+                'get_missing_ranges() does not apply to tables that use overwrite_all'
+            )
         available_range = self.get_available_range()
         if available_range is None:
-            return None
+            raise Exception('get_available_range() not properly implemented')
+
+        collected_range = self.get_collected_range()
         if collected_range is None:
-            return [available_range]
+            return available_range
         else:
-            index_type = self.index_type
-            if index_type is None:
+            chunk_size = self.chunk_size
+            if chunk_size is None:
                 raise Exception(
-                    'ranges computations require index_type to be set'
+                    'ranges computations require chunk_size to be set'
                 )
             return absorb.ops.get_range_diff(
                 subtract_this=collected_range,
                 from_this=available_range,
-                index_type=index_type,
+                chunk_size=chunk_size,
+                boundary_type=self.boundary_type,
             )
 
     @classmethod
     def is_range_sortable(cls) -> bool:
-        return cls.index_type is not None
+        return cls.chunk_size is not None
 
     def ready_for_update(self) -> bool:
         """used for periodically updating datasets that have no get_available_range()"""
@@ -100,13 +106,13 @@ class TableCoverage(table_io.TableIO):
         import tooltime
 
         # ensure valid for dataset
-        if not absorb.ops.index_is_temporal(self.index_type):
+        if self.get_index_type() != 'temporal':
             raise Exception(
                 'ready_for_update() can only be called if index is temporal'
             )
-        if not isinstance(self.index_type, str):
+        if not isinstance(self.chunk_size, str):
             raise Exception(
-                'ready_for_update() can only be called if index_type is a string'
+                'ready_for_update() can only be called if chunk_size is a string'
             )
 
         # get last update time
@@ -118,7 +124,7 @@ class TableCoverage(table_io.TableIO):
         min_latency_seconds: float | int
         if self.update_latency is None:
             min_latency_seconds = tooltime.timelength_to_seconds(
-                '1 ' + self.index_type
+                '1 ' + self.chunk_size
             )
         elif isinstance(self.update_latency, str):
             min_latency_seconds = tooltime.timelength_to_seconds(
@@ -127,7 +133,7 @@ class TableCoverage(table_io.TableIO):
         elif isinstance(self.update_latency, float):
             min_latency_seconds = (
                 self.update_latency
-                * tooltime.timelength_to_seconds('1 ' + self.index_type)
+                * tooltime.timelength_to_seconds('1 ' + self.chunk_size)
             )
         else:
             raise Exception('invalid format for update_latency')

@@ -13,8 +13,9 @@ class Commits(absorb.Table):
     description = 'Commit history of git repository'
     url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
-    parameter_types = {'paths': list[str]}
     index_type = 'id'
+    index_column = 'hash'
+    parameter_types = {'paths': list[str]}
     require_name = True
     required_packages = ['nitwit >= 1.1']
 
@@ -53,9 +54,10 @@ class Authors(absorb.Table):
     description = 'Author stats of git repository'
     url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
+    index_type = 'id'
+    index_column = 'author'
     parameter_types = {'path': str}
     require_name = True
-    index_type = 'id'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -91,9 +93,10 @@ class FileDiffs(absorb.Table):
     description = 'File diffs of git repository'
     url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
+    index_type = 'id'
+    index_column = ('hash', 'path')
     parameter_types = {'path': str}
     require_name = True
-    index_type = 'id'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -122,9 +125,10 @@ class FileDiffStats(absorb.Table):
     description = 'File diff statistics of git repository'
     url = 'https://git-scm.com/'
     write_range = 'overwrite_all'
+    index_type = 'id'
+    index_column = 'hash'
     parameter_types = {'path': str}
     require_name = True
-    index_type = 'id'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

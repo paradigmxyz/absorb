@@ -20,11 +20,13 @@ class TablePaths(table_names.TableNames):
 
     def get_file_path(
         self,
-        chunk: absorb.Chunk | None = None,
+        chunk: absorb.Chunk = None,
         glob: bool = False,
         warn: bool = True,
         df: pl.DataFrame | None = None,
     ) -> str:
+        import datetime
+
         # special case the chunk if write_range=overwrite_all
         if self.write_range == 'overwrite_all':
             if glob:
@@ -32,7 +34,9 @@ class TablePaths(table_names.TableNames):
             else:
                 if df is not None:
                     if 'timestamp' in df.columns:
-                        chunk = df['timestamp'].max()
+                        chunk = typing.cast(
+                            datetime.datetime, df['timestamp'].max()
+                        )
                     else:
                         chunk = 'all'
                 else:
@@ -41,7 +45,7 @@ class TablePaths(table_names.TableNames):
         # get file path
         return absorb.ops.paths.get_table_filepath(
             chunk=chunk,
-            index_type=self.index_type,
+            chunk_size=self.chunk_size,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -55,7 +59,7 @@ class TablePaths(table_names.TableNames):
     ) -> list[str]:
         return absorb.ops.paths.get_table_filepaths(
             chunks=chunks,
-            index_type=self.index_type,
+            chunk_size=self.chunk_size,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -65,13 +69,13 @@ class TablePaths(table_names.TableNames):
 
     def parse_file_path(self, path: str) -> dict[str, typing.Any]:
         if self.write_range == 'overwrite_all':
-            index_type = None
+            chunk_size = None
         else:
-            index_type = self.index_type
+            chunk_size = self.chunk_size
         return absorb.ops.paths.parse_file_path(
             path=path,
             filename_template=self.filename_template,
-            index_type=index_type,
+            chunk_size=chunk_size,
         )
 
     def setup_table_dir(self) -> None:

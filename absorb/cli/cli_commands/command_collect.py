@@ -47,14 +47,7 @@ def collect_command(args: Namespace) -> dict[str, Any]:
 
         # instantiate dataset
         if dataset.write_range == 'append_only':
-            index_type = dataset.index_type
-            if index_type is None:
-                raise Exception(
-                    'Cannot collect append_only dataset without index_type.'
-                )
-            data_ranges = cli_parsing._parse_ranges(
-                args.range, index_type=index_type
-            )
+            data_ranges = cli_parsing._parse_ranges(args.range)
         else:
             data_ranges = None
 

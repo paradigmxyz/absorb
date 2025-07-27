@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing_extensions import NotRequired
 import typing
+from typing import Union
 import datetime
 import types
 
@@ -10,55 +11,38 @@ import polars as pl
 from . import table
 
 
-# chunk formats
-PrimitiveIndexType = typing.Literal[
-    # temporal
-    'hour',
-    'day',
-    'week',
-    'month',
-    'quarter',
-    'year',
-    'timestamp',
-    'timestamp_range',
-    # numerical
-    'number',
-    'number_range',
-    'number_list',
-    # names
-    'id',
-    'id_list',
+#
+# # coverage
+#
+
+IndexValue = Union[datetime.datetime, int, str]
+IndexRange = Union[
+    tuple[datetime.datetime, datetime.datetime],
+    tuple[int, int],
+    tuple[str, str],
 ]
+IndexSemiRange = Union[
+    tuple[Union[datetime.datetime, None], Union[datetime.datetime, None]],
+    tuple[Union[int, None], Union[int, None]],
+    tuple[Union[str, None], Union[str, None]],
+]
+CustomRange = dict[str, typing.Any]
+Coverage = typing.Union[IndexRange, list[IndexRange], CustomRange]
 
+#
+# # index types
+#
 
-class CustomIndexType:
-    def partition_into_chunks(self, coverage: Coverage) -> list[Chunk]:
-        raise NotImplementedError()
-
-    def format_value(self, chunk: CustomChunk) -> str:
-        raise NotImplementedError()
-
-
-class MultiIndexType(typing.TypedDict):
-    type: typing.Literal['multi']
-    dims: dict[str, ScalarIndexType]
-
-
-class ExplicitIndexType(typing.TypedDict):
-    type: PrimitiveIndexType
-    number_interval: NotRequired[int | None]
-    timestamp_interval: NotRequired[datetime.timedelta | None]
-
-
-ScalarIndexType = typing.Union[
-    PrimitiveIndexType,
-    ExplicitIndexType,
+CustomIndexType = dict[str, typing.Any]
+IndexType = typing.Union[
+    typing.Literal['temporal', 'numerical', 'id', 'no_index'],
     CustomIndexType,
 ]
 
-IndexType = typing.Union[ScalarIndexType, MultiIndexType]
+#
+# # chunks
+#
 
-# chunks
 PrimitiveChunk = typing.Union[
     datetime.datetime,
     tuple[datetime.datetime, datetime.datetime],
@@ -69,18 +53,43 @@ PrimitiveChunk = typing.Union[
     list[str],
     tuple[str, str],
 ]
-CustomChunk = typing.Any
-ScalarChunk = typing.Union[PrimitiveChunk, CustomChunk]
-MultiChunk = dict[str, ScalarChunk]
-Chunk = typing.Union[ScalarChunk, MultiChunk]
+CustomChunk = dict[str, typing.Any]
+Chunk = typing.Union[None, PrimitiveChunk, CustomChunk]
+
+#
+# # chunk sizes
+#
+
+TemporalChunkSize = typing.Literal[
+    'hour',
+    'day',
+    'week',
+    'month',
+    'quarter',
+    'year',
+]
+NumericalChunkSize = int
+CustomChunkSize = dict[str, typing.Any]
+ChunkSize = typing.Union[
+    TemporalChunkSize,
+    NumericalChunkSize,
+    CustomChunkSize,
+]
+
+# CustomChunk = typing.Any
+# ScalarChunk = typing.Union[PrimitiveChunk, CustomChunk]
+# ScalarChunk = PrimitiveChunk
+# MultiChunk = dict[str, ScalarChunk]
+# Chunk = typing.Union[ScalarChunk, MultiChunk]
+# Chunk = ScalarChunk
 
 # chunk coverage
-ChunkList = typing.Sequence[Chunk]
-ScalarChunkRange = tuple[ScalarChunk, ScalarChunk]
-MultiChunkRange = typing.Mapping[
-    str, typing.Union[ScalarChunkRange, list[ScalarChunk]]
-]
-Coverage = typing.Union[ChunkList, ScalarChunkRange, MultiChunkRange]
+# ChunkList = typing.Sequence[Chunk]
+# ScalarChunkRange = tuple[ScalarChunk, ScalarChunk]
+# MultiChunkRange = typing.Mapping[
+#     str, typing.Union[ScalarChunkRange, list[ScalarChunk]]
+# ]
+# Coverage = typing.Union[ChunkList, ScalarChunkRange, MultiChunkRange]
 
 
 class ChunkPaths(typing.TypedDict):
@@ -91,31 +100,31 @@ class ChunkPaths(typing.TypedDict):
 ChunkData = typing.Union[pl.DataFrame, ChunkPaths]
 
 
-def get_index_type_type(
-    index_type: PrimitiveIndexType,
-) -> type | types.GenericAlias | None:
-    import datetime
-
-    if isinstance(index_type, str):
-        return {
-            'hour': datetime.datetime,
-            'day': datetime.datetime,
-            'week': datetime.datetime,
-            'month': datetime.datetime,
-            'quarter': datetime.datetime,
-            'year': datetime.datetime,
-            'timestamp': datetime.datetime,
-            'timestamp_range': tuple[datetime.datetime, datetime.datetime],
-            'count': int,
-            'count_range': tuple[int, int],
-            'id': str,
-            'id_list': list[str],
-            None: None,
-        }[index_type]
-    elif isinstance(index_type, dict):
-        return dict[str, typing.Any]
-    else:
-        raise Exception()
+# def get_index_type_type(
+#     index_type: PrimitiveIndexType,
+# ) -> type | types.GenericAlias | None:
+#     import datetime
+#
+#     if isinstance(index_type, str):
+#         return {
+#             'hour': datetime.datetime,
+#             'day': datetime.datetime,
+#             'week': datetime.datetime,
+#             'month': datetime.datetime,
+#             'quarter': datetime.datetime,
+#             'year': datetime.datetime,
+#             'timestamp': datetime.datetime,
+#             'timestamp_range': tuple[datetime.datetime, datetime.datetime],
+#             'count': int,
+#             'count_range': tuple[int, int],
+#             'id': str,
+#             'id_list': list[str],
+#             None: None,
+#         }[index_type]
+#     elif isinstance(index_type, dict):
+#         return dict[str, typing.Any]
+#     else:
+#         raise Exception()
 
 
 JSONValue = typing.Union[

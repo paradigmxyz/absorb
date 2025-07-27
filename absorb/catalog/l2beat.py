@@ -26,7 +26,7 @@ class Metrics(absorb.Table):
     description = 'On-chain metrics for Ethereum and its rollups'
     url = 'https://l2beat.com/'
     write_range = 'overwrite_all'
-    index_type = 'day'
+    row_precision = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

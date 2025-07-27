@@ -13,7 +13,7 @@ class Treasuries(absorb.Table):
     description = 'Holdings of US Treasury securities per each country'
     url = 'https://home.treasury.gov/data/treasury-international-capital-tic-system'
     write_range = 'overwrite_all'
-    index_type = 'month'
+    row_precision = 'month'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -31,7 +31,10 @@ class Treasuries(absorb.Table):
         import datetime
 
         holdings = get_post_2019_holdings()
-        return (datetime.datetime(2011, 9, 1), holdings['timestamp'].max())
+        max_timestamp = typing.cast(
+            datetime.datetime, holdings['timestamp'].max()
+        )
+        return (datetime.datetime(2011, 9, 1), max_timestamp)
 
 
 def get_post_2019_holdings() -> pl.DataFrame:

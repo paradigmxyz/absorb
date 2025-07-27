@@ -7,6 +7,7 @@ from . import cli_helpers
 
 if typing.TYPE_CHECKING:
     import argparse
+    import datetime
 
 
 def get_subcommands() -> list[
@@ -113,6 +114,7 @@ def get_subcommands() -> list[
                     ['--range'],
                     {
                         'help': 'range of data to collect',
+                        'nargs': '+',
                     },
                 ),
                 (
@@ -686,28 +688,117 @@ def _parse_datasets(args: argparse.Namespace) -> list[absorb.Table]:
 
 
 def _parse_ranges(
-    raw_ranges: list[str] | None, index_type: absorb.IndexType
-) -> list[typing.Any] | None:
+    raw_ranges: list[str] | None,
+) -> list[tuple[datetime.datetime | None, datetime.datetime | None]] | None:
     """
+    range formats:
+    - `START:END` cover start to end
+    - `START` cover start only
+    - `START:` cover start to now
+    - `:END` cover beginning to end
+    - `:` cover entire range
+
+    START / END formats:
+    - year (2024)
+    - month (2024-03)
+    - day (2024-01-05)
+
     examples:
     --range 2025-01-01:2025-03-01
     --range 2025-01-01:
     --range :2025-01-01
     """
+    import datetime
+
     if raw_ranges is None:
         return None
-    if index_type == 'day' or index_type == 'timestamp_range':
-        raise NotImplementedError('manual ranges for ' + str(index_type))
-    else:
-        raise NotImplementedError('manual ranges for ' + str(index_type))
 
-    # 'date',
-    # 'date_range',
-    # 'named_range',
-    # 'block_range',
-    # 'id_range',
-    # 'count',
-    # None,
+    output: list[tuple[datetime.datetime | None, datetime.datetime | None]] = []
+    for raw_range in raw_ranges:
+        if ':' not in raw_range:
+            start = parse_raw_datetime(raw_range)
+            if is_year(raw_range):
+                end = datetime.datetime(int(raw_range) + 1, 1, 1)
+            elif is_month(raw_range):
+                if start.month == 12:
+                    end = datetime.datetime(start.year + 1, 1, 1)
+                else:
+                    end = datetime.datetime(start.year, start.month + 1, 1)
+            elif is_day(raw_range):
+                end = start + datetime.timedelta(days=1)
+            else:
+                raise ValueError('Invalid range format: ' + str(raw_range))
+        else:
+            parts = raw_range.split(':')
+            if len(parts) == 1:
+                timestamp = parse_raw_datetime(parts[0])
+                if raw_range.startswith(':'):
+                    output.append((None, timestamp))
+                elif raw_range.endswith(':'):
+                    output.append((timestamp, None))
+                else:
+                    raise Exception()
+            elif len(parts) == 2:
+                if parts[0] == '':
+                    start = None
+                else:
+                    start = parse_raw_datetime(parts[0])
+                if parts[1] == '':
+                    end = None
+                else:
+                    end = parse_raw_datetime(parts[1])
+            else:
+                raise ValueError('Invalid range format: ' + str(raw_range))
+        output.append((start, end))
+    return output
+
+
+def parse_raw_datetime(raw: str) -> datetime.datetime:
+    import datetime
+
+    if is_year(raw):
+        return datetime.datetime(int(raw), 1, 1)
+    elif is_month(raw):
+        raw_year, raw_month = raw.split('-')
+        year = int(raw_year)
+        month = int(raw_month)
+        return datetime.datetime(year, month, 1)
+    elif is_day(raw):
+        raw_year, raw_month, raw_day = raw.split('-')
+        year = int(raw_year)
+        month = int(raw_month)
+        day = int(raw_day)
+        return datetime.datetime(year, month, day)
+    else:
+        raise ValueError('Invalid range format: ' + raw)
+
+
+def is_year(raw_range: str) -> bool:
+    return raw_range.isdigit() and len(raw_range) == 4
+
+
+def is_month(raw_range: str) -> bool:
+    parts = raw_range.split('-')
+    return (
+        len(parts) == 2
+        and parts[0].isdigit()
+        and len(parts[0]) == 4
+        and parts[1].isdigit()
+        and 1 <= int(parts[1]) <= 12
+    )
+
+
+def is_day(raw_range: str) -> bool:
+    parts = raw_range.split('-')
+    return (
+        len(parts) == 3
+        and parts[0].isdigit()
+        and len(parts[0]) == 4
+        and parts[1].isdigit()
+        and 1 <= int(parts[1]) <= 12
+        and parts[2].isdigit()
+        and 1 <= int(parts[2]) <= 31
+    )
 
 
 def _parse_bucket(args: argparse.Namespace) -> absorb.Bucket:

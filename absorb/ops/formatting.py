@@ -21,24 +21,24 @@ def print_bullet(
 
 
 def format_coverage(
-    coverage: absorb.Coverage | None, index_type: absorb.IndexType | None
+    coverage: absorb.Coverage | None, chunk_size: absorb.ChunkSize | None
 ) -> str:
     if coverage is None:
         return 'None'
     if isinstance(coverage, tuple):
         start, end = coverage
         return (
-            format_chunk(start, index_type)
+            format_chunk(start, chunk_size)
             + '_to_'
-            + format_chunk(end, index_type)
+            + format_chunk(end, chunk_size)
         )
     elif isinstance(coverage, list):
-        start = min(coverage)
-        end = max(coverage)
+        start = min(coverage)[0]
+        end = max(coverage)[0]
         return (
-            format_chunk(start, index_type)
+            format_chunk(start, chunk_size)
             + '_to_'
-            + format_chunk(end, index_type)
+            + format_chunk(end, chunk_size)
         )
     elif isinstance(coverage, dict):
         raise NotImplementedError()
@@ -47,22 +47,22 @@ def format_coverage(
 
 
 def format_chunk(
-    chunk: absorb.Chunk, index_type: absorb.IndexType | None
+    chunk: absorb.Chunk, chunk_size: absorb.ChunkSize | None
 ) -> str:
     if chunk is None:
         return '-'
-    if index_type is None:
-        return '-'
+    if chunk_size is None:
+        return str(chunk)
 
-    if index_type == 'hour':
+    if chunk_size == 'hour':
         return chunk.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
-    elif index_type == 'day':
+    elif chunk_size == 'day':
         return chunk.strftime('%Y-%m-%d')  # type: ignore
-    elif index_type == 'week':
+    elif chunk_size == 'week':
         return chunk.strftime('%Y-%m-%d')  # type: ignore
-    elif index_type == 'month':
+    elif chunk_size == 'month':
         return chunk.strftime('%Y-%m')  # type: ignore
-    elif index_type == 'quarter':
+    elif chunk_size == 'quarter':
         if chunk.month == 1 and chunk.day == 1:  # type: ignore
             quarter = 1
         elif chunk.month == 4 and chunk.day == 1:  # type: ignore
@@ -74,35 +74,13 @@ def format_chunk(
         else:
             raise Exception('invalid quarter timestamp')
         return chunk.strftime('%Y-Q') + str(quarter)  # type: ignore
-    elif index_type == 'year':
+    elif chunk_size == 'year':
         return chunk.strftime('%Y')  # type: ignore
-    elif index_type == 'timestamp':
-        return chunk.strftime('%Y-%m-%d--%H-%M-%S')  # type: ignore
-    elif index_type == 'timestamp_range':
-        import datetime
-
-        t_start: datetime.datetime
-        t_end: datetime.datetime
-        t_start, t_end = chunk  # type: ignore
-        return (
-            t_start.strftime('%Y-%m-%d--%H-%M-%S')
-            + '_to_'
-            + t_end.strftime('%Y-%m-%d--%H-%M-%S')
-        )
-    elif index_type == 'number':
+    elif isinstance(chunk_size, int):
         width = 10
         template = '%0' + str(width) + 'd'
         return template % chunk
-    elif index_type == 'number_range':
-        width = 10
-        template = '%0' + str(width) + 'd'
-        start, end = chunk  # type: ignore
-        return (template % start) + '_to_' + (template % end)
-    elif index_type == 'id':
-        return chunk  # type: ignore
-    elif index_type == 'id_list':
-        return '_'.join(chunk)  # type: ignore
-    elif index_type is None:
-        return str(chunk)
+    elif isinstance(chunk_size, dict):
+        raise NotImplementedError('chunk_size as dict not implemented')
     else:
-        raise Exception('invalid chunk range format: ' + str(index_type))
+        raise Exception('invalid chunk_size format: ' + str(type(chunk_size)))

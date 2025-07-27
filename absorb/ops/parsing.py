@@ -34,6 +34,7 @@ def parse_table_str(
                     class_path=table['table_class']
                 )
                 match_these_parameters = table['parameters']
+                name_parameters = {}
                 break
 
     # if not in config, check classes of source

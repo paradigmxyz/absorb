@@ -15,7 +15,7 @@ class Stablecoins(absorb.Table):
     description = 'Total circulating stablecoins in USD'
     url = 'https://defillama.com/'
     write_range = 'overwrite_all'
-    index_type = 'day'
+    row_precision = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -33,7 +33,7 @@ class StablecoinsOfChains(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'chains': (list, type(None))}
     default_parameters = {'chains': None}
-    index_type = 'day'
+    row_precision = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -72,7 +72,7 @@ class StablecoinsOfTokens(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'tokens': (list, type(None))}
     default_parameters = {'tokens': None}
-    index_type = 'day'
+    row_precision = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -108,7 +108,7 @@ class StablecoinPrices(absorb.Table):
     description = 'Prices of stablecoins in USD over time'
     url = 'https://defillama.com/'
     write_range = 'overwrite_all'
-    index_type = 'day'
+    row_precision = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

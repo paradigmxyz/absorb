@@ -16,8 +16,8 @@ class Mempool(absorb.Table):
     source = 'blocknative'
     description = 'Snapshots of the Ethereum mempool'
     url = 'https://docs.blocknative.com/data-archive/mempool-archive'
-    write_range = 'overwrite_all'
-    index_type = 'hour'
+    write_range = 'append_only'
+    chunk_size = 'hour'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

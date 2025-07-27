@@ -10,7 +10,7 @@ RangeDiffTest = tuple[tuple[str, str], tuple[str, str], list[tuple[str, str]]]
 
 
 # (from_this, subtract_this, target_output)
-range_diff_test_dates = [
+closed_date_range_diff_cases = [
     # single interval cases
     # case 1
     (
@@ -148,8 +148,8 @@ range_diff_test_dates = [
 ]
 
 
-@pytest.mark.parametrize('test', range_diff_test_dates)
-def test_range_diff_dates(test: RangeDiffTest) -> None:
+@pytest.mark.parametrize('test', closed_date_range_diff_cases)
+def test_closed_date_range_diffs(test: RangeDiffTest) -> None:
     (from_this_str, subtract_this_str, target_output_strs) = test
     from_this = (
         datetime.datetime.strptime(from_this_str[0], '%Y-%m-%d'),
@@ -169,7 +169,8 @@ def test_range_diff_dates(test: RangeDiffTest) -> None:
     actual_output = absorb.ops.get_range_diff(
         subtract_this=subtract_this,
         from_this=from_this,
-        index_type='day',
+        boundary_type='closed',
+        chunk_size='day',
     )
     if isinstance(actual_output, tuple):
         actual_output = [actual_output]
@@ -177,7 +178,7 @@ def test_range_diff_dates(test: RangeDiffTest) -> None:
 
 
 # (from_this, subtract_this, target_output)
-range_diff_test_date_ranges = [
+semiopen_date_range_diff_cases = [
     # case 1
     (
         ('2025-03-01', '2025-04-15'),
@@ -265,8 +266,8 @@ range_diff_test_date_ranges = [
 ]
 
 
-@pytest.mark.parametrize('test', range_diff_test_date_ranges)
-def test_range_diff_date_ranges(test: RangeDiffTest) -> None:
+@pytest.mark.parametrize('test', semiopen_date_range_diff_cases)
+def test_semiopen_date_range_diffs(test: RangeDiffTest) -> None:
     (from_this_str, subtract_this_str, target_output_strs) = test
     from_this = (
         datetime.datetime.strptime(from_this_str[0], '%Y-%m-%d'),
@@ -286,7 +287,8 @@ def test_range_diff_date_ranges(test: RangeDiffTest) -> None:
     actual_output = absorb.ops.get_range_diff(
         subtract_this=subtract_this,
         from_this=from_this,
-        index_type='timestamp_range',
+        boundary_type='semiopen',
+        chunk_size='day',
     )
     if isinstance(actual_output, tuple):
         actual_output = [actual_output]

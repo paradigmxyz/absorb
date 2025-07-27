@@ -14,7 +14,7 @@ class Transactions(absorb.Table):
     url = 'https://github.com/flashbots/mempool-dumpster'
     description = 'Archive of the Ethereum mempool collected by Flashbots'
     write_range = 'append_only'
-    index_type = 'day'
+    chunk_size = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

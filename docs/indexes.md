@@ -26,8 +26,5 @@ Use of index for each write_range type:
 - Table.chunk_range indicates both
     1. what data_range is passed to collect_chunk()
     2. what will the file be named
-
-
-
-
-
+- available range does not always divide evenly into chunks
+    - e.g. if dataset continually updates or updates every day, and the chunk size is month

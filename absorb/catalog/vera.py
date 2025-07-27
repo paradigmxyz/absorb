@@ -19,13 +19,13 @@ class VeraChunkedDataset(absorb.Table):
     source = 'vera'
     vera_filetype: str
     url = 'https://verifieralliance.org/'
-    index_type = 'number_range'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         return {}
 
     def get_available_range(self) -> absorb.Coverage:
-        return get_current_files(self.vera_filetype)
+        raise NotImplementedError()
+        # return get_current_files(self.vera_filetype)
 
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
         url = 'https://export.verifieralliance.org/' + chunk  # type: ignore
@@ -34,44 +34,58 @@ class VeraChunkedDataset(absorb.Table):
 
 class Code(VeraChunkedDataset):
     description = 'Verifier Alliance code dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'code'
+    chunk_size = 100000
+    index_column = 'block_number'
 
 
 class Contracts(VeraChunkedDataset):
     description = 'Verifier Alliance contracts dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'contracts'
+    chunk_size = 1000000
+    index_column = 'block_number'
 
 
 class ContractDeployments(VeraChunkedDataset):
     description = 'Verifier Alliance contract deployments dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'contract_deployments'
+    chunk_size = 1000000
+    index_column = 'block_number'
 
 
 class CompiledContracts(VeraChunkedDataset):
     description = 'Verifier Alliance compiled contracts dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'compiled_contracts'
+    chunk_size = 10000
+    index_column = 'block_number'
 
 
 class CompiledContractsSources(VeraChunkedDataset):
     description = 'Verifier Alliance compiled contract sourcecode dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'compiled_contracts_sources'
+    chunk_size = 1000000
+    index_column = 'block_number'
 
 
 class Sources(VeraChunkedDataset):
     description = 'Verifier Alliance sourcecode dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'sources'
+    chunk_size = 10000
+    index_column = 'block_number'
 
 
 class VerifiedContracts(VeraChunkedDataset):
     description = 'Verifier Alliance verified contracts dataset'
-    write_range = 'overwrite_all'
+    write_range = 'append_only'
     vera_filetype = 'verified_contracts'
+    chunk_size = 1000000
+    index_column = 'block_number'
 
 
 def get_tables() -> list[type[absorb.Table]]:

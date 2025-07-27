@@ -195,7 +195,7 @@ for name, (series_id, cadence, lower_name) in get_series_catalog().items():
     cls: Metric = type(name, (Metric,), namespace)  # type: ignore
     cls.description = 'FRED data for ' + name
     cls.url = 'https://fred.stlouisfed.org/series/' + series_id
-    cls.index_type = cadence  # type: ignore
+    cls.row_precision = cadence
     cls.name_template = lower_name
     cls.required_credentials = ['FRED_API_KEY']
     tables.append(cls)  # type: ignore

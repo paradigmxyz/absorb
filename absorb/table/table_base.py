@@ -24,6 +24,10 @@ class TableBase:
         'append_only', 'overwrite_all', 'overwrite_chunks'
     ]
     index_type: absorb.IndexType | None = None
+    index_column: str | tuple[str, ...] | None = None
+    boundary_type: typing.Literal['closed', 'semiopen'] = 'closed'
+    chunk_size: absorb.ChunkSize | None = None
+    row_precision: typing.Any | None = None
 
     # for ongoing datasets, time to wait before checking if new data is posted
     # can be a str duration like '1h' or a float multiple of index type
@@ -49,7 +53,7 @@ class TableBase:
 
     # use first available template that has all parameters filled
     name_template: str | list[str] = '{class_name}'
-    filename_template = '{source}__{table}__{chunk}.parquet'
+    filename_template = '{source}__{table}__{coverage}.parquet'
 
     #
     # # methods
@@ -57,6 +61,58 @@ class TableBase:
 
     def get_schema(self) -> dict[str, type[pl.DataType] | pl.DataType]:
         raise NotImplementedError()
+
+    @classmethod
+    def get_index_type(cls) -> absorb.IndexType:
+        if cls.index_type is not None:
+            return cls.index_type
+
+        # attempt to determine index_type from chunk_size
+        if cls.chunk_size is None:
+            pass
+        elif cls.chunk_size in [
+            'hour',
+            'day',
+            'week',
+            'month',
+            'quarter',
+            'year',
+        ]:
+            return 'temporal'
+        elif isinstance(cls.chunk_size, int):
+            return 'numerical'
+        elif isinstance(cls.chunk_size, dict):
+            raise NotImplementedError('chunk_size as dict is not implemented')
+        else:
+            raise Exception('invalid type for chunk_size')
+
+        # attempt to determine index_type from row_precision
+        if cls.row_precision in [
+            'hour',
+            'day',
+            'week',
+            'month',
+            'quarter',
+            'year',
+        ]:
+            return 'temporal'
+
+        raise Exception('cannot determine index_type')
+
+    @classmethod
+    def get_index_column(cls) -> str | tuple[str, ...]:
+        if cls.index_column is not None:
+            return cls.index_column
+
+        index_type = cls.get_index_type()
+        if index_type == 'temporal':
+            return 'timestamp'
+        elif index_type in ['numerical', 'id', 'no_index', None]:
+            raise Exception('cannot determine index column')
+        elif isinstance(index_type, dict):
+            raise NotImplementedError('index_type as dict is not implemented')
+        else:
+            raise Exception('invalid index type: ' + str(index_type))
 
     @classmethod
     def get_missing_packages(cls) -> list[str]:

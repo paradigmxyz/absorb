@@ -78,9 +78,10 @@ class CexLabels(absorb.Table):
     description = 'CEX labels for EVM and Solana addresses'
     url = 'https://dune.com/'
     write_range = 'overwrite_all'
+    index_type = 'id'
+    index_column = 'address'
     required_packages = ['dune_spice >= 0.2.6']
     required_credentials = ['DUNE_API_KEY']
-    index_type = 'id'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

@@ -70,57 +70,83 @@ class TableCollect(table_coverage.TableCoverage):
 
     def _get_chunks_to_collect(
         self, data_range: absorb.Coverage | None = None, overwrite: bool = False
-    ) -> absorb.ChunkList:
+    ) -> list[absorb.Chunk]:
         if self.write_range == 'overwrite_all':
+            if overwrite:
+                return [None]
             available_range = self.get_available_range()
             collected_range = self.get_collected_range()
             if available_range is not None:
-                # if available range is not None, use it to check for updates
+                # if available_range exists, use it to decide whether to collect
                 if available_range == collected_range:
                     return []
                 else:
-                    return [available_range]
-            elif collected_range is not None and absorb.ops.index_is_temporal(
-                self.index_type
+                    if isinstance(available_range, tuple):
+                        return [available_range]
+                    elif isinstance(available_range, list):
+                        return list(available_range)
+                    elif isinstance(available_range, dict):
+                        return [available_range]
+                    elif available_range is None:
+                        return [None]
+                    else:
+                        raise Exception('invalid available range')
+            elif (
+                collected_range is not None
+                and self.get_index_type() == 'temporal'
             ):
-                # if available range is None, check if ready for update
+                # if temporal, check if ready for update
                 if self.ready_for_update():
                     return [None]
                 else:
                     return []
+            elif self.is_collected():
+                # if already collected, do not collect again
+                return []
             else:
-                # if a non-temporal index, collect entire dataset
-                return [available_range]
+                # if not yet collected, collect entire dataset
+                return [None]
 
         else:
-            index_type = self.index_type
-            if index_type is None:
+            chunk_size = self.chunk_size
+            if chunk_size is None:
                 raise Exception(
                     'index type is required if not using overwrite_all'
                 )
 
             # get coverage range for collection
-            if data_range is None:
+            coverage: absorb.Coverage
+            if data_range is not None:
                 if overwrite:
-                    coverage = self.get_available_range()
+                    coverage = data_range
+                else:
+                    collected_range = self.get_collected_range()
+                    if collected_range is None:
+                        coverage = data_range
+                    else:
+                        coverage = absorb.ops.get_range_diff(
+                            subtract_this=collected_range,
+                            from_this=data_range,
+                            chunk_size=chunk_size,
+                            boundary_type=self.boundary_type,
+                        )
+            else:
+                if overwrite:
+                    available_range = self.get_available_range()
+                    if available_range is None:
+                        raise Exception(
+                            'get_available_range() not properly implemented'
+                        )
+                    coverage = available_range
                 else:
                     coverage = self.get_missing_ranges()
-            else:
-                coverage = [data_range]
-            if coverage is None:
-                raise Exception()
 
-            # partition coverage into chunks
-            data_ranges = absorb.ops.coverage_to_list(
-                coverage, index_type=index_type
-            )
-            return absorb.ops.partition_into_chunks(
-                data_ranges, index_type=index_type
-            )
+            # split each range into chunk
+            return absorb.ops.partition_into_chunks(coverage, chunk_size)
 
     def _summarize_collection_plan(
         self,
-        chunks: absorb.ChunkList,
+        chunks: list[absorb.Chunk],
         overwrite: bool,
         verbose: int,
         dry: bool,
@@ -139,17 +165,17 @@ class TableCollect(table_coverage.TableCoverage):
         elif len(chunks) == 1:
             absorb.ops.print_bullet(
                 'single chunk',
-                absorb.ops.format_chunk(chunks[0], self.index_type),
+                absorb.ops.format_chunk(chunks[0], self.chunk_size),
             )
         elif len(chunks) > 1:
             absorb.ops.print_bullet(
                 'min_chunk',
-                absorb.ops.format_chunk(chunks[0], self.index_type),
+                absorb.ops.format_chunk(chunks[0], self.chunk_size),
                 indent=4,
             )
             absorb.ops.print_bullet(
                 'max_chunk',
-                absorb.ops.format_chunk(chunks[-1], self.index_type),
+                absorb.ops.format_chunk(chunks[-1], self.chunk_size),
                 indent=4,
             )
         absorb.ops.print_bullet('overwrite', str(overwrite))
@@ -166,7 +192,7 @@ class TableCollect(table_coverage.TableCoverage):
             for c, chunk in enumerate(chunks):
                 absorb.ops.print_bullet(
                     key=None,
-                    value=absorb.ops.format_chunk(chunk, self.index_type),
+                    value=absorb.ops.format_chunk(chunk, self.chunk_size),
                     number=c + 1,
                     indent=4,
                 )
@@ -189,7 +215,7 @@ class TableCollect(table_coverage.TableCoverage):
             if self.write_range == 'overwrite_all':
                 as_str = 'all'
             else:
-                as_str = absorb.ops.format_chunk(chunk, self.index_type)
+                as_str = absorb.ops.format_chunk(chunk, self.chunk_size)
             print('collecting', as_str)
 
         # collect chunk

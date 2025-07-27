@@ -15,7 +15,7 @@ class Metrics(absorb.Table):
     url = 'https://www.growthepie.com/'
     source = 'growthepie'
     write_range = 'overwrite_all'
-    index_type = 'day'
+    row_precision = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

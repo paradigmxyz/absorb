@@ -12,7 +12,8 @@ class FourbyteDatatype(absorb.Table):
     source = 'fourbyte'
     url = 'https://www.4byte.directory/'
     write_range = 'append_only'
-    index_type = 'number_range'
+    chunk_size = 10000
+    index_column = 'id'
 
     # custom
     endpoint: str

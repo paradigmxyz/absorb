@@ -17,7 +17,7 @@ class Yields(absorb.Table):
     write_range = 'overwrite_all'
     parameter_types = {'pools': (list, type(None)), 'top_n': int}
     default_parameters = {'pools': None, 'top_n': 5000}
-    index_type = 'day'
+    row_precision = 'day'
     name_template = [
         'pool_yields_top_{top_n}',
         'pool_yields_{pools}',

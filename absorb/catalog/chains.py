@@ -16,7 +16,8 @@ class Chains(absorb.Table):
     description = 'Registry of EVM chains and their chain IDs'
     url = 'https://github.com/ethereum-lists/chains'
     write_range = 'overwrite_all'
-    index_type = 'number'
+    index_type = 'id'
+    index_column = 'chain_id'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl

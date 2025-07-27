@@ -18,7 +18,7 @@ class Metrics(absorb.Table):
     description = 'Daily summary data for each Kalshi market'
     url = 'https://kalshi.com/'
     write_range = 'append_only'
-    index_type = 'day'
+    chunk_size = 'day'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -70,7 +70,8 @@ class Metadata(absorb.Table):
     url = 'https://kalshi.com/'
     cadence = None
     write_range = 'overwrite_all'
-    index_type = 'day'
+    index_type = 'id'
+    index_column = 'series_ticker'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
@@ -139,7 +140,7 @@ class Metadata(absorb.Table):
         now = datetime.datetime.now(datetime.timezone.utc).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
-        return (None, now)
+        return (now, now)
 
 
 def get_date_url(date: datetime.datetime) -> str:

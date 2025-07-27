@@ -79,6 +79,7 @@ def print_dataset_info(table_str: str, verbose: bool) -> dict[str, typing.Any]:
         table = absorb.Table.instantiate(table_str)
         print_table_info(table, verbose=verbose)
     except Exception:
+        raise Exception()
         source, name = table_str.split('.')
         for cls in absorb.ops.get_source_table_classes(source):
             if cls.name_classmethod(
@@ -111,7 +112,7 @@ def print_recipe_info(
         'url',
         'source',
         'write_range',
-        'index_type',
+        'chunk_size',
     ]:
         if hasattr(cls, attr):
             value = getattr(cls, attr)
@@ -155,7 +156,7 @@ def print_table_info(
         'url',
         'source',
         'write_range',
-        'index_type',
+        'chunk_size',
     ]:
         if hasattr(table, attr):
             value = getattr(table, attr)
@@ -193,7 +194,7 @@ def print_table_info(
         available_range = table.get_available_range()
         if available_range is not None:
             formatted_available_range = absorb.ops.format_coverage(
-                available_range, table.index_type
+                available_range, table.chunk_size
             )
         else:
             formatted_available_range = 'not available'
@@ -205,7 +206,7 @@ def print_table_info(
     collected_range = table.get_collected_range()
     absorb.ops.print_bullet(
         key='collected range',
-        value=absorb.ops.format_coverage(collected_range, table.index_type),
+        value=absorb.ops.format_coverage(collected_range, table.chunk_size),
     )
 
     import os

@@ -33,7 +33,7 @@ class SpotCandles(absorb.Table):
     description = 'OHLCV candles for spot pairs at various time intervals'
     url = 'https://data.binance.vision/?prefix=data/spot/daily/klines/'
     write_range = 'append_only'
-    index_type = 'day'
+    chunk_size = 'day'
     parameter_types = {'pair': str, 'interval': str}
     default_parameters = {}
     name_template = 'spot_candles_{pair}_{interval}'
@@ -77,7 +77,7 @@ class SpotTrades(absorb.Table):
     description = 'Trades for a given spot pair'
     url = 'https://data.binance.vision/?prefix=data/spot/daily/trades/'
     write_range = 'append_only'
-    index_type = 'day'
+    chunk_size = 'day'
     parameter_types = {'pair': str}
     default_parameters = {}
     name_template = 'spot_trades_{pair}'
@@ -119,7 +119,7 @@ class SpotAggregateTrades(absorb.Table):
     )
     url = 'https://data.binance.vision/?prefix=data/spot/daily/aggTrades/'
     write_range = 'append_only'
-    index_type = 'day'
+    chunk_size = 'day'
     parameter_types = {'pair': str}
     default_parameters = {}
     name_template = 'spot_aggregate_trades_{pair}'

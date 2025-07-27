@@ -18,91 +18,11 @@ if typing.TYPE_CHECKING:
     _T = TypeVar('_T', bound=SupportsComparison)
 
 
-def index_is_temporal(index_type: absorb.IndexType | None) -> bool:
-    return index_type in [
-        'hour',
-        'day',
-        'week',
-        'month',
-        'quarter',
-        'year',
-        'timestamp_range',
-    ]
-
-
-def coverage_to_list(
-    coverage: absorb.Coverage,
-    index_type: absorb.IndexType,
-) -> absorb.ChunkList:
-    if isinstance(coverage, list):
-        if all(isinstance(item, tuple) for item in coverage) and index_type in [
-            'hour',
-            'day',
-            'week',
-            'month',
-            'quarter',
-            'year',
-        ]:
-            return [
-                subitem
-                for item in coverage
-                for subitem in coverage_to_list(item, index_type)
-            ]
-        else:
-            return coverage
-    elif isinstance(coverage, dict):
-        if not isinstance(index_type, dict):
-            raise Exception()
-        if index_type['type'] == 'multi':
-            return _multi_coverage_to_list(coverage, index_type)
-        else:
-            raise NotImplementedError(
-                'using number_range or timestamp_range with interval size'
-            )
-    elif isinstance(coverage, tuple):
-        import tooltime
-
-        start, end = coverage
-        if index_type in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
-            if not isinstance(index_type, str):  # for mypy
-                raise Exception()
-            return tooltime.get_intervals(
-                start,
-                end,
-                interval=index_type,
-                include_end=True,
-            )['start'].to_list()
-        elif index_type == 'number':
-            return list(range(start, end + 1))
-        else:
-            raise Exception('cannot use this chunk_type as tuple range')
-    else:
-        raise Exception('invalid coverage format')
-
-
-def _multi_coverage_to_list(
-    coverage: absorb.Coverage,
-    index_type: absorb.MultiIndexType,
-) -> absorb.ChunkList:
-    import itertools
-
-    if not isinstance(coverage, dict):
-        raise Exception()
-    keys = list(coverage.keys())
-    dims = [
-        coverage_to_list(
-            coverage=coverage[key],
-            index_type=index_type['dims'][key],
-        )
-        for key in keys
-    ]
-    return [dict(zip(keys, combo)) for combo in itertools.product(*dims)]
-
-
 def get_range_diff(
     subtract_this: absorb.Coverage,
     from_this: absorb.Coverage,
-    index_type: absorb.IndexType,
+    boundary_type: typing.Literal['closed', 'semiopen'],
+    chunk_size: absorb.ChunkSize | None = None,
 ) -> absorb.Coverage:
     """
     subtraction behaves differently depending on range format
@@ -139,93 +59,115 @@ def get_range_diff(
                                 5.          |--|
                                 6.             |--|
     """
-    non_range_types = [
-        'number_list',
-        'timestamp',
-        'id',
-        'id_range',
-        'id_list',
-    ]
+    # convert from_this and subtract_this to lists of tuples
+    if isinstance(from_this, list):
+        pass
+    elif isinstance(from_this, tuple):
+        from_this = [from_this]
+    elif isinstance(from_this, dict):
+        raise NotImplementedError('CustomCoverage not supported for from_this')
+    else:
+        raise Exception('invalid from_this format')
+    if isinstance(subtract_this, list):
+        pass
+    elif isinstance(subtract_this, tuple):
+        subtract_this = [subtract_this]
+    elif isinstance(subtract_this, dict):
+        raise NotImplementedError(
+            'CustomCoverage not supported for subtract_this'
+        )
+    else:
+        raise Exception('invalid subtract_this format')
 
-    if (
-        isinstance(subtract_this, (list, dict))
-        or isinstance(from_this, (list, dict))
-        or index_type in non_range_types
-    ):
-        if not isinstance(subtract_this, list):
-            subtract_this = coverage_to_list(subtract_this, index_type)
-        if not isinstance(from_this, list):
-            from_this = coverage_to_list(from_this, index_type)
-        return [item for item in from_this if item not in subtract_this]
+    # return early if from_this is empty
+    if len(from_this) == 0:
+        return []
 
-    if not isinstance(subtract_this, tuple) or not isinstance(from_this, tuple):
-        raise Exception()
-    if index_type in [
-        'hour',
-        'day',
-        'week',
-        'month',
-        'quarter',
-        'year',
-    ]:
+    # infer chunk_size if not provided
+    if chunk_size is None:
+        if isinstance(from_this[0][0], int):
+            chunk_size = 1
+        elif isinstance(from_this[0][0], datetime.datetime):
+            chunk_size = 'day'
+        else:
+            raise Exception('cannot infer chunk_size from from_this')
+
+    # subtract each entry of subtract this from the entries of from_this
+    output: list[tuple[typing.Any, typing.Any]] = from_this
+    for sub_subtract_this in subtract_this:
+        new_output: list[tuple[typing.Any, typing.Any]] = []
+        for sub_from_this in output:
+            new_output.extend(
+                subtract_tuple(
+                    subtract_this=sub_subtract_this,
+                    from_this=sub_from_this,
+                    boundary_type=boundary_type,
+                    chunk_size=chunk_size,
+                )
+            )
+        output = new_output
+
+    return output
+
+
+def subtract_tuple(
+    subtract_this: tuple[_T, _T],
+    from_this: tuple[_T, _T],
+    chunk_size: absorb.ChunkSize,
+    boundary_type: typing.Literal['closed', 'open', 'semiopen'],
+) -> list[tuple[_T, _T]]:
+    if chunk_size in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
         import datetime
         import tooltime
 
         # get discrete chunk
         discrete_step: datetime.timedelta | tooltime.DateDelta
-        if index_type == 'hour':
+        if chunk_size == 'hour':
             discrete_step = datetime.timedelta(hours=1)
-        elif index_type == 'day':
+        elif chunk_size == 'day':
             discrete_step = datetime.timedelta(days=1)
-        elif index_type == 'week':
+        elif chunk_size == 'week':
             discrete_step = datetime.timedelta(days=7)
-        elif index_type == 'month':
+        elif chunk_size == 'month':
             discrete_step = tooltime.DateDelta(months=1)
-        elif index_type == 'quarter':
+        elif chunk_size == 'quarter':
             discrete_step = tooltime.DateDelta(quarters=1)
-        elif index_type == 'year':
+        elif chunk_size == 'year':
             discrete_step = tooltime.DateDelta(years=1)
         else:
-            raise Exception('invalid index_type')
+            raise Exception('invalid chunk_size')
 
-        range_list: absorb.Coverage = _get_discrete_closed_range_diff(
-            subtract_this=subtract_this,
-            from_this=from_this,
-            discrete_step=discrete_step,
-        )
-    elif index_type == 'timestamp_range':
-        range_list = _get_continuous_closed_open_range_diff(
-            subtract_this=subtract_this,
-            from_this=from_this,
-        )
-    elif index_type == 'number':
-        range_list = _get_discrete_closed_range_diff(
-            subtract_this=subtract_this,
-            from_this=from_this,
-            discrete_step=1,
-        )
-    elif index_type == 'number_range':
-        range_list = _get_discrete_closed_range_diff(
-            subtract_this=subtract_this,
-            from_this=from_this,
-            discrete_step=1,
-        )
-    elif isinstance(index_type, absorb.CustomIndexType):
-        raise NotImplementedError()
+        if boundary_type == 'closed':
+            return _get_discrete_closed_range_diff(
+                subtract_this=subtract_this,
+                from_this=from_this,
+                discrete_step=discrete_step,
+            )
+        elif boundary_type == 'semiopen':
+            return _get_continuous_closed_open_range_diff(
+                subtract_this=subtract_this,
+                from_this=from_this,
+            )
+        else:
+            raise Exception('invalid boundary_type: ' + str(boundary_type))
+    elif isinstance(chunk_size, int):
+        if boundary_type == 'closed':
+            return _get_discrete_closed_range_diff(
+                subtract_this=subtract_this,
+                from_this=from_this,
+                discrete_step=1,
+            )
+        elif boundary_type == 'semiopen':
+            return _get_continuous_closed_open_range_diff(
+                subtract_this=subtract_this,
+                from_this=from_this,
+            )
+        else:
+            raise Exception('invalid boundary_type: ' + str(boundary_type))
+    elif isinstance(chunk_size, dict):
+        raise NotImplementedError('CustomChunkSize not supported')
     else:
-        raise Exception('invalid index_type')
-
-    if len(range_list) == 0:
-        return []
-    elif len(range_list) == 1:
-        return range_list[0]  # type: ignore
-    else:
-        return range_list
-        # return [
-        #     item
-        #     for range in range_list
-        #     for item in coverage_to_list(range, index_type=index_type)
-        # ]
+        raise Exception('invalid chunk_size')
 
 
 def _get_discrete_closed_range_diff(
@@ -390,6 +332,32 @@ def _get_continuous_closed_open_range_diff(
 
 
 def partition_into_chunks(
-    coverage: absorb.Coverage, index_type: absorb.IndexType
-) -> absorb.ChunkList:
-    return coverage_to_list(coverage=coverage, index_type=index_type)
+    coverage: absorb.Coverage, chunk_size: absorb.ChunkSize
+) -> list[absorb.Chunk]:
+    if isinstance(coverage, list):
+        return [
+            subitem
+            for item in coverage
+            for subitem in partition_into_chunks(item, chunk_size)
+        ]
+    elif isinstance(coverage, tuple):
+        import tooltime
+
+        start, end = coverage
+        if chunk_size in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
+            return tooltime.get_intervals(
+                start,
+                end,
+                interval=typing.cast(str, chunk_size),
+                include_end=True,
+            )['start'].to_list()
+        elif isinstance(chunk_size, int):
+            if not isinstance(start, int) or not isinstance(end, int):
+                raise Exception(
+                    'start and end must be integers for int chunk_size'
+                )
+            return list(range(start, end + 1, chunk_size))
+        else:
+            raise Exception('cannot use this chunk_type as tuple range')
+    else:
+        raise Exception('invalid coverage format')

@@ -99,7 +99,7 @@ def get_table_metadata_path(
 
 def get_table_filepath(
     chunk: absorb.Chunk,
-    index_type: absorb.IndexType | None,
+    chunk_size: absorb.ChunkSize | None,
     filename_template: str,
     table: str,
     *,
@@ -113,7 +113,7 @@ def get_table_filepath(
     dir_path = get_table_dir(source=source, table=table, warn=warn)
     filename = get_table_filename(
         chunk=chunk,
-        index_type=index_type,
+        chunk_size=chunk_size,
         filename_template=filename_template,
         table=table,
         source=source,
@@ -125,7 +125,7 @@ def get_table_filepath(
 
 def get_table_filename(
     chunk: absorb.Chunk,
-    index_type: absorb.IndexType | None,
+    chunk_size: absorb.ChunkSize | None,
     filename_template: str,
     table: str,
     *,
@@ -139,23 +139,27 @@ def get_table_filename(
     format_params['table'] = table
     if '{chunk}' in filename_template:
         if glob:
+            if chunk is not None:
+                raise Exception('use chunk=None if glob=True')
             format_params['chunk'] = '*'
         else:
-            if index_type is None:
+            if chunk_size is None:
                 raise Exception(
-                    'index_type must be provided if {chunk} is in filename_template'
+                    'chunk_size must be provided if {chunk} is in filename_template'
                 )
             if isinstance(chunk, str):
                 chunk_str = chunk
             else:
-                chunk_str = absorb.ops.format_chunk(chunk, index_type)
+                if chunk is None:
+                    raise Exception('chunk cannot be None')
+                chunk_str = absorb.ops.format_chunk(chunk, chunk_size)
             format_params['chunk'] = chunk_str
     return filename_template.format(**format_params)
 
 
 def get_table_filepaths(
     chunks: typing.Any,
-    index_type: absorb.IndexType | None,
+    chunk_size: absorb.ChunkSize | None,
     filename_template: str,
     table: str,
     *,
@@ -170,7 +174,7 @@ def get_table_filepaths(
     for chunk in chunks:
         filename = get_table_filename(
             chunk=chunk,
-            index_type=index_type,
+            chunk_size=chunk_size,
             filename_template=filename_template,
             table=table,
             source=source,
@@ -185,39 +189,35 @@ def parse_file_path(
     path: str,
     filename_template: str,
     *,
-    index_type: absorb.IndexType | None = None,
+    chunk_size: absorb.ChunkSize | None,
 ) -> dict[str, typing.Any]:
     import os
 
     keys = os.path.splitext(filename_template)[0].split('__')
     values = os.path.splitext(os.path.basename(path))[0].split('__')
     items = {k[1:-1]: v for k, v in zip(keys, values)}
-    if index_type is not None and 'chunk' in items:
-        items['chunk'] = parse_chunk(items['chunk'], index_type)
+    if chunk_size is not None and 'chunk' in items:
+        items['chunk'] = parse_chunk(items['chunk'], chunk_size)
     return items
 
 
-def parse_chunk(as_str: str, index_type: absorb.IndexType) -> typing.Any:
+def parse_chunk(as_str: str, chunk_size: absorb.ChunkSize | None) -> typing.Any:
     import datetime
 
-    if index_type == 'hour':
+    if chunk_size == 'hour':
         return datetime.datetime.strptime(as_str, '%Y-%m-%d--%H-%M-%S')
-    elif index_type == 'day':
+    elif chunk_size == 'day':
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')
-    elif index_type == 'week':
+    elif chunk_size == 'week':
         return datetime.datetime.strptime(as_str, '%Y-%m-%d')
-    elif index_type == 'month':
+    elif chunk_size == 'month':
         return datetime.datetime.strptime(as_str, '%Y-%m')
-    elif index_type == 'quarter':
+    elif chunk_size == 'quarter':
         year = int(as_str[:4])
         month = int(as_str[as_str.index('Q') + 1 :])
         return datetime.datetime(year, month, 1)
-    elif index_type == 'year':
+    elif chunk_size == 'year':
         return datetime.datetime.strptime(as_str, '%Y')
-    elif index_type == 'timestamp':
-        import datetime
-
-        return datetime.datetime.strptime(as_str, '%Y-%m-%d')
     else:
         raise NotImplementedError()
 

@@ -37,9 +37,7 @@ class TableCreate(table_coverage.TableCoverage):
                 raise Exception('missing table parameter: ' + str(parameter))
 
         # make sure that append only tables have an index type
-        if self.write_range == 'append_only' and (
-            not hasattr(self, 'index_type') or self.index_type is None
-        ):
+        if self.write_range == 'append_only' and self.get_index_type() is None:
             raise Exception('index_type is required for append only tables')
 
         # make sure that table name is valid
