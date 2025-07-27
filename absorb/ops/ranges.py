@@ -59,7 +59,7 @@ def get_range_diff(
                                 5.          |--|
                                 6.             |--|
     """
-    # convert from_this and subtract_this to lists of tuples
+    # convert to lists of tuples
     if isinstance(from_this, list):
         pass
     elif isinstance(from_this, tuple):
@@ -95,10 +95,10 @@ def get_range_diff(
     # subtract each entry of subtract this from the entries of from_this
     output: list[tuple[typing.Any, typing.Any]] = from_this
     for sub_subtract_this in subtract_this:
-        new_output: list[tuple[typing.Any, typing.Any]] = []
+        new_output = []
         for sub_from_this in output:
             new_output.extend(
-                subtract_tuple(
+                _subtract_tuples(
                     subtract_this=sub_subtract_this,
                     from_this=sub_from_this,
                     boundary_type=boundary_type,
@@ -110,18 +110,18 @@ def get_range_diff(
     return output
 
 
-def subtract_tuple(
+def _subtract_tuples(
     subtract_this: tuple[_T, _T],
     from_this: tuple[_T, _T],
     chunk_size: absorb.ChunkSize,
     boundary_type: typing.Literal['closed', 'open', 'semiopen'],
 ) -> list[tuple[_T, _T]]:
+    # get discrete_step
+    discrete_step: typing.Any
     if chunk_size in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
         import datetime
         import tooltime
 
-        # get discrete chunk
-        discrete_step: datetime.timedelta | tooltime.DateDelta
         if chunk_size == 'hour':
             discrete_step = datetime.timedelta(hours=1)
         elif chunk_size == 'day':
@@ -136,38 +136,26 @@ def subtract_tuple(
             discrete_step = tooltime.DateDelta(years=1)
         else:
             raise Exception('invalid chunk_size')
-
-        if boundary_type == 'closed':
-            return _get_discrete_closed_range_diff(
-                subtract_this=subtract_this,
-                from_this=from_this,
-                discrete_step=discrete_step,
-            )
-        elif boundary_type == 'semiopen':
-            return _get_continuous_closed_open_range_diff(
-                subtract_this=subtract_this,
-                from_this=from_this,
-            )
-        else:
-            raise Exception('invalid boundary_type: ' + str(boundary_type))
     elif isinstance(chunk_size, int):
-        if boundary_type == 'closed':
-            return _get_discrete_closed_range_diff(
-                subtract_this=subtract_this,
-                from_this=from_this,
-                discrete_step=1,
-            )
-        elif boundary_type == 'semiopen':
-            return _get_continuous_closed_open_range_diff(
-                subtract_this=subtract_this,
-                from_this=from_this,
-            )
-        else:
-            raise Exception('invalid boundary_type: ' + str(boundary_type))
+        discrete_step = 1
     elif isinstance(chunk_size, dict):
         raise NotImplementedError('CustomChunkSize not supported')
     else:
         raise Exception('invalid chunk_size')
+
+    if boundary_type == 'closed':
+        return _get_discrete_closed_range_diff(
+            subtract_this=subtract_this,
+            from_this=from_this,
+            discrete_step=discrete_step,
+        )
+    elif boundary_type == 'semiopen':
+        return _get_continuous_closed_open_range_diff(
+            subtract_this=subtract_this,
+            from_this=from_this,
+        )
+    else:
+        raise Exception('invalid boundary_type: ' + str(boundary_type))
 
 
 def _get_discrete_closed_range_diff(

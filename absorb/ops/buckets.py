@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing
 
 import absorb
-from . import config
+from . import env
 
 if typing.TYPE_CHECKING:
     import polars as pl
@@ -11,7 +11,7 @@ if typing.TYPE_CHECKING:
 
 def check_bucket_setup(bucket: absorb.Bucket | None = None) -> str | None:
     # check if rclone package is installed
-    if not config.is_package_installed('rclone_python'):
+    if not env.is_package_installed('rclone_python'):
         return 'rclone_python is not installed. Install it before using buckets (for example, `uv add rclone_python`)'
 
     # check if rclone is installed

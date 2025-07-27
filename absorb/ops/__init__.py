@@ -2,6 +2,7 @@ from .buckets import *
 from .catalog import *
 from .config import *
 from .coverage import *
+from .env import *
 from .formatting import *
 from .git import *
 from .io import *
