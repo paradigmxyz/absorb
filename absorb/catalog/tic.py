@@ -24,7 +24,7 @@ class Treasuries(absorb.Table):
             'for_treas_pos': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         return get_post_2019_holdings()
 
     def get_available_range(self) -> absorb.Coverage:

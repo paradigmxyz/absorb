@@ -27,7 +27,7 @@ class ChainTvls(absorb.Table):
             'tvl_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import polars as pl
 
         chains = self.parameters['chains']
@@ -65,7 +65,7 @@ class ProtocolTvls(absorb.Table):
             'tvl_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import polars as pl
 
         protocols = self.parameters['protocols']
@@ -104,7 +104,7 @@ class ProtocolTvlsPerToken(absorb.Table):
             'tvl_usd': pl.Float64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import polars as pl
 
         protocols = self.parameters['protocols']

@@ -12,7 +12,7 @@ if typing.TYPE_CHECKING:
 
 
 class TableCollect(table_coverage.TableCoverage):
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         raise NotImplementedError()
 
     def is_collected(self) -> bool:
@@ -240,7 +240,7 @@ class TableCollect(table_coverage.TableCoverage):
             print('could not collect data for', str(chunk))
 
     def validate_chunk(
-        self, chunk: absorb.Chunk, data: absorb.ChunkData | None
+        self, chunk: absorb.Chunk, data: absorb.ChunkResult | None
     ) -> None:
         import os
         import polars as pl

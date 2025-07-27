@@ -30,7 +30,7 @@ class Query(absorb.Table):
         result = garlic.query(sql)
         return dict(result.schema)
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import garlic
 
         if not hasattr(self, 'sql'):

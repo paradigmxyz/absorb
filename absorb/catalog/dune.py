@@ -37,7 +37,7 @@ class FullQuery(BaseQuery):
     required_packages = ['dune_spice >= 0.2.6']
     required_credentials = ['DUNE_API_KEY']
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import spice
 
         query = self.parameters['query']
@@ -61,7 +61,7 @@ class AppendOnlyQuery(BaseQuery):
     required_packages = ['dune_spice >= 0.2.6']
     required_credentials = ['DUNE_API_KEY']
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import spice
 
         query = self.parameters['query']
@@ -95,7 +95,7 @@ class CexLabels(absorb.Table):
             'ecosystem': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import spice
 
         evm_cex_query = 'https://dune.com/queries/3237025'

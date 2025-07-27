@@ -39,7 +39,7 @@ class Commits(absorb.Table):
             'repo_source': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import nitwit
         import polars as pl
 
@@ -76,7 +76,7 @@ class Authors(absorb.Table):
             'repo_source': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import nitwit
 
         dfs = []
@@ -111,7 +111,7 @@ class FileDiffs(absorb.Table):
             'repo_source': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import nitwit
 
         dfs = [
@@ -140,7 +140,7 @@ class FileDiffStats(absorb.Table):
             'deletions': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import nitwit
 
         dfs = [

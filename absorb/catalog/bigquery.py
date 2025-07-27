@@ -23,7 +23,7 @@ class Query(absorb.Table):
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         raise NotImplementedError()
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         return query(self.parameters['sql'])
 
     def get_available_range(self) -> absorb.Coverage:

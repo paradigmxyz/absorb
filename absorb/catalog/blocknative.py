@@ -52,7 +52,7 @@ class Mempool(absorb.Table):
             'detect_date': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         url = url_template.format(
             year=chunk.year,  # type: ignore
             month=chunk.month,  # type: ignore

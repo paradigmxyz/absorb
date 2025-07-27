@@ -37,7 +37,7 @@ class Metrics(absorb.Table):
             'status': pl.String,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import requests
         import polars as pl
 
@@ -95,7 +95,7 @@ class Metadata(absorb.Table):
             'search_score': pl.Int64,
         }
 
-    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkData | None:
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         import requests
         import time
         import polars as pl

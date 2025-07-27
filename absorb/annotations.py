@@ -76,56 +76,20 @@ ChunkSize = typing.Union[
     CustomChunkSize,
 ]
 
-# CustomChunk = typing.Any
-# ScalarChunk = typing.Union[PrimitiveChunk, CustomChunk]
-# ScalarChunk = PrimitiveChunk
-# MultiChunk = dict[str, ScalarChunk]
-# Chunk = typing.Union[ScalarChunk, MultiChunk]
-# Chunk = ScalarChunk
-
-# chunk coverage
-# ChunkList = typing.Sequence[Chunk]
-# ScalarChunkRange = tuple[ScalarChunk, ScalarChunk]
-# MultiChunkRange = typing.Mapping[
-#     str, typing.Union[ScalarChunkRange, list[ScalarChunk]]
-# ]
-# Coverage = typing.Union[ChunkList, ScalarChunkRange, MultiChunkRange]
-
+#
+# # chunk collection outputs
+#
 
 class ChunkPaths(typing.TypedDict):
     type: typing.Literal['files']
     paths: list[str]
 
 
-ChunkData = typing.Union[pl.DataFrame, ChunkPaths]
+ChunkResult = typing.Union[pl.DataFrame, ChunkPaths]
 
-
-# def get_index_type_type(
-#     index_type: PrimitiveIndexType,
-# ) -> type | types.GenericAlias | None:
-#     import datetime
 #
-#     if isinstance(index_type, str):
-#         return {
-#             'hour': datetime.datetime,
-#             'day': datetime.datetime,
-#             'week': datetime.datetime,
-#             'month': datetime.datetime,
-#             'quarter': datetime.datetime,
-#             'year': datetime.datetime,
-#             'timestamp': datetime.datetime,
-#             'timestamp_range': tuple[datetime.datetime, datetime.datetime],
-#             'count': int,
-#             'count_range': tuple[int, int],
-#             'id': str,
-#             'id_list': list[str],
-#             None: None,
-#         }[index_type]
-#     elif isinstance(index_type, dict):
-#         return dict[str, typing.Any]
-#     else:
-#         raise Exception()
-
+# # table representation
+#
 
 JSONValue = typing.Union[
     str,
@@ -153,6 +117,9 @@ TableReference = typing.Union[
     table.Table,
 ]
 
+#
+# # buckets
+#
 
 class Bucket(typing.TypedDict):
     rclone_remote: str | None
@@ -160,6 +127,9 @@ class Bucket(typing.TypedDict):
     path_prefix: str | None
     provider: str | None
 
+#
+# # configuration
+#
 
 class Config(typing.TypedDict):
     version: str
