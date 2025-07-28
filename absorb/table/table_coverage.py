@@ -30,9 +30,9 @@ class TableCoverage(table_io.TableIO):
         if not os.path.isdir(dir_path):
             return None
 
-        glob_str = self.get_glob()
+        chunk_glob = self.get_chunk_glob()
         if self.write_range == 'overwrite_all':
-            files = sorted(glob.glob(glob_str))
+            files = sorted(glob.glob(chunk_glob))
             if len(files) == 0:
                 return None
             elif len(files) == 1:
@@ -53,20 +53,14 @@ class TableCoverage(table_io.TableIO):
 
                 else:
                     return None
-
-                # parsed: dict[str, typing.Any] = self.parse_file_path(files[0])
-                # if 'chunk' in parsed:
-                #     return [parsed['chunk']]
-                # else:
-                #     raise Exception('chunk not in name template')
             else:
                 raise Exception('too many files')
         elif self.is_range_sortable():
-            files = sorted(glob.glob(glob_str))
+            files = sorted(glob.glob(chunk_glob))
             if len(files) == 0:
                 return None
-            start = self.parse_file_path(files[0])['chunk']
-            end = self.parse_file_path(files[-1])['chunk']
+            start = self.parse_chunk_path(files[0])['chunk']
+            end = self.parse_chunk_path(files[-1])['chunk']
             return (start, end)
         else:
             raise Exception()

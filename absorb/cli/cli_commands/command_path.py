@@ -22,7 +22,7 @@ def _get_path(args: Namespace) -> str:
     elif args.glob:
         tracked_dataset = cli_parsing._parse_datasets(args)[0]
         instance = absorb.Table.instantiate(tracked_dataset)
-        return instance.get_glob(warn=False)
+        return instance.get_chunk_glob(warn=False)
     elif '.' in args.dataset:
         source, table = args.dataset.split('.')
         return absorb.ops.get_table_dir(source=source, table=table, warn=False)

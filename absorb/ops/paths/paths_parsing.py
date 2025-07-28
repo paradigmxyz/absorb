@@ -5,7 +5,7 @@ import typing
 import absorb
 
 
-def parse_file_path(
+def parse_chunk_path(
     path: str,
     filename_template: str,
     *,

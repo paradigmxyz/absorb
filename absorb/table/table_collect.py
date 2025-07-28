@@ -18,8 +18,8 @@ class TableCollect(table_coverage.TableCoverage):
     def is_collected(self) -> bool:
         import glob
 
-        data_glob = self.get_glob()
-        return len(glob.glob(data_glob)) > 0
+        chunk_glob = self.get_chunk_glob()
+        return len(glob.glob(chunk_glob)) > 0
 
     def collect(
         self,
@@ -232,7 +232,7 @@ class TableCollect(table_coverage.TableCoverage):
                 raise Exception(
                     'collected data is not a DataFrame: ' + str(type(data))
                 )
-            path = self.get_file_path(chunk=chunk, df=data)
+            path = self.get_chunk_path(chunk=chunk, df=data)
             absorb.ops.write_file(df=data, path=path)
 
         # print post-summary

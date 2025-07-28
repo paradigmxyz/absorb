@@ -84,6 +84,6 @@ def delete_table_data(table: absorb.Table, confirm: bool = False) -> None:
             'use confirm=True to delete table and its data files'
         )
 
-    data_glob = table.get_glob()
-    for path in glob.glob(data_glob):
+    chunk_glob = table.get_chunk_glob()
+    for path in glob.glob(chunk_glob):
         os.remove(path)

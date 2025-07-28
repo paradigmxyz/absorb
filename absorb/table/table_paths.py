@@ -20,10 +20,10 @@ class TablePaths(table_names.TableNames):
             self.name(), source=self.source, warn=warn
         )
 
-    def get_glob(self, warn: bool = True) -> str:
-        return self.get_file_path(glob=True, warn=warn)
+    def get_chunk_glob(self, warn: bool = True) -> str:
+        return self.get_chunk_path(glob=True, warn=warn)
 
-    def get_file_path(
+    def get_chunk_path(
         self,
         chunk: absorb.Chunk = None,
         glob: bool = False,
@@ -59,12 +59,12 @@ class TablePaths(table_names.TableNames):
             warn=warn,
         )
 
-    def parse_file_path(self, path: str) -> dict[str, typing.Any]:
+    def parse_chunk_path(self, path: str) -> dict[str, typing.Any]:
         if self.write_range == 'overwrite_all':
             chunk_size = None
         else:
             chunk_size = self.chunk_size
-        return absorb.ops.paths.parse_file_path(
+        return absorb.ops.paths.parse_chunk_path(
             path=path,
             filename_template=self.filename_template,
             chunk_size=chunk_size,
