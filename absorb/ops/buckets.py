@@ -45,6 +45,17 @@ def get_default_bucket() -> absorb.Bucket:
     return absorb.ops.get_config()['default_bucket']
 
 
+def fill_bucket_defaults(bucket: absorb.Bucket | None = None) -> absorb.Bucket:
+    if bucket is None:
+        return get_default_bucket()
+    else:
+        bucket = bucket.copy()
+        for key, value in get_default_bucket().items():
+            if bucket.get(key) is None:
+                bucket[key] = value  # type: ignore
+        return bucket
+
+
 #
 # # bucket scanning
 #
@@ -66,45 +77,6 @@ def scan_bucket(
     return pl.scan_parquet(glob, **scan_kwargs)
 
 
-def get_table_bucket_glob(
-    table: absorb.TableReference,
-    bucket: absorb.Bucket | None = None,
-) -> str:
-    # determine bucket
-    if bucket is None:
-        bucket = get_default_bucket()
-
-    # get bucket protocol
-    if bucket['provider'] == 'gcp':
-        protocol = 'gs'
-    elif bucket['provider'] == 'aws':
-        protocol = 's3'
-    else:
-        raise Exception()
-    bucket_name = bucket['bucket_name']
-    if bucket_name is None:
-        raise Exception('bucket must be specified')
-    path_prefix = bucket.get('path_prefix')
-    if path_prefix is None:
-        raise Exception('path_prefix must be specified')
-
-    # resolve table
-    table = absorb.Table.instantiate(table)
-
-    return (
-        protocol
-        + '://'
-        + bucket_name
-        + '/'
-        + path_prefix
-        + '/datasets/'
-        + table.source
-        + '/tables/'
-        + table.name()
-        + '/*.parquet'
-    )
-
-
 #
 # # uploads/downloads
 #
@@ -114,6 +86,8 @@ def upload_tables_to_bucket(
     tables: typing.Sequence[absorb.TableReference],
     bucket: absorb.Bucket | None = None,
 ) -> None:
+    import rclone_python.rclone
+
     # determine bucket
     if bucket is None:
         bucket = get_default_bucket()
@@ -125,13 +99,22 @@ def upload_tables_to_bucket(
 
     # upload each bucket
     for table in tables:
-        _upload_table_to_bucket(table, bucket)
+        # get paths
+        table = absorb.Table.instantiate(table)
+        table_dir = table.get_table_dir()
+        bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
+
+        # perform upload
+        print('uploading', table_dir, 'to', bucket_path)
+        rclone_python.rclone.copy(table_dir, bucket_path)
 
 
 def download_tables_to_bucket(
     tables: typing.Sequence[absorb.TableReference],
     bucket: absorb.Bucket | None = None,
 ) -> None:
+    import rclone_python.rclone
+
     # determine bucket
     if bucket is None:
         bucket = get_default_bucket()
@@ -143,63 +126,73 @@ def download_tables_to_bucket(
 
     # upload each bucket
     for table in tables:
-        _download_table_from_bucket(table, bucket)
+        # get paths
+        table = absorb.Table.instantiate(table)
+        table_dir = table.get_table_dir()
+        bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
+
+        # perform upload
+        print('downloading', bucket_path, 'to', table_dir)
+        rclone_python.rclone.copy(bucket_path, table_dir)
 
 
-def _upload_table_to_bucket(
+#
+# # paths
+#
+
+
+def get_raw_bucket_path(
     table: absorb.TableReference,
-    bucket: absorb.Bucket,
-) -> None:
-    import rclone_python.rclone
-
-    # get paths
-    table = absorb.Table.instantiate(table)
-    table_dir = table.get_table_dir()
-    bucket_path = get_rclone_bucket_path(table=table, **bucket)
-
-    print('uploading', table_dir, 'to', bucket_path)
-
-    # perform upload
-    rclone_python.rclone.copy(table_dir, bucket_path)
-
-
-def _download_table_from_bucket(
-    table: absorb.TableReference,
-    bucket: absorb.Bucket,
-) -> None:
-    import rclone_python.rclone
-
-    # get paths
-    table = absorb.Table.instantiate(table)
-    table_dir = table.get_table_dir()
-    bucket_path = get_rclone_bucket_path(table=table, **bucket)
-
-    # perform upload
-    rclone_python.rclone.copy(bucket_path, table_dir)
-
-
-def get_rclone_bucket_path(
-    *,
-    rclone_remote: str | None,
-    bucket_name: str | None,
-    path_prefix: str | None,
-    table: absorb.Table,
-    provider: str | None = None,
+    bucket: absorb.Bucket | None = None,
 ) -> str:
-    if rclone_remote is None:
-        raise Exception('rclone_remote must be specified')
+    # determine bucket information
+    if bucket is None:
+        bucket = get_default_bucket()
+    bucket_name = bucket['bucket_name']
     if bucket_name is None:
-        raise Exception('bucket_name must be specified')
+        raise Exception('bucket must be specified')
+    path_prefix = bucket['path_prefix']
     if path_prefix is None:
         raise Exception('path_prefix must be specified')
+
+    # determine table
+    table = absorb.Table.instantiate(table)
+
     return (
-        rclone_remote.strip('/')
-        + ':'
-        + bucket_name.strip('/')
+        bucket_name
         + '/'
-        + path_prefix.strip('/')
+        + path_prefix
         + '/datasets/'
         + table.source
         + '/tables/'
         + table.name()
     )
+
+
+def get_table_bucket_glob(
+    table: absorb.TableReference,
+    bucket: absorb.Bucket | None = None,
+) -> str:
+    # get bucket protocol
+    bucket = fill_bucket_defaults(bucket)
+    if bucket['provider'] == 'gcp':
+        protocol = 'gs'
+    elif bucket['provider'] == 'aws':
+        protocol = 's3'
+    else:
+        raise Exception()
+
+    raw_path = get_raw_bucket_path(table=table, bucket=bucket)
+    return protocol + '://' + raw_path + '/*.parquet'
+
+
+def get_rclone_bucket_path(
+    table: absorb.Table,
+    bucket: absorb.Bucket | None = None,
+) -> str:
+    bucket = fill_bucket_defaults(bucket)
+    rclone_remote = bucket.get('rclone_remote', None)
+    if rclone_remote is None:
+        raise Exception('rclone_remote must be specified')
+    raw_bucket_path = get_raw_bucket_path(table=table, bucket=bucket)
+    return rclone_remote.strip('/') + ':' + raw_bucket_path
