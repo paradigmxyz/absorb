@@ -155,13 +155,13 @@ def print_table_info(
         'url',
         'source',
         'write_range',
-        'chunk_size',
     ]:
         if hasattr(table, attr):
             value = getattr(table, attr)
         else:
             value = None
         absorb.ops.print_bullet(key=attr, value=value)
+    absorb.ops.print_bullet(key='chunk_size', value=str(table.get_chunk_size()))
 
     # parameters
     print()
@@ -193,7 +193,7 @@ def print_table_info(
         available_range = table.get_available_range()
         if available_range is not None:
             formatted_available_range = absorb.ops.format_coverage(
-                available_range, table.chunk_size
+                available_range, table.get_chunk_size()
             )
         else:
             formatted_available_range = 'not available'
@@ -205,7 +205,9 @@ def print_table_info(
     collected_range = table.get_collected_range()
     absorb.ops.print_bullet(
         key='collected range',
-        value=absorb.ops.format_coverage(collected_range, table.chunk_size),
+        value=absorb.ops.format_coverage(
+            collected_range, table.get_chunk_size()
+        ),
     )
 
     import os

@@ -25,7 +25,7 @@ class TableCreate(table_coverage.TableCoverage):
         # make sure that parameters match the parameter types
         if set(parameters.keys()) != set(self.parameter_types.keys()):
             raise Exception(
-                self.full_name()
+                self.full_name_classmethod()
                 + ': parameters must match parameter_types spec'
             )
         self.parameters = parameters

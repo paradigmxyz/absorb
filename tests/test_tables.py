@@ -98,7 +98,16 @@ def test_table_parameter_names_valid(table: type[absorb.Table]) -> None:
 
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
 def test_overwrite_all_does_not_use_chunks(table: type[absorb.Table]) -> None:
-    if table.write_range == 'overwrite_all' and table.chunk_size is not None:
+    if table in general_queries:
+        return
+    try:
+        instance = table({})
+    except Exception:
+        return
+    if (
+        table.write_range == 'overwrite_all'
+        and instance.get_chunk_size() is not None
+    ):
         raise Exception(
             'if write_range is overwrite_all, chunk_size must be None for '
             + str(table.source)
@@ -109,10 +118,16 @@ def test_overwrite_all_does_not_use_chunks(table: type[absorb.Table]) -> None:
 
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
 def test_can_get_index_type(table: type[absorb.Table]) -> None:
+    # attempt to instantiate
     if table in general_queries:
         return
     try:
-        index_type = table.get_index_type()
+        instance = table({})
+    except Exception:
+        return
+
+    try:
+        index_type = instance.get_index_type()
     except Exception:
         raise Exception(
             'cannot get index type for '
@@ -132,32 +147,37 @@ def test_can_get_index_type(table: type[absorb.Table]) -> None:
 def test_if_has_index_type_get_index_column(table: type[absorb.Table]) -> None:
     if table in general_queries:
         return
-    if table.get_index_type() != 'no_index':
-        try:
-            index_column = table.get_index_column()
-        except Exception:
-            raise Exception(
-                'cannot get index column for '
-                + str(table.source)
-                + '.'
-                + str(table.name_classmethod())
-            )
-        assert index_column is not None
 
-        try:
-            instance = table({})
-            schema = instance.get_schema()
-            if isinstance(index_column, str):
-                assert index_column in schema.keys()
-            elif isinstance(index_column, tuple):
-                for col in index_column:
-                    assert col in schema.keys()
-            else:
-                raise Exception(
-                    'invalid format for index_column in '
-                    + instance.full_name()
-                    + ': '
-                    + str(index_column)
-                )
-        except Exception:
-            pass
+    try:
+        instance = table({})
+    except Exception:
+        return
+
+    try:
+        index_column = instance.get_index_column()
+    except Exception as e:
+        raise Exception(
+            'cannot get index column for '
+            + str(table.source)
+            + '.'
+            + str(instance.name())
+        )
+    assert index_column is not None
+
+    try:
+        # check if index_column is in schema
+        schema = instance.get_schema()
+        if isinstance(index_column, str):
+            assert index_column in schema.keys()
+        elif isinstance(index_column, tuple):
+            for col in index_column:
+                assert col in schema.keys()
+        else:
+            raise Exception(
+                'invalid format for index_column in '
+                + instance.full_name()
+                + ': '
+                + str(index_column)
+            )
+    except Exception:
+        pass

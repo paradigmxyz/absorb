@@ -187,12 +187,12 @@ def _print_datasets_verbose(datasets: list[absorb.TableDict]) -> None:
         instance = absorb.Table.instantiate(dataset)
         available_range = instance.get_available_range()
         available_range_str = absorb.ops.format_coverage(
-            available_range, instance.chunk_size
+            available_range, instance.get_chunk_size()
         )
         collected_range = instance.get_collected_range()
         if collected_range is not None:
             collected_range_str = absorb.ops.format_coverage(
-                collected_range, instance.chunk_size
+                collected_range, instance.get_chunk_size()
             )
         else:
             collected_range_str = '-'

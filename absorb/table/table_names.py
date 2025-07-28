@@ -4,10 +4,10 @@ import typing
 
 import absorb
 
-from . import table_base
+from . import table_properties
 
 
-class TableNames(table_base.TableBase):
+class TableNames(table_properties.TableProperties):
     @classmethod
     def full_class_name(cls) -> str:
         return cls.__module__ + '.' + cls.__qualname__

@@ -78,7 +78,7 @@ class TableCoverage(table_io.TableIO):
         if collected_range is None:
             return available_range
         else:
-            chunk_size = self.chunk_size
+            chunk_size = self.get_chunk_size()
             if chunk_size is None:
                 raise Exception(
                     'ranges computations require chunk_size to be set'
@@ -90,9 +90,8 @@ class TableCoverage(table_io.TableIO):
                 boundary_type=self.boundary_type,
             )
 
-    @classmethod
-    def is_range_sortable(cls) -> bool:
-        return cls.chunk_size is not None
+    def is_range_sortable(self) -> bool:
+        return self.get_chunk_size() is not None
 
     def ready_for_update(self) -> bool:
         """used for periodically updating datasets that have no get_available_range()"""
@@ -104,7 +103,8 @@ class TableCoverage(table_io.TableIO):
             raise Exception(
                 'ready_for_update() can only be called if index is temporal'
             )
-        if not isinstance(self.chunk_size, str):
+        chunk_size = self.get_chunk_size()
+        if not isinstance(chunk_size, str):
             raise Exception(
                 'ready_for_update() can only be called if chunk_size is a string'
             )
@@ -118,7 +118,7 @@ class TableCoverage(table_io.TableIO):
         min_latency_seconds: float | int
         if self.update_latency is None:
             min_latency_seconds = tooltime.timelength_to_seconds(
-                '1 ' + self.chunk_size
+                '1 ' + chunk_size
             )
         elif isinstance(self.update_latency, str):
             min_latency_seconds = tooltime.timelength_to_seconds(
@@ -127,7 +127,7 @@ class TableCoverage(table_io.TableIO):
         elif isinstance(self.update_latency, float):
             min_latency_seconds = (
                 self.update_latency
-                * tooltime.timelength_to_seconds('1 ' + self.chunk_size)
+                * tooltime.timelength_to_seconds('1 ' + chunk_size)
             )
         else:
             raise Exception('invalid format for update_latency')

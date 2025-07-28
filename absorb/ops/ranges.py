@@ -18,6 +18,9 @@ if typing.TYPE_CHECKING:
     _T = TypeVar('_T', bound=SupportsComparison)
 
 
+temporal_intervals = ['hour', 'day', 'week', 'month', 'quarter', 'year']
+
+
 def get_range_diff(
     subtract_this: absorb.Coverage,
     from_this: absorb.Coverage,
@@ -118,7 +121,7 @@ def _subtract_tuples(
 ) -> list[tuple[_T, _T]]:
     # get discrete_step
     discrete_step: typing.Any
-    if chunk_size in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
+    if chunk_size in temporal_intervals:
         import datetime
         import tooltime
 
@@ -332,7 +335,7 @@ def partition_into_chunks(
         import tooltime
 
         start, end = coverage
-        if chunk_size in ['hour', 'day', 'week', 'month', 'quarter', 'year']:
+        if chunk_size in temporal_intervals:
             return tooltime.get_intervals(
                 start,
                 end,

@@ -50,7 +50,7 @@ class TablePaths(table_names.TableNames):
         # get file path
         return absorb.ops.paths.get_table_filepath(
             chunk=chunk,
-            chunk_size=self.chunk_size,
+            chunk_size=self.get_chunk_size(),
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,
@@ -63,7 +63,7 @@ class TablePaths(table_names.TableNames):
         if self.write_range == 'overwrite_all':
             chunk_size = None
         else:
-            chunk_size = self.chunk_size
+            chunk_size = self.get_chunk_size()
         return absorb.ops.paths.parse_chunk_path(
             path=path,
             filename_template=self.filename_template,

@@ -108,7 +108,7 @@ class TableCollect(table_coverage.TableCoverage):
                 return [None]
 
         else:
-            chunk_size = self.chunk_size
+            chunk_size = self.get_chunk_size()
             if chunk_size is None:
                 raise Exception(
                     'index type is required if not using overwrite_all'
@@ -165,17 +165,17 @@ class TableCollect(table_coverage.TableCoverage):
         elif len(chunks) == 1:
             absorb.ops.print_bullet(
                 'single chunk',
-                absorb.ops.format_chunk(chunks[0], self.chunk_size),
+                absorb.ops.format_chunk(chunks[0], self.get_chunk_size()),
             )
         elif len(chunks) > 1:
             absorb.ops.print_bullet(
                 'min_chunk',
-                absorb.ops.format_chunk(chunks[0], self.chunk_size),
+                absorb.ops.format_chunk(chunks[0], self.get_chunk_size()),
                 indent=4,
             )
             absorb.ops.print_bullet(
                 'max_chunk',
-                absorb.ops.format_chunk(chunks[-1], self.chunk_size),
+                absorb.ops.format_chunk(chunks[-1], self.get_chunk_size()),
                 indent=4,
             )
         absorb.ops.print_bullet('overwrite', str(overwrite))
@@ -189,17 +189,16 @@ class TableCollect(table_coverage.TableCoverage):
         if verbose > 1:
             print()
             absorb.ops.print_bullet(key='chunks', value='')
+            chunk_size = self.get_chunk_size()
             for c, chunk in enumerate(chunks):
+                chunk_str = absorb.ops.format_chunk(chunk, chunk_size)
                 absorb.ops.print_bullet(
-                    key=None,
-                    value=absorb.ops.format_chunk(chunk, self.chunk_size),
-                    number=c + 1,
-                    indent=4,
+                    key=None, value=chunk_str, number=c + 1, indent=4
                 )
 
         if dry:
             print('[dry run]')
-        if len(chunks) > 0:
+        elif len(chunks) > 0:
             print()
 
     def _execute_collect_chunk(
@@ -215,7 +214,7 @@ class TableCollect(table_coverage.TableCoverage):
             if self.write_range == 'overwrite_all':
                 as_str = 'all'
             else:
-                as_str = absorb.ops.format_chunk(chunk, self.chunk_size)
+                as_str = absorb.ops.format_chunk(chunk, self.get_chunk_size())
             print('collecting', as_str)
 
         # collect chunk
