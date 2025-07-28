@@ -79,7 +79,6 @@ def print_dataset_info(table_str: str, verbose: bool) -> dict[str, typing.Any]:
         table = absorb.Table.instantiate(table_str)
         print_table_info(table, verbose=verbose)
     except Exception:
-        raise Exception()
         source, name = table_str.split('.')
         for cls in absorb.ops.get_source_table_classes(source):
             if cls.name_classmethod(
@@ -213,7 +212,7 @@ def print_table_info(
 
     path = table.get_table_dir()
     if os.path.isdir(path):
-        bytes_str = absorb.ops.format_bytes(absorb.ops.get_dir_size(path))
+        bytes_str = absorb.ops.format_bytes(get_dir_size(path))
     else:
         path = '[not collected]'
         bytes_str = '[not collected]'
@@ -221,3 +220,30 @@ def print_table_info(
     absorb.ops.print_bullet(key='size', value=bytes_str)
 
     return {}
+
+
+def get_dir_size(path: str) -> int:
+    import platform
+    import subprocess
+
+    system = platform.system()
+
+    if system == 'Linux':
+        # Linux has -b flag for bytes
+        result = subprocess.run(
+            ['du', '-sb', path], capture_output=True, text=True, check=True
+        )
+        return int(result.stdout.strip().split('\t')[0])
+
+    elif system == 'Darwin':  # macOS
+        # macOS outputs in 512-byte blocks
+        result = subprocess.run(
+            ['du', '-s', path], capture_output=True, text=True, check=True
+        )
+        blocks = int(result.stdout.strip().split('\t')[0])
+        return blocks * 512
+
+    else:
+        raise NotImplementedError(
+            'Unsupported operating system for get_dir_size'
+        )

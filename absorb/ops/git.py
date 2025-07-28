@@ -3,7 +3,7 @@ from __future__ import annotations
 import absorb
 
 
-def setup_git(track_datasets: list[absorb.Table] | None = None) -> None:
+def setup_git(track_tables: list[absorb.Table] | None = None) -> None:
     import os
 
     absorb_root = absorb.ops.get_absorb_root()
@@ -27,10 +27,10 @@ def setup_git(track_datasets: list[absorb.Table] | None = None) -> None:
         git_add_and_commit_file(config_path, repo_root=absorb_root)
 
     # add metadata of existing tables
-    if track_datasets is not None:
+    if track_tables is not None:
         n_added = 0
-        for dataset in track_datasets:
-            metadata_path = absorb.ops.get_table_metadata_path(dataset)
+        for table in track_tables:
+            metadata_path = table.get_table_metadata_path()
             if not git_is_file_tracked(metadata_path, repo_root=absorb_root):
                 git_add_file(metadata_path, repo_root=absorb_root)
                 n_added += 1

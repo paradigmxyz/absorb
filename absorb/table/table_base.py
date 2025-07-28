@@ -53,7 +53,7 @@ class TableBase:
 
     # use first available template that has all parameters filled
     name_template: str | list[str] = '{class_name}'
-    filename_template = '{source}__{table}__{coverage}.parquet'
+    filename_template = '{source}__{table}__{chunk}.parquet'
 
     #
     # # methods

@@ -84,3 +84,11 @@ def format_chunk(
         raise NotImplementedError('chunk_size as dict not implemented')
     else:
         raise Exception('invalid chunk_size format: ' + str(type(chunk_size)))
+
+
+def format_bytes(bytes_size: int | float) -> str:
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if bytes_size < 1024.0:
+            return f'{bytes_size:.2f} {unit}'
+        bytes_size /= 1024.0
+    return f'{bytes_size:.2f} PB'

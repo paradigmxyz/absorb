@@ -78,4 +78,3 @@ def compare_versions(installed: str, operator: str, required: str) -> bool:
         )
 
     return False
-

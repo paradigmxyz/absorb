@@ -159,5 +159,5 @@ def test_if_has_index_type_get_index_column(table: type[absorb.Table]) -> None:
                     + ': '
                     + str(index_column)
                 )
-        except Exception as e:
+        except Exception:
             pass

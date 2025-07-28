@@ -56,7 +56,7 @@ def setup_command(args: Namespace) -> dict[str, Any]:
     # setup git tracking
     config = absorb.ops.get_config()
     if config['use_git']:
-        absorb.ops.setup_git(track_datasets=datasets)
+        absorb.ops.setup_git(track_tables=datasets)
 
     if args.set_default_rclone_remote:
         absorb.ops.set_default_rclone_remote(args.set_default_rclone_remote)

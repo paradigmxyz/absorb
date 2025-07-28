@@ -80,6 +80,7 @@ ChunkSize = typing.Union[
 # # chunk collection outputs
 #
 
+
 class ChunkPaths(typing.TypedDict):
     type: typing.Literal['files']
     paths: list[str]
@@ -121,15 +122,18 @@ TableReference = typing.Union[
 # # buckets
 #
 
+
 class Bucket(typing.TypedDict):
     rclone_remote: str | None
     bucket_name: str | None
     path_prefix: str | None
     provider: str | None
 
+
 #
 # # configuration
 #
+
 
 class Config(typing.TypedDict):
     version: str

@@ -15,6 +15,11 @@ class TablePaths(table_names.TableNames):
             source=self.source, table=self.name(), warn=warn
         )
 
+    def get_table_metadata_path(self, warn: bool = True) -> str:
+        return absorb.ops.get_table_metadata_path(
+            self.name(), source=self.source, warn=warn
+        )
+
     def get_glob(self, warn: bool = True) -> str:
         return self.get_file_path(glob=True, warn=warn)
 
@@ -54,19 +59,6 @@ class TablePaths(table_names.TableNames):
             warn=warn,
         )
 
-    def get_file_paths(
-        self, chunks: absorb.Coverage, warn: bool = True
-    ) -> list[str]:
-        return absorb.ops.paths.get_table_filepaths(
-            chunks=chunks,
-            chunk_size=self.chunk_size,
-            filename_template=self.filename_template,
-            table=self.name(),
-            source=self.source,
-            parameters=self.parameters,
-            warn=warn,
-        )
-
     def parse_file_path(self, path: str) -> dict[str, typing.Any]:
         if self.write_range == 'overwrite_all':
             chunk_size = None
@@ -88,9 +80,7 @@ class TablePaths(table_names.TableNames):
 
         # set up metadata
         metadata = self.create_table_dict()
-        metadata_path = absorb.ops.get_table_metadata_path(
-            self.name(), source=self.source
-        )
+        metadata_path = self.get_table_metadata_path()
         if os.path.isfile(metadata_path):
             with open(metadata_path, 'r') as f:
                 existing_metadata = json.load(f)

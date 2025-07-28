@@ -52,3 +52,38 @@ def write_file(*, df: pl.DataFrame, path: str) -> None:
     else:
         raise Exception('invalid file extension')
     shutil.move(tmp_path, path)
+
+
+def delete_table_dir(table: absorb.Table, confirm: bool = False) -> None:
+    import os
+    import shutil
+
+    if not confirm:
+        raise absorb.ConfirmError(
+            'use confirm=True to delete table and its data files'
+        )
+
+    table_dir = table.get_table_dir()
+    if os.path.isdir(table_dir):
+        shutil.rmtree(table_dir)
+
+    if absorb.ops.get_config()['use_git']:
+        absorb.ops.git_remove_and_commit_file(
+            table.get_table_metadata_path(),
+            repo_root=absorb.ops.get_absorb_root(),
+            message='Remove table metadata for ' + table.full_name(),
+        )
+
+
+def delete_table_data(table: absorb.Table, confirm: bool = False) -> None:
+    import os
+    import glob
+
+    if not confirm:
+        raise absorb.ConfirmError(
+            'use confirm=True to delete table and its data files'
+        )
+
+    data_glob = table.get_glob()
+    for path in glob.glob(data_glob):
+        os.remove(path)
