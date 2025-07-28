@@ -523,6 +523,12 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--provider'],
+                    {
+                        'help': 'bucket provider (e.g. gcp, aws, azure)',
+                    },
+                ),
+                (
                     ['--path-prefix'],
                     {
                         'help': 'path prefix to use for the bucket',
@@ -569,6 +575,12 @@ def get_subcommands() -> list[
                     {
                         'help': 'name of bucket to download to',
                         'metavar': 'BUCKET',
+                    },
+                ),
+                (
+                    ['--provider'],
+                    {
+                        'help': 'bucket provider (e.g. gcp, aws, azure)',
                     },
                 ),
                 (
