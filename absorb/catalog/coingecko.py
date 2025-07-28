@@ -33,7 +33,7 @@ class CoinMetrics(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime(time_unit='ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'coin': pl.String,
             'price': pl.Float64,
             'market_cap_usd': pl.Float64,
@@ -59,7 +59,8 @@ class Categories(absorb.Table):
     description = 'Categorizations of coins'
     url = 'https://coingecko.com/'
     write_range = 'overwrite_all'
-    index_type = 'temporal'
+    index_type = 'id'
+    index_column = ('coin', 'category')
     parameter_types = {'categories': (list, type(None))}
     default_parameters = {'categories': None}
     name_template = [
@@ -103,7 +104,7 @@ class CategoryMetrics(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime(time_unit='ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'category': pl.String,
             'market_cap_usd': pl.Float64,
             'volume_usd': pl.Float64,
@@ -265,12 +266,13 @@ def get_historical_coin_metrics(
         )
 
         # parse into dataframes
+        dt = pl.Datetime('us', 'UTC')
         schema: dict[str, pl.DataType | type[pl.DataType]]
-        schema = {'timestamp': pl.Datetime('ms'), 'price': pl.Float64}
+        schema = {'timestamp': dt, 'price': pl.Float64}
         prices = pl.DataFrame(result['prices'], schema=schema, orient='row')
-        schema = {'timestamp': pl.Datetime('ms'), 'market_cap_usd': pl.Float64}
+        schema = {'timestamp': dt, 'market_cap_usd': pl.Float64}
         cap = pl.DataFrame(result['market_caps'], schema=schema, orient='row')
-        schema = {'timestamp': pl.Datetime('ms'), 'volume_usd': pl.Float64}
+        schema = {'timestamp': dt, 'volume_usd': pl.Float64}
         vol = pl.DataFrame(result['total_volumes'], schema=schema, orient='row')
         df = prices.join(cap, on='timestamp').join(vol, on='timestamp')
         df = df.insert_column(1, pl.lit(coin).alias('coin'))

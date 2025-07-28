@@ -28,7 +28,7 @@ class Yields(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'pool': pl.String,
             'chain': pl.String,
             'project': pl.String,
@@ -126,7 +126,9 @@ def get_historical_yields_of_pool(pool: str) -> pl.DataFrame:
 
     data = common._fetch('historical_yields_per_pool', {'pool': pool})
     columns: dict[str, str | pl.Expr] = {
-        'timestamp': pl.col.timestamp.str.to_datetime(),
+        'timestamp': pl.col.timestamp.str.to_datetime()
+        .dt.replace_time_zone('UTC')
+        .dt.cast_time_unit('us'),
         'pool': pl.lit(pool, dtype=pl.String),
         'tvl_usd': 'tvlUsd',
         'apy_base': 'apyBase',

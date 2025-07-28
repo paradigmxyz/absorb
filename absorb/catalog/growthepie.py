@@ -21,7 +21,7 @@ class Metrics(absorb.Table):
         import polars as pl
 
         return {
-            'date': pl.Datetime(time_unit='us', time_zone=None),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'network': pl.String,
             'market_cap_usd': pl.Float64,
             'market_cap_eth': pl.Float64,
@@ -62,7 +62,9 @@ class Metrics(absorb.Table):
         data = response.json()
         return (
             pl.DataFrame(data)
-            .with_columns(date=pl.col.date.str.to_date().cast(pl.Datetime))
+            .with_columns(
+                timestamp=pl.col.date.str.to_date().cast(pl.Datetime('us', 'UTC'))
+            )
             .rename({'origin_key': 'network'})
             .pivot(on='metric_key', index=['date', 'network'], values='value')
             .sort('date', 'network')

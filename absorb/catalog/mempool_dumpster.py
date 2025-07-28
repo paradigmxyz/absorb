@@ -22,8 +22,8 @@ class Transactions(absorb.Table):
         return {
             'inclusion_block_number': pl.Int64,
             'inclusion_delay': pl.Int64,
-            'inclusion_timestamp': pl.Datetime('ms'),
-            'timestamp': pl.Datetime('ms'),
+            'inclusion_timestamp': pl.Datetime('us', 'UTC'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'hash': pl.Binary,
             'from': pl.Binary,
             'to': pl.Binary,

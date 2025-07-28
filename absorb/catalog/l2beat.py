@@ -32,7 +32,7 @@ class Metrics(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime(time_unit='ms', time_zone=None),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'n_transactions': pl.Int64,
             'n_user_operations': pl.Int64,
             'native_tvs': pl.Float64,
@@ -86,7 +86,9 @@ def get_project_activity(project: str) -> pl.DataFrame:
             schema=data['data']['chart']['types'],
             orient='row',
         )
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
         .rename({'count': 'n_transactions', 'uopsCount': 'n_user_operations'})
     )
 
@@ -104,7 +106,7 @@ def get_project_tvs(project: str) -> pl.DataFrame:
         schema=data['data']['chart']['types'],
         orient='row',
     ).select(
-        timestamp=(pl.col.timestamp * 1000).cast(pl.Datetime('ms')),
+        timestamp=(pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC')),
         native_tvs=pl.col.native.cast(pl.Float64),
         canonical_tvs=pl.col.canonical.cast(pl.Float64),
         external_tvs=pl.col.external.cast(pl.Float64),

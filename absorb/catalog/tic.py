@@ -19,7 +19,7 @@ class Treasuries(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Date,
+            'timestamp': pl.Datetime('us', 'UTC'),
             'country': pl.String,
             'for_treas_pos': pl.Float64,
         }
@@ -73,7 +73,9 @@ def get_post_2019_holdings() -> pl.DataFrame:
         .with_columns(pl.col('*').replace('n.a.', None))
         .with_columns(
             country_code=pl.col.country_code.cast(int),
-            timestamp=pl.col.timestamp.str.to_date('%Y-%m'),
+            timestamp=pl.col.timestamp.str.to_date('%Y-%m').cast(
+                pl.Datetime('us', 'UTC')
+            ),
             for_treas_pos=pl.col.for_treas_pos.cast(float),
             for_treas_net=pl.col.for_treas_net.cast(float),
             for_lt_treas_pos=pl.col.for_lt_treas_pos.cast(float),

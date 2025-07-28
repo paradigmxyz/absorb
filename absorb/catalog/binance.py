@@ -42,7 +42,7 @@ class SpotCandles(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('us'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'pair': pl.String,
             'open': pl.Float64,
             'high': pl.Float64,
@@ -86,7 +86,7 @@ class SpotTrades(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('us'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'pair': pl.String,
             'price': pl.Float64,
             'quantity_base': pl.Float64,
@@ -128,7 +128,7 @@ class SpotAggregateTrades(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('us'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'pair': pl.String,
             'price': pl.Float64,
             'quantity': pl.Float64,
@@ -338,11 +338,11 @@ def _process(
 
     datetime_column = (
         pl.when(pl.col.timestamp >= 1230796800 * 1_000_000)
-        .then(pl.col.timestamp.cast(pl.Datetime('us')))
+        .then(pl.col.timestamp.cast(pl.Datetime('us', 'UTC')))
         .when(pl.col.timestamp >= 1230796800 * 1_000)
-        .then((1_000 * pl.col.timestamp).cast(pl.Datetime('us')))
+        .then((1_000 * pl.col.timestamp).cast(pl.Datetime('us', 'UTC')))
         .when(pl.col.timestamp >= 1230796800)
-        .then((1_000_000 * pl.col.timestamp).cast(pl.Datetime('us')))
+        .then((1_000_000 * pl.col.timestamp).cast(pl.Datetime('us', 'UTC')))
     )
 
     return (

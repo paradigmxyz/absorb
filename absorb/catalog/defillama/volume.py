@@ -139,7 +139,7 @@ class ProtocolDexVolumes(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'volume_usd': pl.Float64,
@@ -176,7 +176,7 @@ class ChainDexVolumes(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'volume_usd': pl.Float64,
@@ -215,7 +215,7 @@ class ProtocolOptionsVolumes(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'volume_usd': pl.Float64,
@@ -251,7 +251,7 @@ class ChainOptionsVolumes(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'volume_usd': pl.Float64,
@@ -404,7 +404,7 @@ def get_historical_dex_volume(
         data = common._fetch('historical_dex_volume')
     return pl.DataFrame(
         data['totalDataChart'], schema=['timestamp', 'volume_usd'], orient='row'
-    ).with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+    ).with_columns((pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC')))
 
 
 def get_historical_dex_volume_per_protocol(
@@ -421,7 +421,7 @@ def get_historical_dex_volume_per_protocol(
     ]
     schema = ['timestamp', 'protocol', 'volume_usd']
     return pl.DataFrame(rows, orient='row', schema=schema).with_columns(
-        (pl.col.timestamp * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 
@@ -439,7 +439,7 @@ def get_historical_dex_volume_of_protocol(
         schema={'timestamp': pl.Int64, 'volume_usd': pl.Float64},
         orient='row',
     ).select(
-        (pl.col.timestamp * 1000).cast(pl.Datetime('ms')),
+        (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC')),
         pl.lit(data['name']).alias('protocol'),
         'volume_usd',
     )
@@ -461,7 +461,7 @@ def get_historical_dex_volume_per_chain_of_protocol(
     ]
     schema = ['timestamp', 'chain', 'protocol', 'volume_usd']
     return pl.DataFrame(rows, orient='row', schema=schema).with_columns(
-        (pl.col.timestamp * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 
@@ -478,7 +478,7 @@ def get_historical_dex_volume_of_chain(
     return pl.DataFrame(
         data['totalDataChart'], schema=['timestamp', 'volume_usd'], orient='row'
     ).select(
-        (pl.col.timestamp * 1000).cast(pl.Datetime('ms')),
+        (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC')),
         pl.lit(chain).alias('chain'),
         'volume_usd',
     )
@@ -498,7 +498,7 @@ def get_historical_dex_volume_per_protocol_of_chain(
     ]
     schema = ['timestamp', 'chain', 'protocol', 'volume_usd']
     return pl.DataFrame(rows, orient='row', schema=schema).with_columns(
-        (pl.col.timestamp * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 

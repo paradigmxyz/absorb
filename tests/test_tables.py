@@ -4,6 +4,8 @@ import absorb.catalog.snowflake
 import absorb.catalog.dune
 import absorb.catalog.bigquery
 
+import polars as pl
+
 import pytest
 
 
@@ -155,7 +157,7 @@ def test_if_has_index_type_get_index_column(table: type[absorb.Table]) -> None:
 
     try:
         index_column = instance.get_index_column()
-    except Exception as e:
+    except Exception:
         raise Exception(
             'cannot get index column for '
             + str(table.source)
@@ -181,3 +183,43 @@ def test_if_has_index_type_get_index_column(table: type[absorb.Table]) -> None:
             )
     except Exception:
         pass
+
+
+@pytest.mark.parametrize('table', absorb.ops.get_table_classes())
+def test_temporal_index_column_name_and_type(table: type[absorb.Table]) -> None:
+    # attempt to instantiate
+    if table in general_queries:
+        return
+    try:
+        instance = table({})
+    except Exception:
+        return
+
+    index_column = instance.get_index_column()
+    schema = instance.get_schema()
+    if isinstance(index_column, str):
+        index_column = (index_column,)
+    for column in index_column:
+        assert column in schema.keys()
+
+    if instance.get_index_type() == 'temporal':
+        column_type = schema[index_column[0]]
+        assert isinstance(column_type, pl.Datetime), (
+            'index column type is not pl.Datetime for '
+            + str(table.source)
+            + '.'
+            + str(instance.name())
+        )
+
+        assert column_type.time_unit == 'us', (
+            'index column time unit is not us for '
+            + str(table.source)
+            + '.'
+            + str(instance.name())
+        )
+        assert column_type.time_zone == 'UTC', (
+            'index column time zone is not UTC for '
+            + str(table.source)
+            + '.'
+            + str(instance.name())
+        )

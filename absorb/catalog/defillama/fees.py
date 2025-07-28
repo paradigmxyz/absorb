@@ -79,7 +79,7 @@ class Fees(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'revenue_usd': pl.Int64,
         }
 
@@ -100,7 +100,7 @@ class ChainFees(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'revenue_usd': pl.Int64,
@@ -141,7 +141,7 @@ class FeesOfProtocols(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'revenue_usd': pl.Int64,
@@ -186,7 +186,9 @@ def get_historical_fees() -> pl.DataFrame:
             orient='row',
             strict=False,
         )
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
         .sort('timestamp')
     )
 
@@ -206,7 +208,9 @@ def get_historical_fees_per_protocol_of_chain(chain: str) -> pl.DataFrame:
             schema=['timestamp', 'chain', 'protocol', 'revenue_usd'],
             orient='row',
         )
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
         .sort('timestamp')
     )
 
@@ -227,6 +231,8 @@ def get_historical_fees_per_chain_of_protocol(protocol: str) -> pl.DataFrame:
             schema=['timestamp', 'chain', 'protocol', 'revenue_usd'],
             orient='row',
         )
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
         .sort('timestamp')
     )

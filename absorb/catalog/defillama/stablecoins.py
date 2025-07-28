@@ -78,7 +78,7 @@ class StablecoinsOfTokens(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime(time_unit='ms', time_zone=None),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'token': pl.String,
             'chain': pl.String,
             'circulating': pl.Float64,
@@ -148,7 +148,7 @@ def get_historical_total_stablecoins() -> pl.DataFrame:
     ]
     schema = {'timestamp': pl.Float64, 'circulating_usd': pl.Float64}
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
-        (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp.cast(float) * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 
@@ -176,7 +176,7 @@ def get_historical_stablecoins_of_chain(chain: str) -> pl.DataFrame:
         'bridged_Usd': pl.Float64,
     }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
-        (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp.cast(float) * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 
@@ -194,7 +194,7 @@ def get_historical_stablecoins_of_token(token: str) -> pl.DataFrame:
         'circulating': pl.Float64,
     }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
-        (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp.cast(float) * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 
@@ -231,7 +231,9 @@ def get_historical_stablecoins_per_chain_of_token(token: str) -> pl.DataFrame:
     return (
         pl.DataFrame(rows, schema=schema, orient='row')
         .with_columns(
-            (pl.col.timestamp.cast(float) * 1000).cast(pl.Datetime('ms'))
+            (pl.col.timestamp.cast(float) * 1000000).cast(
+                pl.Datetime('us', 'UTC')
+            )
         )
         .sort('timestamp')
     )
@@ -250,7 +252,9 @@ def get_historical_stablecoin_prices() -> pl.DataFrame:
     return (
         pl.DataFrame(rows, schema=schema, orient='row')
         .filter(pl.col.timestamp > 0)
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
     )
 
 

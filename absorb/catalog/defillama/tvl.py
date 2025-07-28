@@ -22,7 +22,7 @@ class ChainTvls(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'tvl_usd': pl.Float64,
         }
@@ -59,7 +59,7 @@ class ProtocolTvls(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'protocol': pl.String,
             'tvl_usd': pl.Float64,
@@ -97,7 +97,7 @@ class ProtocolTvlsPerToken(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime('ms'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'protocol': pl.String,
             'symbol': pl.String,
             'supply': pl.Float64,
@@ -152,7 +152,9 @@ def get_current_project_tvls() -> pl.DataFrame:
         'slug',
         pl.col.parentProtocol.str.strip_prefix('parent#').alias('parent'),
         'category',
-        (pl.col.listedAt * 1000).cast(pl.Datetime('ms')).alias('list_date'),
+        (pl.col.listedAt * 1000000)
+        .cast(pl.Datetime('us', 'UTC'))
+        .alias('list_date'),
         'symbol',
         'chain',
         'chains',
@@ -167,7 +169,7 @@ def get_historical_tvl() -> pl.DataFrame:
 
     data = common._fetch('historical_tvl')
     return pl.DataFrame(data, orient='row').select(
-        timestamp=(pl.col.date * 1000).cast(pl.Datetime('ms')),
+        timestamp=(pl.col.date * 1000000).cast(pl.Datetime('us', 'UTC')),
         tvl_usd=pl.col.tvl.cast(pl.Float64),
     )
 
@@ -177,7 +179,7 @@ def get_historical_tvl_of_chain(chain: str) -> pl.DataFrame:
 
     data = common._fetch('historical_tvl_of_chain', {'chain': chain})
     return pl.DataFrame(data).select(
-        timestamp=(pl.col.date * 1000).cast(pl.Datetime('ms')),
+        timestamp=(pl.col.date * 1000000).cast(pl.Datetime('us', 'UTC')),
         chain=pl.lit(chain),
         tvl_usd=pl.col.tvl.cast(pl.Float64),
     )
@@ -204,7 +206,7 @@ def get_historical_tvl_per_chain_of_protocol(
         'tvl_usd': pl.Float64,
     }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
-        (pl.col.timestamp * 1000).cast(pl.Datetime('ms'))
+        (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
     )
 
 
@@ -226,7 +228,9 @@ def get_historical_tvl_per_token_of_protocol(
     schema = ['timestamp', 'protocol', 'symbol', 'supply']
     tokens = (
         pl.DataFrame(rows, schema=schema, orient='row')
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
         .sort('timestamp', 'symbol')
     )
 
@@ -238,7 +242,9 @@ def get_historical_tvl_per_token_of_protocol(
     schema = ['timestamp', 'protocol', 'symbol', 'tvl_usd']
     tokensInUsd = (
         pl.DataFrame(rows, schema=schema, orient='row')
-        .with_columns((pl.col.timestamp * 1000).cast(pl.Datetime('ms')))
+        .with_columns(
+            (pl.col.timestamp * 1000000).cast(pl.Datetime('us', 'UTC'))
+        )
         .sort('timestamp', 'protocol', 'symbol')
     )
 

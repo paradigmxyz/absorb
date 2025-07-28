@@ -23,7 +23,7 @@ class FourbyteDatatype(absorb.Table):
 
         return {
             'id': pl.Int64,
-            'created_at': pl.Datetime,
+            'created_at': pl.Datetime('us', 'UTC'),
             'text_signature': pl.String,
             'hex_signature': pl.String,
             'bytes_signature': pl.Binary,

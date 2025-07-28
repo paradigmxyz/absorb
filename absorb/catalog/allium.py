@@ -26,7 +26,7 @@ class StablecoinSupply(Query):
         import polars as pl
 
         return {
-            'DATE': pl.Datetime(time_unit='ns', time_zone=None),
+            'DATE': pl.Datetime('us', 'UTC'),
             'CHAIN': pl.String,
             'TOKEN_ADDRESS': pl.String,
             'TOKEN_SYMBOL': pl.String,

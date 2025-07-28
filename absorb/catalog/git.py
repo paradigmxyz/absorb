@@ -26,12 +26,12 @@ class Commits(absorb.Table):
             'hash': pl.String,
             'author': pl.String,
             'email': pl.String,
-            'timestamp': pl.Datetime(time_unit='ms', time_zone='UTC'),
+            'timestamp': pl.Datetime(time_unit='us', time_zone='UTC'),
             'message': pl.String,
             'parents': pl.String,
             'committer': pl.String,
             'committer_email': pl.String,
-            'commit_timestamp': pl.Datetime(time_unit='ms', time_zone='UTC'),
+            'commit_timestamp': pl.Datetime(time_unit='us', time_zone='UTC'),
             'tree_hash': pl.String,
             'is_merge': pl.Boolean,
             'repo_author': pl.String,
@@ -66,10 +66,10 @@ class Authors(absorb.Table):
             'author': pl.String,
             'email': pl.String,
             'first_commit_timestamp': pl.Datetime(
-                time_unit='ms', time_zone='UTC'
+                time_unit='us', time_zone='UTC'
             ),
             'last_commit_timestamp': pl.Datetime(
-                time_unit='ms', time_zone='UTC'
+                time_unit='us', time_zone='UTC'
             ),
             'n_commits': pl.Int64,
             'n_repos': pl.UInt32,

@@ -17,7 +17,7 @@ class Metric(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Datetime(time_unit='ms'),
+            'timestamp': pl.Datetime(time_unit='us', time_zone='UTC'),
             'raw_value': pl.Float64,
             'value': pl.Float64,
             'metric': pl.String,
@@ -28,7 +28,7 @@ class Metric(absorb.Table):
 
         series_id = self.parameters['series_id']
         return get_series(series_id, rename=False).select(
-            timestamp=pl.col.date.cast(pl.Datetime('ms')),
+            timestamp=pl.col.date.cast(pl.Datetime('us', 'UTC')),
             raw_value='raw_value',
             value='value',
             metric=pl.lit(series_id),
