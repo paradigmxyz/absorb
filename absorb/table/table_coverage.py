@@ -54,7 +54,9 @@ class TableCoverage(table_io.TableIO):
                 else:
                     return None
             else:
-                raise Exception('too many files')
+                raise Exception(
+                    'too many files, there should only be one parquet file when when overwrite_all=True'
+                )
         elif self.is_range_sortable():
             files = sorted(glob.glob(chunk_glob))
             if len(files) == 0:
@@ -96,45 +98,41 @@ class TableCoverage(table_io.TableIO):
     def ready_for_update(self) -> bool:
         """used for periodically updating datasets that have no get_available_range()"""
         import datetime
-        import tooltime
-
-        # ensure valid for dataset
-        if self.get_index_type() != 'temporal':
-            raise Exception(
-                'ready_for_update() can only be called if index is temporal'
-            )
-        chunk_size = self.get_chunk_size()
-        if not isinstance(chunk_size, str):
-            raise Exception(
-                'ready_for_update() can only be called if chunk_size is a string'
-            )
 
         # get last update time
-        last_update_time = self.get_max_collected_timestamp()
+        last_update_time = self.get_last_update_time()
         if last_update_time is None:
             return True
 
-        # get min latency
-        min_latency_seconds: float | int
-        if self.update_latency is None:
-            min_latency_seconds = tooltime.timelength_to_seconds(
-                '1 ' + chunk_size
-            )
-        elif isinstance(self.update_latency, str):
-            min_latency_seconds = tooltime.timelength_to_seconds(
-                self.update_latency
-            )
-        elif isinstance(self.update_latency, float):
-            min_latency_seconds = (
-                self.update_latency
-                * tooltime.timelength_to_seconds('1 ' + chunk_size)
-            )
-        else:
-            raise Exception('invalid format for update_latency')
-        min_latency = datetime.timedelta(seconds=min_latency_seconds)
+        # get min update latency
+        update_latency = datetime.timedelta(self.get_update_latency())
 
-        # return whether now is past the last update time + min latency
-        return datetime.datetime.now() > last_update_time + min_latency
+        # return whether now is past the last update time + min update_latency
+        return datetime.datetime.now() > last_update_time + update_latency
+
+    def get_last_update_time(self) -> datetime.datetime | None:
+        """
+        there are a few options for how to do this
+        - the max timestamp in the table
+        - the time that the dataset was collected
+        - can decide based on whether is temporal and whether write_range=all
+        """
+        if self.get_index_type() == 'temporal':
+            return self.get_max_collected_timestamp()
+        else:
+            import glob
+
+            files = sorted(glob.glob(self.get_chunk_glob()))
+            if len(files) == 0:
+                return None
+            parsed = self.parse_chunk_path(files[-1])
+            if 'chunk' in parsed:
+                try:
+                    return absorb.ops.parse_raw_datetime(parsed['chunk'])
+                except ValueError:
+                    raise Exception('cannot parse last update time from chunk')
+            else:
+                raise Exception('cannot parse last update time from chunk')
 
     def get_min_collected_timestamp(self) -> datetime.datetime | None:
         import polars as pl

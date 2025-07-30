@@ -728,22 +728,22 @@ def _parse_ranges(
     output: list[tuple[datetime.datetime | None, datetime.datetime | None]] = []
     for raw_range in raw_ranges:
         if ':' not in raw_range:
-            start = parse_raw_datetime(raw_range)
-            if is_year(raw_range):
+            start = absorb.ops.parse_raw_datetime(raw_range)
+            if absorb.ops.is_year(raw_range):
                 end = datetime.datetime(int(raw_range) + 1, 1, 1)
-            elif is_month(raw_range):
+            elif absorb.ops.is_month(raw_range):
                 if start.month == 12:
                     end = datetime.datetime(start.year + 1, 1, 1)
                 else:
                     end = datetime.datetime(start.year, start.month + 1, 1)
-            elif is_day(raw_range):
+            elif absorb.ops.is_day(raw_range):
                 end = start + datetime.timedelta(days=1)
             else:
                 raise ValueError('Invalid range format: ' + str(raw_range))
         else:
             parts = raw_range.split(':')
             if len(parts) == 1:
-                timestamp = parse_raw_datetime(parts[0])
+                timestamp = absorb.ops.parse_raw_datetime(parts[0])
                 if raw_range.startswith(':'):
                     output.append((None, timestamp))
                 elif raw_range.endswith(':'):
@@ -754,63 +754,15 @@ def _parse_ranges(
                 if parts[0] == '':
                     start = None
                 else:
-                    start = parse_raw_datetime(parts[0])
+                    start = absorb.ops.parse_raw_datetime(parts[0])
                 if parts[1] == '':
                     end = None
                 else:
-                    end = parse_raw_datetime(parts[1])
+                    end = absorb.ops.parse_raw_datetime(parts[1])
             else:
                 raise ValueError('Invalid range format: ' + str(raw_range))
         output.append((start, end))
     return output
-
-
-def parse_raw_datetime(raw: str) -> datetime.datetime:
-    import datetime
-
-    if is_year(raw):
-        return datetime.datetime(int(raw), 1, 1)
-    elif is_month(raw):
-        raw_year, raw_month = raw.split('-')
-        year = int(raw_year)
-        month = int(raw_month)
-        return datetime.datetime(year, month, 1)
-    elif is_day(raw):
-        raw_year, raw_month, raw_day = raw.split('-')
-        year = int(raw_year)
-        month = int(raw_month)
-        day = int(raw_day)
-        return datetime.datetime(year, month, day)
-    else:
-        raise ValueError('Invalid range format: ' + raw)
-
-
-def is_year(raw_range: str) -> bool:
-    return raw_range.isdigit() and len(raw_range) == 4
-
-
-def is_month(raw_range: str) -> bool:
-    parts = raw_range.split('-')
-    return (
-        len(parts) == 2
-        and parts[0].isdigit()
-        and len(parts[0]) == 4
-        and parts[1].isdigit()
-        and 1 <= int(parts[1]) <= 12
-    )
-
-
-def is_day(raw_range: str) -> bool:
-    parts = raw_range.split('-')
-    return (
-        len(parts) == 3
-        and parts[0].isdigit()
-        and len(parts[0]) == 4
-        and parts[1].isdigit()
-        and 1 <= int(parts[1]) <= 12
-        and parts[2].isdigit()
-        and 1 <= int(parts[2]) <= 31
-    )
 
 
 def _parse_bucket(args: argparse.Namespace) -> absorb.Bucket:

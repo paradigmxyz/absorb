@@ -47,10 +47,18 @@ class TablePaths(table_names.TableNames):
                 else:
                     raise Exception('must specify range')
 
+        chunk_size = self.get_chunk_size()
+        if chunk_size is None:
+            if (
+                self.write_range == 'overwrite_all'
+                and self.get_row_precision() is not None
+            ):
+                chunk_size = self.get_row_precision()
+
         # get file path
         return absorb.ops.paths.get_table_filepath(
             chunk=chunk,
-            chunk_size=self.get_chunk_size(),
+            chunk_size=chunk_size,
             filename_template=self.filename_template,
             table=self.name(),
             source=self.source,

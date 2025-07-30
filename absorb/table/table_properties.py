@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+import datetime
 
 import absorb
 from . import table_base
@@ -61,3 +62,32 @@ class TableProperties(table_base.TableBase):
 
     def get_row_precision(self) -> typing.Any | None:
         return type(self).row_precision
+
+    def get_update_latency(self) -> int | float:
+        import tooltime
+
+        class_update_latency = type(self).update_latency
+        chunk_size = self.get_chunk_size()
+        row_precision = self.get_row_precision()
+        if isinstance(class_update_latency, str):
+            return tooltime.timelength_to_seconds(class_update_latency)
+        elif isinstance(class_update_latency, int):
+            return class_update_latency
+        elif isinstance(class_update_latency, float):
+            if isinstance(row_precision, str):
+                seconds = tooltime.timelength_to_seconds('1 ' + row_precision)
+                return class_update_latency * seconds
+            if isinstance(chunk_size, str):
+                seconds = tooltime.timelength_to_seconds('1 ' + chunk_size)
+                return class_update_latency * seconds
+            raise Exception(
+                'if using a float update_latency, must have chunk_size or row_precision'
+            )
+        elif class_update_latency is None:
+            if isinstance(chunk_size, str):
+                return tooltime.timelength_to_seconds('1 ' + chunk_size)
+            if isinstance(row_precision, str):
+                return tooltime.timelength_to_seconds('1 ' + row_precision)
+            raise Exception('could not determine update latency')
+        else:
+            raise Exception('invalid format for class update_latency')
