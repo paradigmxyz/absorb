@@ -11,6 +11,7 @@ if typing.TYPE_CHECKING:
 
 
 def ls_command(args: Namespace) -> dict[str, Any]:
+    import os
     import toolstr
 
     # decide which sections to print
@@ -51,9 +52,30 @@ def ls_command(args: Namespace) -> dict[str, Any]:
                         cls.name_classmethod(allow_generic=True)
                         for cls in table_classes
                     ]
+
+                    if not args.verbose:
+                        max_width = os.get_terminal_size().columns
+                        without_formatting = (
+                            '- ' + source + ': ' + ', '.join(names)
+                        )
+                        if len(without_formatting) > max_width:
+                            with_cutoff = without_formatting[: max_width - 5]
+                            head, tail = with_cutoff.split(': ')
+                            entries = tail.split(', ')[:-1]
+                            if len(entries) >= 1:
+                                last_entry = entries[-1]
+                                names = names[: names.index(last_entry) + 1]
+                            else:
+                                names = []
+                            suffix = '[green],[/green] ...'
+                        else:
+                            suffix = ''
+                    else:
+                        suffix = ''
+
                     toolstr.print_bullet(
                         key=source,
-                        value='[green],[/green] '.join(names),
+                        value='[green],[/green] '.join(names) + suffix,
                         **absorb.ops.bullet_styles,
                     )
 
