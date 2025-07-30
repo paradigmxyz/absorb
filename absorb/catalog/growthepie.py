@@ -63,7 +63,9 @@ class Metrics(absorb.Table):
         return (
             pl.DataFrame(data)
             .with_columns(
-                timestamp=pl.col.date.str.to_date().cast(pl.Datetime('us', 'UTC'))
+                timestamp=pl.col.date.str.to_date().cast(
+                    pl.Datetime('us', 'UTC')
+                )
             )
             .rename({'origin_key': 'network'})
             .pivot(on='metric_key', index=['date', 'network'], values='value')

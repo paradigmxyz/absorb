@@ -20,7 +20,10 @@ class Stablecoins(absorb.Table):
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
-        return {'timestamp': pl.Float64, 'circulating_usd': pl.Float64}
+        return {
+            'timestamp': pl.Datetime('us', 'UTC'),
+            'circulating_usd': pl.Float64,
+        }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
         return get_historical_total_stablecoins()
@@ -39,7 +42,7 @@ class StablecoinsOfChains(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Float64,
+            'timestamp': pl.Datetime('us', 'UTC'),
             'chain': pl.String,
             'circulating_usd': pl.Float64,
             'minted_usd': pl.Float64,
@@ -114,7 +117,7 @@ class StablecoinPrices(absorb.Table):
         import polars as pl
 
         return {
-            'timestamp': pl.Float64,
+            'timestamp': pl.Datetime('us', 'UTC'),
             'token': pl.String,
             'price': pl.Float64,
         }

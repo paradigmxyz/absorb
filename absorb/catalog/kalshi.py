@@ -24,7 +24,7 @@ class Metrics(absorb.Table):
         import polars as pl
 
         return {
-            'date': pl.String,
+            'timestamp': pl.Datetime('us', 'UTC'),
             'ticker_name': pl.String,
             'old_ticker_name': pl.String,
             'report_ticker': pl.String,
@@ -53,6 +53,7 @@ class Metrics(absorb.Table):
             df = df.insert_column(
                 2, pl.lit(None, dtype=pl.String).alias('old_ticker_name')
             )
+        df = df.rename({'date': 'timestamp'})
 
         return df
 

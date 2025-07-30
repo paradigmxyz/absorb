@@ -18,12 +18,13 @@ class Mempool(absorb.Table):
     url = 'https://docs.blocknative.com/data-archive/mempool-archive'
     write_range = 'append_only'
     chunk_size = 'hour'
+    index_column = 'detecttime'
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
-            'detecttime': pl.String,
+            'detecttime': pl.Datetime('us', 'UTC'),
             'hash': pl.String,
             'status': pl.String,
             'region': pl.String,
@@ -62,6 +63,8 @@ class Mempool(absorb.Table):
         polars_kwargs = {'separator': '\t', 'schema': self.get_schema()}
         return absorb.ops.download_csv_gz_to_dataframe(
             url=url, polars_kwargs=polars_kwargs
+        ).with_columns(
+            pl.col.detecttime.str.to_datetime(time_unit='us', time_zone='UTC')
         )
 
     def get_available_range(self) -> absorb.Coverage:

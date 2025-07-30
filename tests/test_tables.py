@@ -25,6 +25,7 @@ general_queries = [
     absorb.catalog.dune.AppendOnlyQuery,
     absorb.catalog.bigquery.Query,
 ]
+general_queries.extend(absorb.ops.get_source_table_classes('vera'))
 
 
 @pytest.mark.parametrize('table', absorb.ops.get_table_classes())
@@ -196,6 +197,13 @@ def test_temporal_index_column_name_and_type(table: type[absorb.Table]) -> None:
         return
 
     index_column = instance.get_index_column()
+    if index_column is None:
+        raise Exception(
+            'no index column for '
+            + str(table.source)
+            + '.'
+            + str(instance.name())
+        )
     schema = instance.get_schema()
     if isinstance(index_column, str):
         index_column = (index_column,)
