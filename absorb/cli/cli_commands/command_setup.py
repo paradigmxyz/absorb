@@ -58,18 +58,24 @@ def setup_command(args: Namespace) -> dict[str, Any]:
     if config['use_git']:
         absorb.ops.setup_git(track_tables=datasets)
 
+    if args.set_default_bucket:
+        import json
+
+        absorb.ops.set_default_bucket(json.loads(args.set_default_bucket))
     if args.set_default_rclone_remote:
         absorb.ops.set_default_rclone_remote(args.set_default_rclone_remote)
-    if args.set_default_bucket:
-        absorb.ops.set_default_bucket(args.set_default_bucket)
+    if args.set_default_bucket_name:
+        absorb.ops.set_default_bucket_name(args.set_default_bucket_name)
     if args.set_default_provider:
         absorb.ops.set_default_provider(args.set_default_provider)
     if args.set_default_path_prefix:
         absorb.ops.set_default_path_prefix(args.set_default_path_prefix)
-    if args.clear_default_rclone_remote:
-        absorb.ops.clear_default_rclone_remote()
     if args.clear_default_bucket:
         absorb.ops.clear_default_bucket()
+    if args.clear_default_rclone_remote:
+        absorb.ops.clear_default_rclone_remote()
+    if args.clear_default_bucket_name:
+        absorb.ops.clear_default_bucket_name()
     if args.clear_default_provider:
         absorb.ops.clear_default_provider()
     if args.clear_default_path_prefix:

@@ -104,6 +104,23 @@ def disable_git_tracking() -> None:
 #
 
 
+def set_default_bucket(bucket: absorb.Bucket) -> None:
+    # check bucket validity
+    default_bucket = absorb.ops.get_default_config()['default_bucket']
+    for key in bucket.keys():
+        if key not in default_bucket:
+            raise Exception('bucket has invalid key: ' + str(key))
+    for key in default_bucket.keys():
+        if key not in bucket:
+            raise Exception('bucket is missing key: ' + str(key))
+
+    config = config_io.get_config()
+    config['default_bucket'] = bucket
+    config_io.write_config(
+        config, 'Set default bucket to ' + str(bucket['bucket_name'])
+    )
+
+
 def set_default_rclone_remote(rclone_remote: str) -> None:
     config = config_io.get_config()
     config['default_bucket']['rclone_remote'] = rclone_remote
@@ -112,7 +129,7 @@ def set_default_rclone_remote(rclone_remote: str) -> None:
     )
 
 
-def set_default_bucket(bucket: str) -> None:
+def set_default_bucket_name(bucket: str) -> None:
     config = config_io.get_config()
     config['default_bucket']['bucket_name'] = bucket
     config_io.write_config(config, 'Set default bucket to ' + bucket)
@@ -130,13 +147,19 @@ def set_default_path_prefix(path_prefix: str) -> None:
     config_io.write_config(config, 'Set default path prefix to ' + path_prefix)
 
 
+def clear_default_bucket() -> None:
+    config = config_io.get_config()
+    config['default_bucket'] = absorb.ops.get_default_config()['default_bucket']
+    config_io.write_config(config, 'Cleared default bucket')
+
+
 def clear_default_rclone_remote() -> None:
     config = config_io.get_config()
     config['default_bucket']['rclone_remote'] = None
     config_io.write_config(config, 'Cleared default rclone remote')
 
 
-def clear_default_bucket() -> None:
+def clear_default_bucket_name() -> None:
     config = config_io.get_config()
     config['default_bucket']['bucket_name'] = None
     config_io.write_config(config, 'Cleared default bucket')

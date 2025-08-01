@@ -397,6 +397,13 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--set-default-bucket'],
+                    {
+                        'help': 'set default bucket using json blob',
+                        'metavar': 'JSON',
+                    },
+                ),
+                (
                     ['--set-default-rclone-remote'],
                     {
                         'help': 'set rclone remote to use for bucket uploads and downloads',
@@ -404,9 +411,9 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
-                    ['--set-default-bucket'],
+                    ['--set-default-bucket-name'],
                     {
-                        'help': 'set default bucket for upload and downloads',
+                        'help': 'set default bucket name for upload and downloads',
                         'metavar': 'BUCKET',
                     },
                 ),
@@ -425,6 +432,13 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
+                    ['--clear-default-bucket'],
+                    {
+                        'help': 'clear default bucket setting',
+                        'action': 'store_true',
+                    },
+                ),
+                (
                     ['--clear-default-rclone-remote'],
                     {
                         'help': 'clear rclone remote to use for bucket uploads and downloads',
@@ -432,9 +446,9 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
-                    ['--clear-default-bucket'],
+                    ['--clear-default-bucket-name'],
                     {
-                        'help': 'clear bucket to use for upload and downloads',
+                        'help': 'clear bucket name to use for upload and downloads',
                         'action': 'store_true',
                     },
                 ),
