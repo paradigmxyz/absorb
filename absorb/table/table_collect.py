@@ -208,6 +208,7 @@ class TableCollect(table_coverage.TableCoverage):
         overwrite: bool,
         verbose: int,
     ) -> None:
+        import glob
         import os
 
         # print summary
@@ -234,6 +235,13 @@ class TableCollect(table_coverage.TableCoverage):
                 )
             path = self.get_chunk_path(chunk=chunk, df=data)
             absorb.ops.write_file(df=data, path=path)
+
+            # delete other files if write_range=overwrite_all
+            if self.write_range == 'overwrite_all':
+                for other_path in glob.glob(self.get_data_glob()):
+                    if other_path != path:
+                        print('removing old data', other_path)
+                        os.remove(other_path)
 
         # print post-summary
         if verbose >= 1 and data is None:
