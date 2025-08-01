@@ -8,7 +8,16 @@ from . import table_coverage
 if typing.TYPE_CHECKING:
     T = typing.TypeVar('T')
 
+    import datetime
     import polars as pl
+    from typing_extensions import NotRequired
+
+    class ChunkResultSummary(typing.TypedDict):
+        success: bool
+        paths: NotRequired[list[str]]
+        bytes_in_memory: NotRequired[int]
+        bytes_on_disk: NotRequired[int]
+        n_rows: NotRequired[int]
 
 
 class TableCollect(table_coverage.TableCoverage):
@@ -30,14 +39,17 @@ class TableCollect(table_coverage.TableCoverage):
         verbose: int = 1,
         dry: bool = False,
     ) -> None:
+        import datetime
+
         self._check_ready_to_collect()
 
         # get collection plan
         chunks = self._get_chunks_to_collect(data_range, overwrite)
 
         # summarize collection plan
+        start = datetime.datetime.now()
         if verbose >= 1:
-            self._summarize_collection_plan(chunks, overwrite, verbose, dry)
+            self._summarize_collect_plan(chunks, overwrite, verbose, dry, start)
 
         # return early if dry
         if dry:
@@ -47,8 +59,13 @@ class TableCollect(table_coverage.TableCoverage):
         self.setup_table_dir()
 
         # collect each chunk
-        for chunk in chunks:
+        chunk_summaries = [
             self._execute_collect_chunk(chunk, overwrite, verbose)
+            for chunk in chunks
+        ]
+
+        # summarize collection
+        self._summarize_collected_data(chunk_summaries, start, verbose)
 
     def _check_ready_to_collect(self) -> None:
         import os
@@ -145,12 +162,13 @@ class TableCollect(table_coverage.TableCoverage):
             # split each range into chunk
             return absorb.ops.partition_into_chunks(coverage, chunk_size)
 
-    def _summarize_collection_plan(
+    def _summarize_collect_plan(
         self,
         chunks: list[absorb.Chunk],
         overwrite: bool,
         verbose: int,
         dry: bool,
+        start: datetime.datetime,
     ) -> None:
         import datetime
         import rich
@@ -181,9 +199,7 @@ class TableCollect(table_coverage.TableCoverage):
             )
         absorb.ops.print_bullet('overwrite', str(overwrite))
         absorb.ops.print_bullet('output dir', self.get_table_dir())
-        absorb.ops.print_bullet(
-            'collection start time', str(datetime.datetime.now())
-        )
+        absorb.ops.print_bullet('collection start time', str(start))
         if len(chunks) == 0:
             print('[already collected]')
 
@@ -202,12 +218,95 @@ class TableCollect(table_coverage.TableCoverage):
         elif len(chunks) > 0:
             print()
 
+    def _summarize_collected_data(
+        self,
+        summaries: list[ChunkResultSummary],
+        start_time: datetime.datetime,
+        verbose: int,
+    ) -> None:
+        import datetime
+        import toolstr
+
+        if not verbose:
+            return
+
+        # aggregate totals
+        total_rows = 0
+        total_disk_bytes = 0
+        total_memory_bytes = 0
+        n_success = 0
+        for summary in summaries:
+            if summary['success']:
+                total_rows += summary['n_rows']
+                total_disk_bytes += summary['bytes_on_disk']
+                total_memory_bytes += summary['bytes_in_memory']
+                n_success += 1
+        n_fail = len(summaries) - n_success
+
+        # compute timings
+        end_time = datetime.datetime.now()
+        total_time = (end_time - start_time).total_seconds()
+        total_time = (end_time - start_time).total_seconds()
+
+        # print summary
+
+        import rich
+
+        print()
+        if n_fail > 0:
+            start_tag = '[red]'
+            end_tag = '[/red]'
+            symbol_color = 'red'
+        else:
+            start_tag = ''
+            end_tag = ''
+            symbol_color = 'green'
+        rich.print(
+            '[bold][green]'
+            + start_tag
+            + 'done collecting:'
+            + end_tag
+            + '[/green] [white]'
+            + self.full_name()
+            + '[/white][/bold]'
+        )
+        absorb.ops.print_bullet(
+            'successful chunks',
+            str(n_success) + ' / ' + str(len(summaries)),
+            symbol_color=symbol_color,
+        )
+        absorb.ops.print_bullet(
+            'collection end time',
+            '  ' + str(end_time),
+            symbol_color=symbol_color,
+        )
+        absorb.ops.print_bullet(
+            'collection total time',
+            toolstr.format(total_time, decimals=2) + ' seconds',
+            symbol_color=symbol_color,
+        )
+        absorb.ops.print_bullet(
+            'rows collected',
+            toolstr.format(total_rows),
+            symbol_color=symbol_color,
+        )
+        absorb.ops.print_bullet(
+            'bytes collected',
+            toolstr.format_nbytes(total_disk_bytes)
+            + ' on disk, '
+            + toolstr.format_nbytes(total_memory_bytes)
+            + ' in memory ('
+            + toolstr.format(total_memory_bytes / total_disk_bytes, decimals=2)
+            + 'x compression)',
+            symbol_color=symbol_color,
+        )
+
     def _execute_collect_chunk(
         self,
         chunk: absorb.Chunk,
         overwrite: bool,
         verbose: int,
-    ) -> None:
+    ) -> ChunkResultSummary:
         import glob
         import os
 
@@ -215,9 +314,10 @@ class TableCollect(table_coverage.TableCoverage):
         if verbose >= 1:
             if self.write_range == 'overwrite_all':
                 as_str = 'all'
+                print('[collecting entire dataset]')
             else:
                 as_str = absorb.ops.format_chunk(chunk, self.get_chunk_size())
-            print('collecting', as_str)
+                print('[collecting', as_str + ']')
 
         # collect chunk
         data = self.collect_chunk(chunk=chunk)
@@ -226,7 +326,9 @@ class TableCollect(table_coverage.TableCoverage):
         self.validate_chunk(chunk=chunk, data=data)
 
         # write file
-        if self.chunk_datatype == 'dataframe' and data is not None:
+        if data is None:
+            chunk_summary: ChunkResultSummary = {'success': False}
+        elif self.chunk_datatype == 'dataframe':
             import polars as pl
 
             if not isinstance(data, pl.DataFrame):
@@ -243,9 +345,21 @@ class TableCollect(table_coverage.TableCoverage):
                         print('removing old data', other_path)
                         os.remove(other_path)
 
+            chunk_summary = {
+                'success': True,
+                'paths': [path],
+                'bytes_in_memory': int(data.estimated_size()),
+                'bytes_on_disk': os.path.getsize(path),
+                'n_rows': data.shape[0],
+            }
+        else:
+            raise Exception()
+
         # print post-summary
         if verbose >= 1 and data is None:
             print('could not collect data for', str(chunk))
+
+        return chunk_summary
 
     def validate_chunk(
         self, chunk: absorb.Chunk, data: absorb.ChunkResult | None

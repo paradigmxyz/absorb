@@ -13,11 +13,21 @@ bullet_styles = {
 
 
 def print_bullet(
-    key: str | None, value: str | None, **kwargs: typing.Any
+    key: str | None,
+    value: str | None,
+    symbol_color: str | None = None,
+    **kwargs: typing.Any,
 ) -> None:
     import toolstr
 
-    toolstr.print_bullet(key=key, value=value, **kwargs, **bullet_styles)
+    if symbol_color is not None:
+        styles = bullet_styles.copy()
+        styles['bullet_style'] = symbol_color
+        styles['colon_style'] = symbol_color
+    else:
+        styles = bullet_styles
+
+    toolstr.print_bullet(key=key, value=value, **kwargs, **styles)
 
 
 def format_coverage(
