@@ -16,6 +16,7 @@ class TableCollect(table_coverage.TableCoverage):
         raise NotImplementedError()
 
     def is_collected(self) -> bool:
+        """return True if any data files exist"""
         import glob
 
         chunk_glob = self.get_chunk_glob()

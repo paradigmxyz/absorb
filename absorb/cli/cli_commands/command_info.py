@@ -73,25 +73,27 @@ def print_source_info(source: str, verbose: bool) -> dict[str, typing.Any]:
 
 
 def print_dataset_info(table_str: str, verbose: bool) -> dict[str, typing.Any]:
+    """print info of either a table or a table recipe"""
     import toolstr
 
+    table = None
     try:
         table = absorb.Table.instantiate(table_str)
-        print_table_info(table, verbose=verbose)
     except Exception:
         source, name = table_str.split('.')
         for cls in absorb.ops.get_source_table_classes(source):
-            if cls.name_classmethod(
-                allow_generic=True
-            ) == name or name == absorb.ops.names._camel_to_snake(
-                cls.__qualname__
-            ):
+            class_name = cls.name_classmethod(allow_generic=True)
+            as_camel = absorb.ops.names._camel_to_snake(cls.__qualname__)
+            if class_name == name or name == as_camel:
                 return print_recipe_info(cls, verbose=verbose)
         else:
             import sys
 
             print('could not find match')
             sys.exit(1)
+
+    if table is not None:
+        print_table_info(table, verbose=verbose)
 
     return {}
 
@@ -140,12 +142,13 @@ def print_recipe_info(
 def print_table_info(
     table: absorb.Table, verbose: bool
 ) -> dict[str, typing.Any]:
+    import os
     import toolstr
 
     schema = table.get_schema()
 
     toolstr.print_text_box(
-        'dataset = ' + table.name(),
+        'Table = ' + table.name(),
         style='green',
         text_style='bold white',
     )
@@ -187,39 +190,38 @@ def print_table_info(
     # collection status
     print()
     toolstr.print('[green bold]status[/green bold]')
-    # absorb.ops.print_bullet(key='tracked', value=table.is_tracked())
-
-    if verbose:
-        available_range = table.get_available_range()
-        if available_range is not None:
-            formatted_available_range = absorb.ops.format_coverage(
-                available_range, table.get_chunk_size()
+    if not table.is_collected():
+        print('- [not collected]')
+    else:
+        # print available range
+        if verbose:
+            available_range = table.get_available_range()
+            if available_range is not None:
+                formatted_available_range = absorb.ops.format_coverage(
+                    available_range, table.get_chunk_size()
+                )
+            else:
+                formatted_available_range = 'not available'
+            absorb.ops.print_bullet(
+                key='available range',
+                value=formatted_available_range,
             )
-        else:
-            formatted_available_range = 'not available'
+
+        # print collected range
+        collected_range = table.get_collected_range()
         absorb.ops.print_bullet(
-            key='available range',
-            value=formatted_available_range,
+            key='collected range',
+            value=absorb.ops.format_coverage(
+                collected_range, table.get_chunk_size()
+            ),
         )
 
-    collected_range = table.get_collected_range()
-    absorb.ops.print_bullet(
-        key='collected range',
-        value=absorb.ops.format_coverage(
-            collected_range, table.get_chunk_size()
-        ),
-    )
-
-    import os
-
-    path = table.get_table_dir()
-    if os.path.isdir(path):
+        # print path and collected size
+        path = table.get_table_dir()
         bytes_str = absorb.ops.format_bytes(get_dir_size(path))
-    else:
-        path = '[not collected]'
-        bytes_str = '[not collected]'
-    absorb.ops.print_bullet(key='path', value=path)
-    absorb.ops.print_bullet(key='size', value=bytes_str)
+        absorb.ops.print_bullet(key='path', value=path)
+        absorb.ops.print_bullet(key='size', value=bytes_str)
+        raise Exception()
 
     return {}
 
