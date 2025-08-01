@@ -29,7 +29,9 @@ def check_bucket_setup(bucket: absorb.Bucket | None = None) -> str | None:
         for key in ['rclone_remote', 'bucket_name', 'path_prefix']:
             if key not in bucket:
                 return f'Bucket configuration is missing required key: {key}'
-        if not rclone_python.rclone.check_remote_existing(
+        if bucket['rclone_remote'] is None:
+            return 'rclone_remote has not been set'
+        elif not rclone_python.rclone.check_remote_existing(
             bucket['rclone_remote']
         ):
             return (
