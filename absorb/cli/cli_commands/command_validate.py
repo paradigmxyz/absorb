@@ -191,6 +191,16 @@ def validate_command(args: Namespace) -> dict[str, Any]:
                 + ' tracked metadata does not match table folder metadata'
             )
 
+    # check that when write_mode=overwrite_all there is at most one data file
+    for table_dict in absorb.ops.get_collected_tables():
+        instance = absorb.Table.instantiate(table_dict)
+        if instance.write_range == 'overwrite_all':
+            n_data_files = len(glob.glob(instance.get_data_glob()))
+            if n_data_files > 1:
+                errors.append(
+                    'table ' + instance.full_name() + ' has multiple data files'
+                )
+
     # print errors
     if len(errors) > 0:
         toolstr.print_text_box('Errors Found', style='red')
