@@ -87,6 +87,7 @@ def scan_bucket(
 def upload_tables_to_bucket(
     tables: typing.Sequence[absorb.TableReference],
     bucket: absorb.Bucket | None = None,
+    verbose: bool = True,
 ) -> None:
     import rclone_python.rclone
 
@@ -107,8 +108,15 @@ def upload_tables_to_bucket(
         bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
 
         # perform upload
-        print('uploading', table_dir, 'to', bucket_path)
-        rclone_python.rclone.copy(table_dir, bucket_path)
+        absorb.ops.print_bullet('table', table.full_name())
+        absorb.ops.print_bullet('source path', table_dir)
+        absorb.ops.print_bullet('destination path', bucket_path)
+        print()
+        rclone_python.rclone.copy(
+            table_dir,
+            bucket_path,
+            args=['-vv', '--stats', '1s', '--stats-one-line'],
+        )
 
 
 def download_tables_to_bucket(
@@ -134,7 +142,10 @@ def download_tables_to_bucket(
         bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
 
         # perform upload
-        print('downloading', bucket_path, 'to', table_dir)
+        absorb.ops.print_bullet('table', table.full_name())
+        absorb.ops.print_bullet('source path', table_dir)
+        absorb.ops.print_bullet('destination path', bucket_path)
+        print()
         rclone_python.rclone.copy(bucket_path, table_dir)
 
 

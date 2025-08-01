@@ -10,6 +10,8 @@ if typing.TYPE_CHECKING:
 
 
 def download_command(args: Namespace) -> dict[str, typing.Any]:
+    import toolstr
+
     # determine tables to download
     tables = cli_parsing._parse_datasets(args)
 
@@ -17,14 +19,28 @@ def download_command(args: Namespace) -> dict[str, typing.Any]:
     bucket = cli_parsing._parse_bucket(args)
 
     # print summary
-    print(
+    if len(tables) == 1:
+        word = 'table'
+    else:
+        word = 'tables'
+    open_tag = '[green bold]'
+    close_tag = '[/green bold]'
+    toolstr.print(
         'downloading '
+        + open_tag
         + str(len(tables))
-        + ' tables to bucket '
+        + close_tag
+        + ' '
+        + word
+        + ' to bucket '
+        + open_tag
         + str(bucket['bucket_name'])
+        + close_tag
     )
-    for table in tables:
-        print('- ' + table.full_name())
+    if len(tables) > 1:
+        for table in tables:
+            toolstr.print_bullet(value=table.full_name(), key=None, indent=4)
+        print()
 
     # exit early if dry
     if args.dry:
