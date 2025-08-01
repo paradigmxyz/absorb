@@ -9,7 +9,54 @@ if typing.TYPE_CHECKING:
     import polars as pl
 
 
+@typing.overload
 def query(
+    table: absorb.TableReference,
+    *,
+    update: bool = False,
+    collect_if_missing: bool = True,
+    scan_kwargs: dict[str, typing.Any] | None = None,
+    bucket: bool | absorb.Bucket = False,
+    lazy: typing.Literal[False] = False,
+) -> pl.DataFrame: ...
+
+
+@typing.overload
+def query(
+    table: absorb.TableReference,
+    *,
+    update: bool = False,
+    collect_if_missing: bool = True,
+    scan_kwargs: dict[str, typing.Any] | None = None,
+    bucket: bool | absorb.Bucket = False,
+    lazy: typing.Literal[True],
+) -> pl.LazyFrame: ...
+
+
+def query(
+    table: absorb.TableReference,
+    *,
+    update: bool = False,
+    collect_if_missing: bool = True,
+    scan_kwargs: dict[str, typing.Any] | None = None,
+    bucket: bool | absorb.Bucket = False,
+    lazy: bool = False,
+) -> pl.DataFrame | pl.LazyFrame:
+    lf = _query_lazy(
+        table=table,
+        update=update,
+        collect_if_missing=collect_if_missing,
+        scan_kwargs=scan_kwargs,
+        bucket=bucket,
+    )
+
+    if lazy:
+        return lf
+    else:
+        return lf.collect()
+
+
+def _query_lazy(
     table: absorb.TableReference,
     *,
     update: bool = False,

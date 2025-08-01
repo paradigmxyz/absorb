@@ -24,12 +24,7 @@ def preview_command(args: Namespace) -> dict[str, Any]:
     n_rows = {}
     for d, dataset in enumerate(datasets):
         # load dataset preview
-        df = (
-            absorb.query(dataset)
-            .slice(offset)
-            .head(preview_length + 1)
-            .collect()
-        )
+        df = absorb.query(dataset).slice(offset).head(preview_length + 1)
 
         # print number of rows in preview
         if d > 0:
