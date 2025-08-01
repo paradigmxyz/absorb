@@ -20,13 +20,21 @@ class StablecoinSupply(Query):
 
     sql = 'SELECT * FROM CROSSCHAIN_ALLIUM.STABLECOIN.SUPPLY_BETA'
     row_precision = 'day'
-    index_column = 'DATE'
+
+    def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
+        import polars as pl
+
+        df = typing.cast(pl.DataFrame, super().collect_chunk(chunk))
+        df = df.rename({'DATE': 'timestamp'}).with_columns(
+            pl.col.timestamp.dt.cast_time_unit('us').dt.replace_time_zone('UTC')
+        )
+        return df
 
     def get_schema(self) -> dict[str, pl.DataType | type[pl.DataType]]:
         import polars as pl
 
         return {
-            'DATE': pl.Datetime('us', 'UTC'),
+            'timestamp': pl.Datetime('us', 'UTC'),
             'CHAIN': pl.String,
             'TOKEN_ADDRESS': pl.String,
             'TOKEN_SYMBOL': pl.String,
