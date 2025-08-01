@@ -20,7 +20,7 @@ class TableIO(table_paths.TablePaths):
         if scan_kwargs is None:
             scan_kwargs = {}
         try:
-            return pl.scan_parquet(self.get_chunk_glob(), **scan_kwargs)
+            return pl.scan_parquet(self.get_data_glob(), **scan_kwargs)
         except Exception as e:
             if e.args[0].startswith('expected at least 1 source'):
                 raise Exception('no data to load for ' + str(self.full_name()))

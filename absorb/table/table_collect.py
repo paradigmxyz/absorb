@@ -19,8 +19,8 @@ class TableCollect(table_coverage.TableCoverage):
         """return True if any data files exist"""
         import glob
 
-        chunk_glob = self.get_chunk_glob()
-        return len(glob.glob(chunk_glob)) > 0
+        data_glob = self.get_data_glob()
+        return len(glob.glob(data_glob)) > 0
 
     def collect(
         self,

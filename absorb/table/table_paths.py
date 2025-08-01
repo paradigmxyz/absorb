@@ -20,7 +20,7 @@ class TablePaths(table_names.TableNames):
             self.name(), source=self.source, warn=warn
         )
 
-    def get_chunk_glob(self, warn: bool = True) -> str:
+    def get_data_glob(self, warn: bool = True) -> str:
         return self.get_chunk_path(glob=True, warn=warn)
 
     def get_chunk_path(

@@ -139,7 +139,7 @@ def validate_command(args: Namespace) -> dict[str, Any]:
                 )
 
             # check there are no extra files beyond metadata and parquet files
-            target_parquet_files = glob.glob(instance.get_chunk_glob())
+            target_parquet_files = glob.glob(instance.get_data_glob())
             for filename in os.listdir(table_dir):
                 if filename == os.path.basename(metadata_path):
                     continue

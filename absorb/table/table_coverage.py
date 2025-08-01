@@ -30,9 +30,9 @@ class TableCoverage(table_io.TableIO):
         if not os.path.isdir(dir_path):
             return None
 
-        chunk_glob = self.get_chunk_glob()
+        data_glob = self.get_data_glob()
         if self.write_range == 'overwrite_all':
-            files = sorted(glob.glob(chunk_glob))
+            files = sorted(glob.glob(data_glob))
             if len(files) == 0:
                 return None
             elif len(files) == 1:
@@ -58,7 +58,7 @@ class TableCoverage(table_io.TableIO):
                     'too many files, there should only be one parquet file when when overwrite_all=True'
                 )
         elif self.is_range_sortable():
-            files = sorted(glob.glob(chunk_glob))
+            files = sorted(glob.glob(data_glob))
             if len(files) == 0:
                 return None
             start = self.parse_chunk_path(files[0])['chunk']
@@ -122,7 +122,7 @@ class TableCoverage(table_io.TableIO):
         else:
             import glob
 
-            files = sorted(glob.glob(self.get_chunk_glob()))
+            files = sorted(glob.glob(self.get_data_glob()))
             if len(files) == 0:
                 return None
             parsed = self.parse_chunk_path(files[-1])
