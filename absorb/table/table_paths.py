@@ -102,6 +102,10 @@ class TablePaths(table_names.TableNames):
             with open(metadata_path, 'w') as f:
                 json.dump(metadata, f)
             if absorb.ops.get_config()['use_git']:
+                # create git repo
+                absorb.ops.setup_git()
+
+                # add metadata file
                 absorb.ops.git_add_and_commit_file(
                     metadata_path,
                     repo_root=absorb.ops.get_absorb_root(),

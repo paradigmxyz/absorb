@@ -41,6 +41,32 @@ def setup_git(track_tables: list[absorb.Table] | None = None) -> None:
             )
 
 
+def git_is_in_repo(path: str) -> bool:
+    """Check if a directory is inside a git repository"""
+    import subprocess
+    import os
+
+    # Ensure the path exists
+    if not os.path.exists(path):
+        return False
+
+    # If it's a file, use its directory
+    if os.path.isfile(path):
+        path = os.path.dirname(path)
+
+    try:
+        subprocess.run(
+            ['git', 'rev-parse', '--git-dir'],
+            cwd=path,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 def git_is_file_tracked(path: str, repo_root: str) -> bool:
     """Check if a file is currently being tracked by git"""
     import subprocess
@@ -115,6 +141,9 @@ def git_commit(message: str, repo_root: str, *, verbose: bool = False) -> None:
     """Commit staged changes"""
     import subprocess
 
+    if not git_is_in_repo(repo_root):
+        return
+
     # Check if there are staged changes
     try:
         result = subprocess.run(
@@ -150,9 +179,12 @@ def git_commit(message: str, repo_root: str, *, verbose: bool = False) -> None:
         raise
 
 
-def run_git_command(cmd: list[str], repo_root: str) -> str:
+def run_git_command(cmd: list[str], repo_root: str) -> str | None:
     """Run a git command in the specified repository directory"""
     import subprocess
+
+    if not git_is_in_repo(repo_root):
+        return None
 
     try:
         result = subprocess.run(
