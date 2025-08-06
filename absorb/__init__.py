@@ -4,12 +4,12 @@ from .errors import *
 from .table import Table
 from . import ops
 from .ops import (
-    scan,
-    load,
-    query,
-    sql_query,
     get_available_range,
     get_collected_range,
+    get_collected_tables,
+    get_schema,
+    query,
+    sql_query,
 )
 
 import typing

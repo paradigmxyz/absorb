@@ -12,4 +12,5 @@ from .parsing import *
 from .paths import *
 from .queries import *
 from .ranges import *
+from .schemas import *
 from .validation import *

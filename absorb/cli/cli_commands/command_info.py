@@ -221,7 +221,6 @@ def print_table_info(
         bytes_str = absorb.ops.format_bytes(get_dir_size(path))
         absorb.ops.print_bullet(key='path', value=path)
         absorb.ops.print_bullet(key='size', value=bytes_str)
-        raise Exception()
 
     return {}
 

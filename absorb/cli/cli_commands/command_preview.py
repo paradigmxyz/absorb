@@ -42,7 +42,9 @@ def preview_command(args: Namespace) -> dict[str, Any]:
         print(df.head(preview_length))
 
         # print total number of rows
-        dataset_n_rows = absorb.scan(dataset).select(pl.len()).collect().item()
+        dataset_n_rows = (
+            absorb.ops.scan(dataset).select(pl.len()).collect().item()
+        )
         n_rows[dataset.full_name()] = dataset_n_rows
         print(dataset_n_rows, 'rows,', len(df.columns), 'columns')
 
@@ -51,18 +53,18 @@ def preview_command(args: Namespace) -> dict[str, Any]:
         if len(datasets) == 1:
             dataset = datasets[0]
             if n_rows[dataset.full_name()] <= 1_000_000:
-                return {'df': absorb.load(dataset)}
+                return {'df': absorb.ops.load(dataset)}
             else:
-                return {'lf': absorb.scan(dataset)}
+                return {'lf': absorb.ops.scan(dataset)}
         else:
             dfs = {}
             lfs = {}
             for dataset in datasets:
                 table_name = dataset.full_name()
                 if n_rows[table_name] <= 1_000_000:
-                    dfs[table_name] = absorb.load(dataset)
+                    dfs[table_name] = absorb.ops.load(dataset)
                 else:
-                    lfs[table_name] = absorb.scan(dataset)
+                    lfs[table_name] = absorb.ops.scan(dataset)
             outputs: dict[str, typing.Any] = {}
             if len(dfs) > 0:
                 outputs['dfs'] = dfs

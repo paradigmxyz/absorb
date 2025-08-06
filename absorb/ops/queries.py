@@ -139,7 +139,7 @@ def create_sql_context(
     for table_dict in all_tables:
         name = table_dict['source_name'] + '.' + table_dict['table_name']
         if name not in tables_by_name:
-            tables_by_name[name] = absorb.scan(table_dict)
+            tables_by_name[name] = absorb.ops.scan(table_dict)
 
     # create context
     return pl.SQLContext(**tables_by_name)  # type: ignore

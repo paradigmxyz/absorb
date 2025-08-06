@@ -47,6 +47,7 @@ def upload_command(args: Namespace) -> dict[str, typing.Any]:
         return {}
 
     # upload tables
-    absorb.ops.upload_tables_to_bucket(tables=tables, bucket=bucket)
+    for table in tables:
+        absorb.ops.upload_table(table=table, bucket=bucket)
 
     return {}

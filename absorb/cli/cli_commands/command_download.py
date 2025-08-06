@@ -47,6 +47,7 @@ def download_command(args: Namespace) -> dict[str, typing.Any]:
         return {}
 
     # download tables
-    absorb.ops.download_tables_to_bucket(tables=tables, bucket=bucket)
+    for table in tables:
+        absorb.ops.download_table(table=table, bucket=bucket)
 
     return {}

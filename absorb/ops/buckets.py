@@ -84,8 +84,8 @@ def scan_bucket(
 #
 
 
-def upload_tables_to_bucket(
-    tables: typing.Sequence[absorb.TableReference],
+def upload_table(
+    table: absorb.TableReference,
     bucket: absorb.Bucket | None = None,
     verbose: bool = True,
 ) -> None:
@@ -100,27 +100,25 @@ def upload_tables_to_bucket(
     if problem is not None:
         raise Exception(problem)
 
-    # upload each bucket
-    for table in tables:
-        # get paths
-        table = absorb.Table.instantiate(table)
-        table_dir = table.get_table_dir()
-        bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
+    # get paths
+    table = absorb.Table.instantiate(table)
+    table_dir = table.get_table_dir()
+    bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
 
-        # perform upload
-        absorb.ops.print_bullet('table', table.full_name())
-        absorb.ops.print_bullet('source path', table_dir)
-        absorb.ops.print_bullet('destination path', bucket_path)
-        print()
-        rclone_python.rclone.copy(
-            table_dir,
-            bucket_path,
-            args=['-vv', '--stats', '1s', '--stats-one-line'],
-        )
+    # perform upload
+    absorb.ops.print_bullet('table', table.full_name())
+    absorb.ops.print_bullet('source path', table_dir)
+    absorb.ops.print_bullet('destination path', bucket_path)
+    print()
+    rclone_python.rclone.copy(
+        table_dir,
+        bucket_path,
+        args=['-vv', '--stats', '1s', '--stats-one-line'],
+    )
 
 
-def download_tables_to_bucket(
-    tables: typing.Sequence[absorb.TableReference],
+def download_table(
+    table: absorb.TableReference,
     bucket: absorb.Bucket | None = None,
 ) -> None:
     import rclone_python.rclone
@@ -134,19 +132,17 @@ def download_tables_to_bucket(
     if problem is not None:
         raise Exception(problem)
 
-    # upload each bucket
-    for table in tables:
-        # get paths
-        table = absorb.Table.instantiate(table)
-        table_dir = table.get_table_dir()
-        bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
+    # get paths
+    table = absorb.Table.instantiate(table)
+    table_dir = table.get_table_dir()
+    bucket_path = get_rclone_bucket_path(table=table, bucket=bucket)
 
-        # perform upload
-        absorb.ops.print_bullet('table', table.full_name())
-        absorb.ops.print_bullet('source path', table_dir)
-        absorb.ops.print_bullet('destination path', bucket_path)
-        print()
-        rclone_python.rclone.copy(bucket_path, table_dir)
+    # perform upload
+    absorb.ops.print_bullet('table', table.full_name())
+    absorb.ops.print_bullet('source path', table_dir)
+    absorb.ops.print_bullet('destination path', bucket_path)
+    print()
+    rclone_python.rclone.copy(bucket_path, table_dir)
 
 
 #

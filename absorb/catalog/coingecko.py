@@ -111,8 +111,8 @@ class CategoryMetrics(absorb.Table):
         }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
-        coin_metrics = absorb.load('coingecko.coin_metrics')
-        coin_categories = absorb.load('coingecko.categories')
+        coin_metrics = absorb.ops.load('coingecko.coin_metrics')
+        coin_categories = absorb.ops.load('coingecko.categories')
         return get_historical_category_metrics(
             coin_metrics=coin_metrics, coin_categories=coin_categories
         )
