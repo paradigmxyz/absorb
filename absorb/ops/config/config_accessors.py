@@ -19,9 +19,18 @@ def get_tracked_tables() -> list[absorb.TableDict]:
     return config_io.get_config()['tracked_tables']
 
 
-def add(tables: typing.Sequence[absorb.TableReference]) -> None:
+def add(
+    table: absorb.TableReference
+    | list[absorb.TableReference]
+    | list[absorb.Table],
+) -> None:
     """start tracking tables"""
     import json
+
+    if isinstance(table, list):
+        tables = table
+    else:
+        tables = [table]
 
     table_objs = [absorb.Table.instantiate(table) for table in tables]
     config = config_io.get_config()
@@ -60,9 +69,18 @@ def add(tables: typing.Sequence[absorb.TableReference]) -> None:
     config_io.write_config(config, message)
 
 
-def remove(tables: typing.Sequence[absorb.TableReference]) -> None:
+def remove(
+    table: absorb.TableReference
+    | list[absorb.TableReference]
+    | list[absorb.Table],
+) -> None:
     """stop tracking tables"""
     import json
+
+    if isinstance(table, list):
+        tables = table
+    else:
+        tables = [table]
 
     # gather tables to drop
     drop_tables = [absorb.Table.instantiate(table) for table in tables]

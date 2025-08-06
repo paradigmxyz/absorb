@@ -102,3 +102,38 @@ def format_bytes(bytes_size: int | float) -> str:
             return f'{bytes_size:.2f} {unit}'
         bytes_size /= 1024.0
     return f'{bytes_size:.2f} PB'
+
+
+def preview(
+    dataset: absorb.TableReference, offset: int | None, n_rows: int | None
+) -> None:
+    import polars as pl
+    import toolstr
+
+    if offset is None:
+        offset = 0
+    if n_rows is None:
+        n_rows = 10
+
+    pl.Config.set_tbl_hide_dataframe_shape(True)
+    pl.Config.set_tbl_rows(n_rows)
+
+    # load dataset preview
+    df = absorb.query(dataset).slice(offset).head(n_rows + 1)
+
+    # print number of rows in preview
+    dataset = absorb.Table.instantiate(dataset)
+    toolstr.print_text_box(dataset.full_name(), style='bold')
+
+    if len(df) > n_rows:
+        if offset > 0:
+            print(n_rows, 'rows starting from offset', offset)
+        else:
+            print('first', n_rows, 'rows:')
+
+    # print dataset preview
+    print(df.head(n_rows))
+
+    # print total number of rows
+    dataset_n_rows = absorb.ops.scan(dataset).select(pl.len()).collect().item()
+    print(dataset_n_rows, 'rows,', len(df.columns), 'columns')

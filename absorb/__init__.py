@@ -4,11 +4,14 @@ from .errors import *
 from .table import Table
 from . import ops
 from .ops import (
+    add,
     get_available_range,
     get_collected_range,
     get_collected_tables,
     get_schema,
+    preview,
     query,
+    remove,
     sql_query,
 )
 
