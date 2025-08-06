@@ -93,11 +93,30 @@ def _query_lazy(
         return io.scan(table, scan_kwargs=scan_kwargs)
 
 
+@typing.overload
 def sql_query(
     sql: str,
     *,
     backend: typing.Literal['absorb', 'dune', 'snowflake'] = 'absorb',
-) -> pl.LazyFrame:
+    lazy: typing.Literal[False] = False,
+) -> pl.LazyFrame: ...
+
+
+@typing.overload
+def sql_query(
+    sql: str,
+    *,
+    backend: typing.Literal['absorb', 'dune', 'snowflake'] = 'absorb',
+    lazy: typing.Literal[True],
+) -> pl.DataFrame: ...
+
+
+def sql_query(
+    sql: str,
+    *,
+    backend: typing.Literal['absorb', 'dune', 'snowflake'] = 'absorb',
+    lazy: bool = False,
+) -> pl.DataFrame | pl.LazyFrame:
     if backend == 'absorb':
         # create table context
         context = create_sql_context()
@@ -107,15 +126,27 @@ def sql_query(
             if '.' in table and table in sql:
                 sql = sql.replace(table, '"' + table + '"')
 
-        return context.execute(sql)  # type: ignore
+        lf: pl.LazyFrame = context.execute(sql)  # type: ignore
+        if lazy:
+            return lf
+        else:
+            return lf.collect()
     elif backend == 'dune':
         import spice
 
-        return spice.query(sql).lazy()
+        df = spice.query(sql)
+        if lazy:
+            return df.lazy()
+        else:
+            return df
     elif backend == 'snowflake':
         import garlic
 
-        return garlic.query(sql).lazy()
+        df = garlic.query(sql)
+        if lazy:
+            return df.lazy()
+        else:
+            return df
     else:
         raise Exception('invalid backend: ' + backend)
 

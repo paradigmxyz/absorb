@@ -84,7 +84,7 @@ def scan_bucket(
 #
 
 
-def upload_table(
+def upload(
     table: absorb.TableReference,
     bucket: absorb.Bucket | None = None,
     verbose: bool = True,
@@ -117,7 +117,7 @@ def upload_table(
     )
 
 
-def download_table(
+def download(
     table: absorb.TableReference,
     bucket: absorb.Bucket | None = None,
 ) -> None:
