@@ -2,9 +2,9 @@
 
 # absorb 🧽🫧🫧
 
-*the sovereign dataset manager*
+***this is a beta release***
 
-`absorb` makes it easy to 1) collect, 2) query, 3) manage, and 4) customize datasets from nearly any data source
+`absorb` makes it easy to 1) collect, 2) manage, 3) query, and 4) customize datasets from nearly any data source
 
 ## Features
 - **limitless dataset library**: access to millions of datasets across 20+ diverse data sources
@@ -68,22 +68,16 @@ absorb upload custom_dataset
 import absorb
 
 # collect dataset and save as local files
-absorb.collect('kalshi')
-
-# list datasets that are collected or available
-datasets = absorb.list()
+absorb.collect('kalshi.daily_metrics')
 
 # get schemas of dataset
-schema = absorb.schema('kalshi')
+schema = absorb.get_schema('kalshi.daily_metrics')
 
-# load dataset as polars DataFrame
-df = absorb.load('kalshi')
+# query dataset eagerly, as polars DataFrame
+df = absorb.query('kalshi.daily_metrics')
 
-# scan dataset as polars LazyFrame
-lf = absorb.scan('kalshi')
-
-# create new custom dataset
-absorb.new('custom_dataset')
+# query dataset lazily, as polars LazyFrame
+lf = absorb.query('kalshi.daily_metrics', lazy=True)
 
 # upload custom dataset
 absorb.upload('custom_dataset')
@@ -91,6 +85,8 @@ absorb.upload('custom_dataset')
 
 
 ## Supported Data Sources
+
+🚧 under construction 🚧
 
 `absorb` collects data from each of these sources:
 
@@ -119,12 +115,12 @@ absorb.upload('custom_dataset')
 
 To list all available datasets and data sources, type `absorb ls` on the command line.
 
+To display information about the schema and other metadata of a dataset, type `absorb help <DATASET>` on the command line.
+
 
 ## Output Format
 
-To display information about the schema and other metadata of a dataset, type `absorb help <DATASET>` on the command line.
-
-`absorb` stores each dataset as a collection of parquet files.
+`absorb` uses the filesystem as its database. Each dataset is stored as a collection of parquet files, either on local disk or in the cloud.
 
 Datasets can be stored in any location on your disks, and absorb will use symlinks to organize those files in the `ABSORB_ROOT` tree.
 
@@ -151,7 +147,15 @@ Schema of `absorb_config.json`:
 
 ```python
 {
-    'tracked_tables': list[TableDict]
+    'version': str,
+    'tracked_tables': list[TableDict],
+    'use_git': bool,
+    'default_bucket': {
+        'rclone_remote': str | None,
+        'bucket_name': str | None,
+        'path_prefix': str | None,
+        'provider': str | None,
+    },
 }
 ```
 
@@ -159,9 +163,10 @@ schema of `dataset_config.json`:
 
 ```python
 {
-    "name": str,
-    "definition": str,
-    "parameters": dict[str, Any],
-    "repos": [str]
+    'source_name': str,
+    'table_name': str,
+    'table_class': str,
+    'parameters': dict[str, JSONValue],
+    'table_version': str,
 }
 ```
