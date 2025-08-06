@@ -54,10 +54,13 @@ def get_subcommands() -> list[
                     },
                 ),
                 (
-                    ['--verbose', '-v'],
+                    ['-v', '--verbose'],
                     {
-                        'action': 'store_true',
-                        'help': 'show verbose details',
+                        'help': 'display extra information',
+                        'nargs': '?',
+                        'const': 1,
+                        'default': 0,
+                        'type': int,
                     },
                 ),
             ],

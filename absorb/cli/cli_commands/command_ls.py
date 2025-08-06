@@ -53,7 +53,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
                         for cls in table_classes
                     ]
 
-                    if not args.verbose:
+                    if args.verbose >= 1:
                         max_width = os.get_terminal_size().columns
                         without_formatting = (
                             '- ' + source + ': ' + ', '.join(names)
@@ -116,7 +116,7 @@ def ls_command(args: Namespace) -> dict[str, Any]:
 
 def _print_tracked_datasets(
     tracked_datasets: list[absorb.TableDict],
-    verbose: bool = False,
+    verbose: int = 1,
     one_per_line: bool = False,
 ) -> None:
     cli_outputs._print_title(
@@ -134,7 +134,7 @@ def _print_untracked_datasets(
     tracked_datasets: list[absorb.TableDict],
     source: str | None = None,
     skip_line: bool = False,
-    verbose: bool = False,
+    verbose: int = 1,
     one_per_line: bool = False,
 ) -> None:
     untracked_collected_datasets = absorb.ops.get_untracked_collected_tables(
@@ -168,11 +168,11 @@ def _print_untracked_datasets(
 
 
 def _print_datasets(
-    datasets: list[absorb.TableDict], verbose: bool, one_per_line: bool
+    datasets: list[absorb.TableDict], verbose: int, one_per_line: bool
 ) -> None:
     import toolstr
 
-    if verbose:
+    if verbose >= 1:
         _print_datasets_verbose(datasets)
     elif one_per_line:
         for dataset in datasets:
