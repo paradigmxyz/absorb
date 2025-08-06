@@ -137,3 +137,89 @@ def preview(
     # print total number of rows
     dataset_n_rows = absorb.ops.scan(dataset).select(pl.len()).collect().item()
     print(dataset_n_rows, 'rows,', len(df.columns), 'columns')
+
+
+def print_table_info(
+    table: absorb.Table, verbose: bool
+) -> dict[str, typing.Any]:
+    import os
+    import toolstr
+
+    schema = table.get_schema()
+
+    toolstr.print_text_box(
+        'Table = ' + table.name(),
+        style='green',
+        text_style='bold white',
+    )
+
+    for attr in [
+        'description',
+        'url',
+        'source',
+        'write_range',
+    ]:
+        if hasattr(table, attr):
+            value = getattr(table, attr)
+        else:
+            value = None
+        absorb.ops.print_bullet(key=attr, value=value)
+    absorb.ops.print_bullet(key='chunk_size', value=str(table.get_chunk_size()))
+
+    # parameters
+    print()
+    toolstr.print('[green bold]parameters[/green bold]')
+    if table.parameters is None or len(table.parameter_types) == 0:
+        print('- [none]')
+    else:
+        for key, value in table.parameter_types.items():
+            if key in table.default_parameters:
+                default = (
+                    ' \\[default = ' + str(table.default_parameters[key]) + ']'
+                )
+            else:
+                default = ''
+            absorb.ops.print_bullet(key=key, value=str(value) + default)
+
+    # schema
+    print()
+    toolstr.print('[green bold]schema[/green bold]')
+    for key, value in schema.items():
+        absorb.ops.print_bullet(key=key, value=str(value))
+
+    # collection status
+    print()
+    toolstr.print('[green bold]status[/green bold]')
+    if not table.is_collected():
+        print('- [not collected]')
+    else:
+        # print available range
+        if verbose:
+            available_range = table.get_available_range()
+            if available_range is not None:
+                formatted_available_range = absorb.ops.format_coverage(
+                    available_range, table.get_chunk_size()
+                )
+            else:
+                formatted_available_range = 'not available'
+            absorb.ops.print_bullet(
+                key='available range',
+                value=formatted_available_range,
+            )
+
+        # print collected range
+        collected_range = table.get_collected_range()
+        absorb.ops.print_bullet(
+            key='collected range',
+            value=absorb.ops.format_coverage(
+                collected_range, table.get_chunk_size()
+            ),
+        )
+
+        # print path and collected size
+        path = table.get_table_dir()
+        bytes_str = absorb.ops.format_bytes(absorb.ops.get_dir_size(path))
+        absorb.ops.print_bullet(key='path', value=path)
+        absorb.ops.print_bullet(key='size', value=bytes_str)
+
+    return {}

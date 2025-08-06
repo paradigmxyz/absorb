@@ -10,6 +10,7 @@ from .ops import (
     get_collected_tables,
     get_schema,
     preview,
+    print_table_info,
     query,
     remove,
     sql_query,

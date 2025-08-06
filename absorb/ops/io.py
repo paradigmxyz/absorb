@@ -87,3 +87,30 @@ def delete_table_data(table: absorb.Table, confirm: bool = False) -> None:
     data_glob = table.get_data_glob()
     for path in glob.glob(data_glob):
         os.remove(path)
+
+
+def get_dir_size(path: str) -> int:
+    import platform
+    import subprocess
+
+    system = platform.system()
+
+    if system == 'Linux':
+        # Linux has -b flag for bytes
+        result = subprocess.run(
+            ['du', '-sb', path], capture_output=True, text=True, check=True
+        )
+        return int(result.stdout.strip().split('\t')[0])
+
+    elif system == 'Darwin':  # macOS
+        # macOS outputs in 512-byte blocks
+        result = subprocess.run(
+            ['du', '-s', path], capture_output=True, text=True, check=True
+        )
+        blocks = int(result.stdout.strip().split('\t')[0])
+        return blocks * 512
+
+    else:
+        raise NotImplementedError(
+            'Unsupported operating system for get_dir_size'
+        )
