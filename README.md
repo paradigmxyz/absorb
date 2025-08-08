@@ -2,9 +2,9 @@
 
 # absorb 🧽🫧🫧
 
-***this is a beta release***
-
 `absorb` makes it easy to 1) collect, 2) manage, 3) query, and 4) customize datasets from nearly any data source
+
+🚧 ***this is a preview release of beta software, and it is still under active development*** 🚧
 
 ## Features
 - **limitless dataset library**: access to millions of datasets across 20+ diverse data sources
@@ -68,19 +68,19 @@ absorb upload custom_dataset
 import absorb
 
 # collect dataset and save as local files
-absorb.collect('kalshi.daily_metrics')
+absorb.collect('kalshi.metrics')
 
 # get schemas of dataset
-schema = absorb.get_schema('kalshi.daily_metrics')
+schema = absorb.get_schema('kalshi.metrics')
 
 # query dataset eagerly, as polars DataFrame
-df = absorb.query('kalshi.daily_metrics')
+df = absorb.query('kalshi.metrics')
 
 # query dataset lazily, as polars LazyFrame
-lf = absorb.query('kalshi.daily_metrics', lazy=True)
+lf = absorb.query('kalshi.metrics', lazy=True)
 
 # upload custom dataset
-absorb.upload('custom_dataset')
+absorb.upload('source.table')
 ```
 
 
