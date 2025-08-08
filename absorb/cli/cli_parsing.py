@@ -193,7 +193,7 @@ def get_subcommands() -> list[
                 (
                     ['--all'],
                     {
-                        'help': 'add all available datasets',
+                        'help': 'remove all available datasets',
                         'action': 'store_true',
                     },
                 ),
@@ -563,7 +563,7 @@ def get_subcommands() -> list[
         ),
         (
             'download',
-            'download datasets to a cloud bucket',
+            'download datasets from a cloud bucket',
             [
                 (
                     ['dataset'],
