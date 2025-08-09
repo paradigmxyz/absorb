@@ -6,6 +6,5 @@ todo/*
 *.parquet
 specific_tests
 
-uv.lock
 .python-version
 pytestdebug.log
