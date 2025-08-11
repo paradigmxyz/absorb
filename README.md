@@ -36,7 +36,7 @@ uv tool install paradigm_absorb[test,datasources,interactive]
 
 install from source
 ```bash
-git clone git@github.com:paradigmxyz/absorb.git
+git clone git@github.com:paradigmxyz/absorb.git && cd absorb
 uv tool install --editable .[test,datasources,interactive]
 ```
 
@@ -47,13 +47,16 @@ uv tool install --editable .[test,datasources,interactive]
 
 ```bash
 # collect dataset and save as local files
-absorb collect kalshi
+absorb collect kalshi.metrics
 
 # list datasets that are collected or available
 absorb ls
 
+# show info of dataset
+absorb info kalshi
+
 # show schemas of dataset
-absorb schema kalshi
+absorb info kalshi.metrics
 
 # create new custom dataset
 absorb new custom_dataset
