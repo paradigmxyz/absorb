@@ -93,13 +93,13 @@ def get_table_filename(
                 raise Exception('use chunk=None if glob=True')
             format_params['chunk'] = '*'
         else:
-            if chunk_size is None:
-                raise Exception(
-                    'chunk_size must be provided if {chunk} is in filename_template'
-                )
             if isinstance(chunk, str):
                 chunk_str = chunk
             else:
+                if chunk_size is None:
+                    raise Exception(
+                        'chunk_size must be provided if {chunk} is in filename_template'
+                    )
                 if chunk is None:
                     raise Exception('chunk cannot be None')
                 chunk_str = absorb.ops.format_chunk(chunk, chunk_size)
