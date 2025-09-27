@@ -108,7 +108,7 @@ class TableCoverage(table_io.TableIO):
         update_latency = datetime.timedelta(self.get_update_latency())
 
         # return whether now is past the last update time + min update_latency
-        return datetime.datetime.now() > last_update_time + update_latency
+        return datetime.datetime.now(tz=datetime.timezone.utc) > last_update_time + update_latency
 
     def get_last_update_time(self) -> datetime.datetime | None:
         """
