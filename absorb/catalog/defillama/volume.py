@@ -160,7 +160,7 @@ class ProtocolDexVolumes(absorb.Table):
                 dfs.append(df)
             except Exception:
                 print('could not collect', protocol)
-        return pl.concat(dfs)
+        return pl.concat(dfs).with_columns(pl.col.volume_usd.cast(pl.Float64))
 
 
 class ChainDexVolumes(absorb.Table):
@@ -197,7 +197,7 @@ class ChainDexVolumes(absorb.Table):
                 dfs.append(df)
             except Exception:
                 print('could not collect', chain)
-        return pl.concat(dfs)
+        return pl.concat(dfs).with_columns(pl.col.volume_usd.cast(pl.Float64))
 
 
 class ProtocolOptionsVolumes(absorb.Table):
@@ -233,7 +233,7 @@ class ProtocolOptionsVolumes(absorb.Table):
             print('[' + str(p) + ' / ' + str(len(protocols)) + ']', protocol)
             df = get_historical_options_volume_per_chain_of_protocol(protocol)
             dfs.append(df)
-        return pl.concat(dfs)
+        return pl.concat(dfs).with_columns(pl.col.volume_usd.cast(pl.Float64))
 
 
 class ChainOptionsVolumes(absorb.Table):
@@ -269,7 +269,7 @@ class ChainOptionsVolumes(absorb.Table):
             print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
             df = get_historical_options_volume_per_protocol_of_chain(chain)
             dfs.append(df)
-        return pl.concat(dfs)
+        return pl.concat(dfs).with_columns(pl.col.volume_usd.cast(pl.Float64))
 
 
 #
