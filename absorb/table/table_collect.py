@@ -296,7 +296,10 @@ class TableCollect(table_coverage.TableCoverage):
             + ' on disk, '
             + toolstr.format_nbytes(total_memory_bytes)
             + ' in memory ('
-            + toolstr.format(total_memory_bytes / total_disk_bytes, decimals=2)
+            + toolstr.format(
+                total_memory_bytes / total_disk_bytes
+                if total_disk_bytes > 0 else 0
+                , decimals=2)
             + 'x compression)',
             symbol_color=symbol_color,
         )
