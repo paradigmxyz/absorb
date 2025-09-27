@@ -54,6 +54,9 @@ class Metrics(absorb.Table):
                 2, pl.lit(None, dtype=pl.String).alias('old_ticker_name')
             )
         df = df.rename({'date': 'timestamp'})
+        df = df.with_columns(
+            pl.col.timestamp.str.to_datetime().dt.replace_time_zone('UTC')
+        )
 
         return df
 
@@ -79,21 +82,21 @@ class Metadata(absorb.Table):
 
         return {
             'series_ticker': pl.String,
-            'series_title': pl.String,
-            'total_series_volume': pl.Int64,
-            'total_volume': pl.Int64,
             'event_ticker': pl.String,
-            'event_subtitle': pl.String,
-            'event_title': pl.String,
+            'contract_ticker': pl.String,
             'category': pl.String,
-            'total_market_count': pl.Int64,
-            # 'product_metadata': pl.Struct,
-            # 'markets': pl.List,
-            'is_trending': pl.Boolean,
-            'is_new': pl.Boolean,
-            'is_closing': pl.Boolean,
-            'is_price_delta': pl.Boolean,
-            'search_score': pl.Int64,
+            'series_title': pl.String,
+            'event_title': pl.String,
+            'event_subtitle': pl.String,
+            'contract_title': pl.String,
+            'open_timestamp': pl.Datetime(time_unit='us', time_zone='UTC'),
+            'expected_expiration_timestamp': pl.Datetime(
+                time_unit='us', time_zone='UTC'
+            ),
+            'close_timestamp': pl.Datetime(time_unit='us', time_zone='UTC'),
+            'outcome': pl.String,
+            'total_series_volume': pl.Int64,
+            'total_event_volume': pl.Int64,
         }
 
     def collect_chunk(self, chunk: absorb.Chunk) -> absorb.ChunkResult | None:
@@ -131,8 +134,25 @@ class Metadata(absorb.Table):
                 for result in cursor_results
                 for item in result['current_page']
             )
-            .select(self.get_schema().keys())
-            .unique('series_ticker')
+            .unique('event_ticker')
+            .explode('markets')
+            .with_columns(pl.col.markets.struct.unnest())
+            .select(
+                series_ticker=pl.col.series_ticker,
+                event_ticker=pl.col.event_ticker,
+                contract_ticker=pl.col.ticker,
+                category=pl.col.category,
+                series_title=pl.col.series_title,
+                event_title=pl.col.event_title,
+                event_subtitle=pl.col.event_subtitle,
+                contract_title=pl.col.yes_subtitle,
+                open_timestamp=pl.col.open_ts.str.to_datetime(),
+                expected_expiration_timestamp=pl.col.expected_expiration_ts.str.to_datetime(),
+                close_timestamp=pl.col.close_ts.str.to_datetime(),
+                outcome=pl.col.result,
+                total_series_volume=pl.col.total_series_volume,
+                total_event_volume=pl.col.total_volume,
+            )
         )
 
     def get_available_range(self) -> absorb.Coverage:
@@ -164,3 +184,35 @@ def _find_last() -> datetime.datetime:
             return current
         current = current - datetime.timedelta(days=1)
     raise Exception()
+
+
+def get_series_data(series_ticker):
+    import requests
+
+    url_template = 'https://api.elections.kalshi.com/v1/series/{series_ticker}'
+    url = url_template.format(series_ticker=series_ticker)
+    response = requests.get(url)
+    return response.json()
+
+
+def get_event_data(event_ticker, series_ticker=None):
+    import requests
+
+    if series_ticker is None:
+        series_ticker = '-'.join(event_ticker.split('-')[:-1])
+
+    url_template = 'https://api.elections.kalshi.com/v1/series/{series_ticker}/events/{event_ticker}'
+    url = url_template.format(
+        series_ticker=series_ticker, event_ticker=event_ticker
+    )
+    response = requests.get(url)
+    return response.json()
+
+
+def get_events_of_series(series_ticker, page=1):
+    import requests
+
+    url_template = 'https://api.elections.kalshi.com/v1/events/?series_tickers={series_ticker}&single_event_per_series=false&page_size=100&page_number={page}'
+    url = url_template.format(series_ticker=series_ticker, page=page)
+    response = requests.get(url)
+    return response.json()
