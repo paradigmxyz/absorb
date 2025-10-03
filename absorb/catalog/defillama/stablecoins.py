@@ -176,7 +176,7 @@ def get_historical_stablecoins_of_chain(chain: str) -> pl.DataFrame:
         'chain': pl.String,
         'circulating_usd': pl.Float64,
         'minted_usd': pl.Float64,
-        'bridged_Usd': pl.Float64,
+        'bridged_usd': pl.Float64,
     }
     return pl.DataFrame(rows, schema=schema, orient='row').with_columns(
         (pl.col.timestamp.cast(float) * 1000000).cast(pl.Datetime('us', 'UTC'))
