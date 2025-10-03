@@ -116,7 +116,15 @@ class ChainFees(absorb.Table):
         print('collecting', len(chains), 'chains')
         for c, chain in enumerate(chains, start=1):
             print('[' + str(c) + ' / ' + str(len(chains)) + ']', chain)
-            df = get_historical_fees_per_protocol_of_chain(chain)
+            for i in range(3):
+                try:
+                    df = get_historical_fees_per_protocol_of_chain(chain)
+                    break
+                except Exception as e:
+                    continue
+            else:
+                print(f'Failed to fetch data for chain {chain}')
+                continue
             df = df.select(
                 'timestamp',
                 pl.lit(chain).alias('chain'),
